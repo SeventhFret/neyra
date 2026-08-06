@@ -346,11 +346,10 @@ export default function BranchesTab() {
         <div className="header-container">
           <h1>Branches</h1>
         </div>
-        <Group gap="xs" pb="xs" wrap="nowrap">
+        <Group gap="xs" pb="xs" wrap="nowrap" style={{ flex: "none" }}>
           <Badge
             size="lg"
             variant="light"
-            fullWidth
             radius="sm"
             leftSection={<IconGitBranch size={16} />}
           >

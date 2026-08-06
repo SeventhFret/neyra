@@ -31,6 +31,8 @@ pub fn run() {
             git::switch_branch,
             git::rebase,
             git::create_branch,
+            git::stage,
+            git::unstage,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
