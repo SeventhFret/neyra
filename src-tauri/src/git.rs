@@ -160,10 +160,10 @@ fn current_branch(root: &Path) -> Option<String> {
 }
 
 fn status(root: &Path) -> Result<Vec<StatusEntry>, String> {
-    let raw = git(
-        root,
-        &["status", "--porcelain", "-z", "--untracked-files=all"],
-    )?;
+    // No --untracked-files=all: listing every file inside an untracked
+    // directory is slow on large trees, and plain `git status` — what the
+    // Status tab shows — collapses them into the directory anyway.
+    let raw = git(root, &["status", "--porcelain", "-z"])?;
 
     // NUL-separated records of the form "XY path". Renames and copies are
     // followed by a second record holding the original path.
@@ -378,50 +378,46 @@ fn commits(root: &Path, limit: usize) -> Result<Vec<Commit>, String> {
 pub fn get_repo_data(launch_dir: State<LaunchDir>) -> Result<RepoData, String> {
     let root = repo_root(&launch_dir.0)?;
 
-    Ok(RepoData {
-        current_branch: current_branch(&root),
-        status: status(&root)?,
-        status_message: status_message(&root)?,
-        remotes: remotes(&root)?,
-        branches: branches(&root)?,
-        commits: commits(&root, LOG_LIMIT)?,
-        root: root.to_string_lossy().to_string(),
+    // Each collector spawns its own git process and none of them depend on the
+    // others, so they run concurrently. Sequentially this cost the sum of every
+    // scan; on a large repository the two `git status` runs dominate that sum.
+    std::thread::scope(|scope| {
+        let status_handle = scope.spawn(|| status(&root));
+        let message_handle = scope.spawn(|| status_message(&root));
+        let remotes_handle = scope.spawn(|| remotes(&root));
+        let branches_handle = scope.spawn(|| branches(&root));
+        let commits_handle = scope.spawn(|| commits(&root, LOG_LIMIT));
+        let current_handle = scope.spawn(|| current_branch(&root));
+
+        Ok(RepoData {
+            current_branch: current_handle
+                .join()
+                .map_err(|_| "reading the current branch panicked".to_string())?,
+            status: join_git(status_handle)?,
+            status_message: join_git(message_handle)?,
+            remotes: join_git(remotes_handle)?,
+            branches: join_git(branches_handle)?,
+            commits: join_git(commits_handle)?,
+            root: root.to_string_lossy().to_string(),
+        })
     })
+}
+
+/// Unwraps a scoped worker, turning a panic into an ordinary error.
+fn join_git<T>(handle: std::thread::ScopedJoinHandle<'_, Result<T, String>>) -> Result<T, String> {
+    handle
+        .join()
+        .map_err(|_| "a git command panicked".to_string())?
 }
 
 fn ref_exists(root: &Path, refname: &str) -> bool {
     git(root, &["show-ref", "--verify", "--quiet", refname]).is_ok()
 }
 
-/// Moves onto an existing branch with either `git switch` or `git checkout`.
+/// Switches to a branch that already exists locally — never creates one.
 ///
-/// For a remote branch such as `origin/foo` both forms get `--track`, which
-/// creates a local `foo` following it. Bare `git checkout origin/foo` would
-/// detach HEAD onto the remote-tracking ref instead, which is never what
-/// picking a branch from a list is meant to do. If a local branch of that name
-/// already exists, that one is used.
-fn move_to_branch(root: &Path, branch: &str, command: &str) -> Result<String, String> {
-    if ref_exists(root, &format!("refs/heads/{branch}")) {
-        return git_verbose(root, &[command, branch]);
-    }
-
-    if ref_exists(root, &format!("refs/remotes/{branch}")) {
-        let local = branch
-            .split_once('/')
-            .map(|(_, rest)| rest)
-            .unwrap_or(branch);
-
-        if ref_exists(root, &format!("refs/heads/{local}")) {
-            return git_verbose(root, &[command, local]);
-        }
-
-        return git_verbose(root, &[command, "--track", branch]);
-    }
-
-    Err(format!("There is no branch named {branch}"))
-}
-
-/// `git switch <branch>`.
+/// Given a remote name such as `origin/foo` this switches to a local `foo` if
+/// there is one, and otherwise says so rather than creating a tracking branch.
 #[tauri::command]
 pub fn switch_branch(branch: String, launch_dir: State<LaunchDir>) -> Result<String, String> {
     let branch = branch.trim().to_string();
@@ -430,29 +426,48 @@ pub fn switch_branch(branch: String, launch_dir: State<LaunchDir>) -> Result<Str
     }
 
     let root = repo_root(&launch_dir.0)?;
-    move_to_branch(&root, &branch, "switch")
+
+    if ref_exists(&root, &format!("refs/heads/{branch}")) {
+        return git_verbose(&root, &["switch", branch.as_str()]);
+    }
+
+    if ref_exists(&root, &format!("refs/remotes/{branch}")) {
+        let local = branch
+            .split_once('/')
+            .map(|(_, rest)| rest)
+            .unwrap_or(branch.as_str());
+
+        if ref_exists(&root, &format!("refs/heads/{local}")) {
+            return git_verbose(&root, &["switch", local]);
+        }
+
+        return Err(format!(
+            "{branch} has no local branch {local} to switch to — create it first"
+        ));
+    }
+
+    Err(format!("There is no branch named {branch}"))
 }
 
-/// `git checkout <branch>`.
+/// Replays the current branch onto `branch` — plain `git rebase <branch>`.
+/// Conflicts, `--continue` and `--abort` are left to the CLI.
 #[tauri::command]
-pub fn checkout_branch(branch: String, launch_dir: State<LaunchDir>) -> Result<String, String> {
+pub fn rebase(branch: String, launch_dir: State<LaunchDir>) -> Result<String, String> {
     let branch = branch.trim().to_string();
     if branch.is_empty() {
         return Err("No branch given".to_string());
     }
 
     let root = repo_root(&launch_dir.0)?;
-    move_to_branch(&root, &branch, "checkout")
+    git_verbose(&root, &["rebase", branch.as_str()])
 }
 
-/// Creates a branch and moves onto it: `git switch -c` by default, or
-/// `git checkout -b` when `checkout` is set. Branches from the current HEAD
-/// unless `start_point` names something else.
+/// Creates a branch and switches to it — `git switch -c`. Branches from the
+/// current HEAD unless `start_point` names something else.
 #[tauri::command]
 pub fn create_branch(
     name: String,
     start_point: Option<String>,
-    checkout: Option<bool>,
     launch_dir: State<LaunchDir>,
 ) -> Result<String, String> {
     let name = name.trim().to_string();
@@ -464,11 +479,7 @@ pub fn create_branch(
     let start_owned = start_point.unwrap_or_default();
     let start = start_owned.trim();
 
-    let mut args = if checkout.unwrap_or(false) {
-        vec!["checkout", "-b", name.as_str()]
-    } else {
-        vec!["switch", "-c", name.as_str()]
-    };
+    let mut args = vec!["switch", "-c", name.as_str()];
     if !start.is_empty() {
         args.push(start);
     }
