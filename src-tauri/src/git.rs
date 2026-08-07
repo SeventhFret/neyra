@@ -550,22 +550,43 @@ pub fn commit(
     let mut report = git_verbose(&root, &["commit", "-m", message.as_str()])?;
 
     if push.unwrap_or(false) {
-        let branch = current_branch(&root)
-            .ok_or("HEAD is detached, there is no current branch to push to")?;
-        let remote = remote.unwrap_or_else(|| "origin".to_string());
-
-        let mut args = vec!["push"];
-        if force_with_lease.unwrap_or(false) {
-            args.push("--force-with-lease");
-        }
-        args.push(remote.as_str());
-        args.push(branch.as_str());
-
         report.push('\n');
-        report.push_str(&git_verbose(&root, &args)?);
+        report.push_str(&push_current(&root, force_with_lease, remote)?);
     }
 
     Ok(report.trim().to_string())
+}
+
+/// Pushes the current branch to `remote`.
+fn push_current(
+    root: &Path,
+    force_with_lease: Option<bool>,
+    remote: Option<String>,
+) -> Result<String, String> {
+    let branch =
+        current_branch(root).ok_or("HEAD is detached, there is no current branch to push to")?;
+    let remote = remote.unwrap_or_else(|| "origin".to_string());
+
+    let mut args = vec!["push"];
+    if force_with_lease.unwrap_or(false) {
+        args.push("--force-with-lease");
+    }
+    args.push(remote.as_str());
+    args.push(branch.as_str());
+
+    git_verbose(root, &args)
+}
+
+/// Pushes the current branch without committing first — for getting a branch
+/// the working tree already matches onto the remote, such as after a reset.
+#[tauri::command(async)]
+pub fn push(
+    force_with_lease: Option<bool>,
+    remote: Option<String>,
+    launch_dir: State<LaunchDir>,
+) -> Result<String, String> {
+    let root = repo_root(&launch_dir.0)?;
+    push_current(&root, force_with_lease, remote)
 }
 
 /// Pulls `branch` (the current branch by default) from `remote`.
