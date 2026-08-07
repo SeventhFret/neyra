@@ -95,6 +95,12 @@ pub struct Commit {
     pub body: String,
 }
 
+/// Every command below is `#[tauri::command(async)]` rather than plain
+/// `#[tauri::command]`. The bodies stay synchronous — the attribute only moves
+/// them off the main thread, which the webview also runs on: a plain command
+/// blocks it for as long as git takes, so the frontend cannot paint and the
+/// buttons' loading spinners never appear before the call is already over.
+///
 /// Runs git once. Arguments are passed to the process directly, so no shell is
 /// involved and nothing needs quoting or escaping.
 ///
@@ -378,7 +384,7 @@ fn commits(root: &Path, limit: usize) -> Result<Vec<Commit>, String> {
     Ok(commits)
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn get_repo_data(launch_dir: State<LaunchDir>) -> Result<RepoData, String> {
     let root = repo_root(&launch_dir.0)?;
 
@@ -422,7 +428,7 @@ fn ref_exists(root: &Path, refname: &str) -> bool {
 ///
 /// Given a remote name such as `origin/foo` this switches to a local `foo` if
 /// there is one, and otherwise says so rather than creating a tracking branch.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn switch_branch(branch: String, launch_dir: State<LaunchDir>) -> Result<String, String> {
     let branch = branch.trim().to_string();
     if branch.is_empty() {
@@ -454,7 +460,7 @@ pub fn switch_branch(branch: String, launch_dir: State<LaunchDir>) -> Result<Str
 }
 
 /// Stages paths — `git add`. With no paths, stages everything (`git add --all`).
-#[tauri::command]
+#[tauri::command(async)]
 pub fn stage(paths: Option<Vec<String>>, launch_dir: State<LaunchDir>) -> Result<String, String> {
     let root = repo_root(&launch_dir.0)?;
     let paths = paths.unwrap_or_default();
@@ -471,7 +477,7 @@ pub fn stage(paths: Option<Vec<String>>, launch_dir: State<LaunchDir>) -> Result
 
 /// Unstages paths — `git restore --staged`, falling back to `git rm --cached`
 /// before the first commit, where there is no HEAD to restore the index from.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn unstage(paths: Vec<String>, launch_dir: State<LaunchDir>) -> Result<String, String> {
     if paths.is_empty() {
         return Err("No paths given".to_string());
@@ -491,7 +497,7 @@ pub fn unstage(paths: Vec<String>, launch_dir: State<LaunchDir>) -> Result<Strin
 
 /// Replays the current branch onto `branch` — plain `git rebase <branch>`.
 /// Conflicts, `--continue` and `--abort` are left to the CLI.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn rebase(branch: String, launch_dir: State<LaunchDir>) -> Result<String, String> {
     let branch = branch.trim().to_string();
     if branch.is_empty() {
@@ -504,7 +510,7 @@ pub fn rebase(branch: String, launch_dir: State<LaunchDir>) -> Result<String, St
 
 /// Creates a branch and switches to it — `git switch -c`. Branches from the
 /// current HEAD unless `start_point` names something else.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn create_branch(
     name: String,
     start_point: Option<String>,
@@ -528,7 +534,7 @@ pub fn create_branch(
 }
 
 /// Commits what is staged, optionally pushing the current branch afterwards.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn commit(
     message: String,
     push: Option<bool>,
@@ -563,7 +569,7 @@ pub fn commit(
 }
 
 /// Pulls `branch` (the current branch by default) from `remote`.
-#[tauri::command]
+#[tauri::command(async)]
 pub fn pull(
     rebase: Option<bool>,
     branch: Option<String>,
@@ -592,7 +598,91 @@ pub fn pull(
     git_verbose(&root, &args)
 }
 
-#[tauri::command]
+/// Checks a config name before it is passed to `git config`, which takes the
+/// name as a positional argument: a name starting with `-` would be read as an
+/// option instead. Names are `section.key`, so anything outside that shape is
+/// rejected rather than handed to git.
+///
+/// Values need no equivalent check — arguments reach the process directly, with
+/// no shell involved, and git treats everything after the name as data. A value
+/// with spaces, quotes, newlines or a leading `-` is stored verbatim.
+fn config_name(name: &str) -> Result<String, String> {
+    let name = name.trim();
+
+    if name.is_empty() {
+        return Err("No config name given".to_string());
+    }
+    if name.starts_with('-') || !name.contains('.') {
+        return Err(format!("{name} is not a section.key config name"));
+    }
+    if !name
+        .chars()
+        .all(|char| char.is_ascii_alphanumeric() || matches!(char, '.' | '-' | '_'))
+    {
+        return Err(format!("{name} is not a valid config name"));
+    }
+
+    Ok(name.to_string())
+}
+
+/// Reads a config value, e.g. `user.name` or `user.email`. `None` means the
+/// name is not set. Without `global` this is the value that actually applies to
+/// the repository, where a local setting overrides the global one.
+#[tauri::command(async)]
+pub fn get_config(
+    name: String,
+    global: Option<bool>,
+    launch_dir: State<LaunchDir>,
+) -> Result<Option<String>, String> {
+    let name = config_name(&name)?;
+    let root = repo_root(&launch_dir.0)?;
+
+    // An unset name normally exits 1 with no output, which would come back as a
+    // failure indistinguishable from a real error. `--default` makes git print
+    // an empty value and exit 0 instead.
+    let mut args = vec!["config", "--get", "--default", ""];
+    if global.unwrap_or(false) {
+        args.push("--global");
+    }
+    args.push(name.as_str());
+
+    let value = git(&root, &args)?;
+    let value = value.trim_end_matches('\n');
+
+    Ok(if value.is_empty() {
+        None
+    } else {
+        Some(value.to_string())
+    })
+}
+
+/// Writes a config value. Goes to the repository's own config unless `global`
+/// is set, in which case it goes to `~/.gitconfig`.
+#[tauri::command(async)]
+pub fn set_config(
+    name: String,
+    value: String,
+    global: Option<bool>,
+    launch_dir: State<LaunchDir>,
+) -> Result<(), String> {
+    let name = config_name(&name)?;
+    let root = repo_root(&launch_dir.0)?;
+
+    let mut args = vec!["config"];
+    if global.unwrap_or(false) {
+        args.push("--global");
+    }
+    // --replace-all so a name that already has several entries is left with the
+    // one value; plain `git config` refuses to write in that case.
+    args.push("--replace-all");
+    args.push(name.as_str());
+    args.push(value.as_str());
+
+    git(&root, &args)?;
+    Ok(())
+}
+
+#[tauri::command(async)]
 pub fn fetch(remote: Option<String>, launch_dir: State<LaunchDir>) -> Result<String, String> {
     let root = repo_root(&launch_dir.0)?;
     let remote = remote.unwrap_or_else(|| "origin".to_string());

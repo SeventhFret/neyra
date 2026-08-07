@@ -73,7 +73,7 @@ export default function CommitterTab() {
       const result = await invoke<string>("commit", {
         message: fullCommitMsg,
         push: pushToBranch,
-        force_with_lease: forceWithLease,
+        forceWithLease: forceWithLease,
       });
       await refresh();
       showSuccessNotification({
