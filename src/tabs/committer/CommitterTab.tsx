@@ -15,7 +15,11 @@ import { IconGitCommit } from "@tabler/icons-react";
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 import { useRepoData } from "../../stores";
-import { showErrorNotification, showSuccessNotification } from "../../utils";
+import {
+  showErrorNotification,
+  showSuccessNotification,
+  parseUrlFromCommitStatus,
+} from "../../utils";
 
 export default function CommitterTab() {
   const refresh = useRepoData((state) => state.refresh);
@@ -75,6 +79,7 @@ export default function CommitterTab() {
       showSuccessNotification({
         title: "Commit is successful",
         message: result,
+        prUrl: parseUrlFromCommitStatus(result),
       });
     } catch (error) {
       showErrorNotification({ title: "Failed to commit", message: error });

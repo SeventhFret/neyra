@@ -1,6 +1,11 @@
-import { Text } from "@mantine/core";
+import { Text, Button } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { IconCircleCheck, IconExclamationCircle } from "@tabler/icons-react";
+import {
+  IconCircleCheck,
+  IconExclamationCircle,
+  IconLink,
+} from "@tabler/icons-react";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 export interface GitNotification {
   title: string;
@@ -8,22 +13,41 @@ export interface GitNotification {
   message: unknown;
 }
 
+export interface GitNotificationSuccess extends GitNotification {
+  prUrl?: string;
+}
+
 /** Git output is multi-line and can be long, so keep its line breaks, wrap long
  *  paths, and scroll past the cap instead of growing the notification. */
-function gitOutput(message: unknown) {
+function gitOutput(message: unknown, prUrl?: string) {
   return (
-    <Text
-      size="sm"
-      ff="monospace"
-      style={{
-        maxHeight: "220px",
-        overflowY: "auto",
-        whiteSpace: "pre-wrap",
-        overflowWrap: "anywhere",
-      }}
-    >
-      {String(message)}
-    </Text>
+    <div>
+      <Text
+        size="sm"
+        ff="monospace"
+        style={{
+          maxHeight: "220px",
+          overflowY: "auto",
+          whiteSpace: "pre-wrap",
+          overflowWrap: "anywhere",
+        }}
+      >
+        {String(message)}
+      </Text>
+      {prUrl ? (
+        <Button
+          radius="md"
+          size="sm"
+          variant="light"
+          leftSection={<IconLink />}
+          onClick={async () => {
+            await openUrl(prUrl);
+          }}
+        >
+          Create PR/MR
+        </Button>
+      ) : null}
+    </div>
   );
 }
 
@@ -68,11 +92,15 @@ export function formatRelativeDate(iso: string): string {
   return date.toLocaleDateString();
 }
 
-export function showSuccessNotification({ title, message }: GitNotification) {
+export function showSuccessNotification({
+  title,
+  message,
+  prUrl = undefined,
+}: GitNotificationSuccess) {
   notifications.show({
     ...SHARED,
     title,
-    message: gitOutput(message),
+    message: gitOutput(message, prUrl),
     icon: <IconCircleCheck color="#37b24d" />,
   });
 }
@@ -87,3 +115,16 @@ export function showErrorNotification({ title, message }: GitNotification) {
     icon: <IconExclamationCircle color="#f03e3e" />,
   });
 }
+
+export const parseUrlFromCommitStatus = (msg: string) => {
+  const urlLines = msg
+    .split("\n")
+    .filter((line) => line.includes("remote: ") && line.includes("https://"));
+
+  if (urlLines.length == 0) {
+    return;
+  }
+  const urlLine = urlLines[0];
+
+  return urlLine.slice(urlLine.indexOf("https://")).trim();
+};
