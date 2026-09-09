@@ -1,0 +1,36 @@
+html {
+  scroll-behavior: smooth;
+  overflow: hidden;
+}
+
+body {
+  background-color: #1d1d1d;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  justify-content: center;
+  align-items: center;  
+}
+
+.header-container {
+  font-family: "Roboto Condensed";
+  display: flex;
+  flex-direction: column;
+  color: white;
+  width: 90%;
+}
+
+.header-container h1 {
+  letter-spacing: 2px;
+}
+
+.header-container p {
+  font-family: "Open Sans";
+  /* color: rgb(0, 177, 177); */
+  color: black;
+  font-weight: 600;
+  font-size: 20px;
+}
