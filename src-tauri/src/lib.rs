@@ -27,6 +27,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             git::get_repo_data,
             git::commit,
+            git::push,
             git::pull,
             git::fetch,
             git::switch_branch,

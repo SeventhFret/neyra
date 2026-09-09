@@ -1,5 +1,5 @@
-import { Tabs, Kbd, Group, CopyButton, ActionIcon } from "@mantine/core";
-import { useHotkeys } from "@mantine/hooks";
+import { Tabs, Kbd, Group, ActionIcon } from "@mantine/core";
+import { useClipboard, useHotkeys } from "@mantine/hooks";
 import { exit } from "@tauri-apps/plugin-process";
 import { useEffect, useState } from "react";
 import CommitterTab from "./tabs/committer/CommitterTab";
@@ -30,6 +30,10 @@ function App() {
   const refreshing = useRepoData((state) => state.isLoading);
   const refresh = useRepoData((state) => state.refresh);
   const currentBranch = useRepoData((state) => state.currentBranch);
+  // Replaces CopyButton, whose copied state lives inside its render prop and so
+  // could not be driven by the shortcut below.
+  const clipboard = useClipboard({ timeout: 1500 });
+  const copyBranch = () => clipboard.copy(currentBranch ?? "no branch");
 
   useEffect(() => {
     void refresh();
@@ -45,6 +49,7 @@ function App() {
       ["ctrl+D", () => setCurrentTab("files")],
       ["ctrl+K", () => setCurrentTab("config")],
       ["ctrl+R", () => void refresh()],
+      ["ctrl+alt+C", copyBranch],
       ["ctrl+Q", async () => await exit(0)],
     ],
     [],
@@ -65,8 +70,12 @@ function App() {
         // stretch it past the window and push content off the right edge.
         styles={{ panel: { minWidth: 0, overflow: "hidden" } }}
       >
+        {/* Every tab is out of the tab order — Mantine would otherwise leave
+            the active one tabbable, so tabbing through a form still passed
+            through the sidebar. The Ctrl shortcuts below each tab switch. */}
         <Tabs.List justify="center">
           <Tabs.Tab
+            tabIndex={-1}
             value="status"
             leftSection={<IconSubtitles />}
             rightSection={
@@ -78,6 +87,7 @@ function App() {
             Status
           </Tabs.Tab>
           <Tabs.Tab
+            tabIndex={-1}
             value="committer"
             leftSection={<IconGitCherryPick />}
             rightSection={
@@ -89,6 +99,7 @@ function App() {
             Committer
           </Tabs.Tab>
           <Tabs.Tab
+            tabIndex={-1}
             value="branches"
             leftSection={<IconGitBranch />}
             rightSection={
@@ -100,6 +111,7 @@ function App() {
             Branches
           </Tabs.Tab>
           <Tabs.Tab
+            tabIndex={-1}
             value="files"
             leftSection={<IconFolder />}
             rightSection={
@@ -111,6 +123,7 @@ function App() {
             Files
           </Tabs.Tab>
           <Tabs.Tab
+            tabIndex={-1}
             value="log"
             leftSection={<IconListDetails />}
             rightSection={
@@ -122,6 +135,7 @@ function App() {
             Log
           </Tabs.Tab>
           <Tabs.Tab
+            tabIndex={-1}
             value="config"
             leftSection={<IconSettings />}
             rightSection={
@@ -132,26 +146,28 @@ function App() {
           >
             Config
           </Tabs.Tab>
+          {/* Out of the tab order: these sit before every panel in the DOM, so
+              tabbing into a form used to cross all three first. Each one has a
+              shortcut instead. */}
           <Group mt="auto" px="xs" py="xs" justify="center">
             <ActionIcon
+              tabIndex={-1}
               loading={refreshing}
               size="lg"
               onClick={() => void refresh()}
             >
               <IconRefresh />
             </ActionIcon>
-            <CopyButton value={currentBranch ?? "no branch"}>
-              {({ copied, copy }) => (
-                <ActionIcon
-                  size="lg"
-                  color={copied ? "teal" : "blue"}
-                  onClick={copy}
-                >
-                  {copied ? <IconClipboardCheck /> : <IconClipboard />}
-                </ActionIcon>
-              )}
-            </CopyButton>
             <ActionIcon
+              tabIndex={-1}
+              size="lg"
+              color={clipboard.copied ? "teal" : "blue"}
+              onClick={copyBranch}
+            >
+              {clipboard.copied ? <IconClipboardCheck /> : <IconClipboard />}
+            </ActionIcon>
+            <ActionIcon
+              tabIndex={-1}
               size="lg"
               color="red"
               onClick={async () => {
