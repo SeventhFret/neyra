@@ -17,6 +17,7 @@ import {
   IconCloudDownload,
   IconCloudDown,
   IconGitBranch,
+  IconPlaylistX,
 } from "@tabler/icons-react";
 import { useRepoData } from "../../stores";
 
@@ -86,6 +87,7 @@ export default function StatusTab() {
       ],
       ["ctrl+F", handleFetch],
       ["ctrl+enter", handlePull],
+      ["ctrl+L", () => setPullOutput("")],
     ],
     [],
   );
@@ -222,6 +224,19 @@ export default function StatusTab() {
             </Button>
             <div>
               <Kbd size="sm">Ctrl</Kbd> + <Kbd size="sm">F</Kbd>
+            </div>
+            <Button
+              radius="lg"
+              size="lg"
+              variant="light"
+              color="gray.8"
+              leftSection={<IconPlaylistX />}
+              onClick={() => setPullOutput("")}
+            >
+              Clear output
+            </Button>
+            <div>
+              <Kbd size="sm">Ctrl</Kbd> + <Kbd size="sm">L</Kbd>
             </div>
           </Group>
         </Stack>
