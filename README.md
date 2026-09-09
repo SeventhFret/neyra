@@ -1,7 +1,5 @@
-# Tauri + React + Typescript
+# Neyra
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+**Stay productive in your developer universe.**
 
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+The developer facing productivity tool build for desktop.
