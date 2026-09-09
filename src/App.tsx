@@ -1,5 +1,6 @@
 import { Tabs, Kbd, Group, CopyButton, ActionIcon } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
+import { exit } from "@tauri-apps/plugin-process";
 import { useEffect, useState } from "react";
 import CommitterTab from "./tabs/committer/CommitterTab";
 import StatusTab from "./tabs/status/StatusTab";
@@ -12,6 +13,7 @@ import {
   IconClipboard,
   IconClipboardCheck,
   IconFolder,
+  IconDoorExit,
 } from "@tabler/icons-react";
 import { useRepoData } from "./stores";
 import "./App.css";
@@ -45,6 +47,7 @@ function App() {
           setRefreshing(false);
         },
       ],
+      ["ctrl+Q", async () => await exit(0)],
     ],
     [],
   );
@@ -120,7 +123,7 @@ function App() {
           >
             Files
           </Tabs.Tab>
-          <Group mt="auto" px="xs" py="xs">
+          <Group mt="auto" px="xs" py="xs" justify="center">
             <ActionIcon
               loading={refreshing}
               size="lg"
@@ -143,6 +146,15 @@ function App() {
                 </ActionIcon>
               )}
             </CopyButton>
+            <ActionIcon
+              size="lg"
+              color="red"
+              onClick={async () => {
+                await exit(0);
+              }}
+            >
+              <IconDoorExit />
+            </ActionIcon>
           </Group>
         </Tabs.List>
         <Tabs.Panel value="status">

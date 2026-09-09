@@ -21,6 +21,7 @@ pub fn run() {
     let launch_dir = env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_opener::init())
         .manage(git::LaunchDir(launch_dir))
         .invoke_handler(tauri::generate_handler![

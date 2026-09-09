@@ -259,7 +259,7 @@ export default function FilesTab() {
         </Group>
       </Group>
 
-      <Group gap="sm" align="flex-end">
+      <Group gap="sm" align="center">
         <TextInput
           radius="lg"
           ref={filterInputRef}
