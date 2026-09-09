@@ -8,7 +8,6 @@ import {
   Stack,
   Text,
   TextInput,
-  Tooltip,
 } from "@mantine/core";
 import { getHotkeyHandler, useHotkeys } from "@mantine/hooks";
 import {
@@ -20,7 +19,7 @@ import {
   IconSearch,
 } from "@tabler/icons-react";
 import { invoke } from "@tauri-apps/api/core";
-import { useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { useRepoData, type Branch } from "../../stores";
 import {
   formatRelativeDate,
@@ -29,18 +28,23 @@ import {
 } from "../../utils";
 import classes from "./BranchesTab.module.css";
 
-function BranchRow({
+/** Memoised: a repo with hundreds of branches re-renders this list on every
+ *  keystroke in the filter box otherwise. Props are primitives and stable
+ *  callbacks so the comparison actually holds. */
+const BranchRow = memo(function BranchRow({
   branch,
-  busy,
-  onMove,
+  isBusy,
+  otherIsBusy,
+  canSwitch,
+  onAction,
 }: {
   branch: Branch;
-  busy: string | null;
-  onMove: (name: string, command: "switch" | "checkout") => void;
+  isBusy: boolean;
+  otherIsBusy: boolean;
+  /** False for a remote branch with no local counterpart to switch to. */
+  canSwitch: boolean;
+  onAction: (name: string, command: "switch" | "rebase") => void;
 }) {
-  const isBusy = busy === branch.name;
-  const otherIsBusy = busy !== null && !isBusy;
-
   return (
     <div
       className={`${classes.row} ${branch.isCurrent ? classes.current : ""}`}
@@ -62,18 +66,19 @@ function BranchRow({
 
       <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
         <Group gap="xs" wrap="nowrap">
-          {/* Long names truncate rather than widen the row past the window. */}
-          <Tooltip label={branch.name} withArrow openDelay={400}>
-            <Text
-              fw={600}
-              ff="monospace"
-              c="#e4e4e7"
-              truncate
-              style={{ minWidth: 0 }}
-            >
-              {branch.name}
-            </Text>
-          </Tooltip>
+          {/* Native title rather than Mantine Tooltip throughout the row: each
+              Tooltip mounts a floating-ui popover, and six per row across
+              hundreds of branches is what made this list crawl. */}
+          <Text
+            fw={600}
+            ff="monospace"
+            c="#e4e4e7"
+            truncate
+            title={branch.name}
+            style={{ minWidth: 0 }}
+          >
+            {branch.name}
+          </Text>
 
           {branch.isCurrent && (
             <Badge size="xs" radius="sm" variant="light">
@@ -83,48 +88,41 @@ function BranchRow({
 
           {/* Ahead and behind are relative to the tracked upstream. */}
           {branch.ahead > 0 && (
-            <Tooltip
-              label={`${branch.ahead} commit(s) not pushed to ${branch.upstream}`}
-              withArrow
+            <Badge
+              size="xs"
+              radius="sm"
+              variant="light"
+              color="teal"
+              leftSection={<IconArrowUp size={10} />}
+              title={`${branch.ahead} commit(s) not pushed to ${branch.upstream}`}
             >
-              <Badge
-                size="xs"
-                radius="sm"
-                variant="light"
-                color="teal"
-                leftSection={<IconArrowUp size={10} />}
-              >
-                {branch.ahead}
-              </Badge>
-            </Tooltip>
+              {branch.ahead}
+            </Badge>
           )}
 
           {branch.behind > 0 && (
-            <Tooltip
-              label={`${branch.behind} commit(s) on ${branch.upstream} not pulled`}
-              withArrow
+            <Badge
+              size="xs"
+              radius="sm"
+              variant="light"
+              color="orange"
+              leftSection={<IconArrowDown size={10} />}
+              title={`${branch.behind} commit(s) on ${branch.upstream} not pulled`}
             >
-              <Badge
-                size="xs"
-                radius="sm"
-                variant="light"
-                color="orange"
-                leftSection={<IconArrowDown size={10} />}
-              >
-                {branch.behind}
-              </Badge>
-            </Tooltip>
+              {branch.behind}
+            </Badge>
           )}
 
           {branch.upstreamGone && (
-            <Tooltip
-              label={`${branch.upstream} no longer exists on the remote`}
-              withArrow
+            <Badge
+              size="xs"
+              radius="sm"
+              variant="light"
+              color="red"
+              title={`${branch.upstream} no longer exists on the remote`}
             >
-              <Badge size="xs" radius="sm" variant="light" color="red">
-                gone
-              </Badge>
-            </Tooltip>
+              gone
+            </Badge>
           )}
         </Group>
 
@@ -143,61 +141,51 @@ function BranchRow({
 
       {!branch.isCurrent && (
         <Group gap={6} wrap="nowrap" className={classes.action}>
-          <Tooltip
-            label={
-              branch.isRemote
-                ? `git switch --track ${branch.name}`
-                : `git switch ${branch.name}`
+          <Button
+            size="xs"
+            radius="md"
+            variant="light"
+            loading={isBusy}
+            disabled={otherIsBusy || !canSwitch}
+            title={
+              canSwitch
+                ? `git switch ${branch.name}`
+                : `no local branch to switch to — fetch or create it first`
             }
-            withArrow
+            onClick={() => onAction(branch.name, "switch")}
           >
-            <Button
-              size="xs"
-              radius="md"
-              variant="light"
-              loading={isBusy}
-              disabled={otherIsBusy}
-              onClick={() => onMove(branch.name, "switch")}
-            >
-              Switch
-            </Button>
-          </Tooltip>
-          <Tooltip
-            label={
-              branch.isRemote
-                ? `git checkout --track ${branch.name}`
-                : `git checkout ${branch.name}`
-            }
-            withArrow
+            Switch
+          </Button>
+          <Button
+            size="xs"
+            radius="md"
+            variant="subtle"
+            color="orange"
+            loading={isBusy}
+            disabled={otherIsBusy}
+            title={`git rebase ${branch.name} — replays the current branch onto this one`}
+            onClick={() => onAction(branch.name, "rebase")}
           >
-            <Button
-              size="xs"
-              radius="md"
-              variant="subtle"
-              color="gray"
-              loading={isBusy}
-              disabled={otherIsBusy}
-              onClick={() => onMove(branch.name, "checkout")}
-            >
-              Checkout
-            </Button>
-          </Tooltip>
+            Rebase
+          </Button>
         </Group>
       )}
     </div>
   );
-}
+});
 
 function BranchSection({
   label,
   branches,
   busy,
-  onMove,
+  localNames,
+  onAction,
 }: {
   label: string;
   branches: Branch[];
   busy: string | null;
-  onMove: (name: string, command: "switch" | "checkout") => void;
+  localNames: Set<string>;
+  onAction: (name: string, command: "switch" | "rebase") => void;
 }) {
   if (branches.length === 0) {
     return null;
@@ -221,8 +209,13 @@ function BranchSection({
           <BranchRow
             key={branch.name}
             branch={branch}
-            busy={busy}
-            onMove={onMove}
+            isBusy={busy === branch.name}
+            otherIsBusy={busy !== null && busy !== branch.name}
+            canSwitch={
+              !branch.isRemote ||
+              localNames.has(branch.name.split("/").slice(1).join("/"))
+            }
+            onAction={onAction}
           />
         ))}
       </Paper>
@@ -261,7 +254,7 @@ export default function BranchesTab() {
   /** Name of the branch being switched to, or "" while creating one. */
   const [busy, setBusy] = useState<string | null>(null);
 
-  const { local, remote } = useMemo(() => {
+  const { local, remote, localNames } = useMemo(() => {
     const query = filter.trim().toLowerCase();
     const matching = query
       ? branches.filter((branch) => branch.name.toLowerCase().includes(query))
@@ -270,43 +263,67 @@ export default function BranchesTab() {
     return {
       local: matching.filter((branch) => !branch.isRemote),
       remote: matching.filter((branch) => branch.isRemote),
+      // Every local branch, not just the filtered ones: a remote row needs to
+      // know whether its local counterpart exists regardless of the filter.
+      localNames: new Set(
+        branches.filter((branch) => !branch.isRemote).map((b) => b.name),
+      ),
     };
   }, [branches, filter]);
 
-  const handleMove = async (name: string, command: "switch" | "checkout") => {
-    if (busy !== null) {
-      return;
-    }
-
+  // Kept out of the busy state so the callback identity survives a re-render
+  // and the memoised rows are not thrown away on every keystroke.
+  const busyRef = useRef<string | null>(null);
+  const startWork = (name: string) => {
+    busyRef.current = name;
     setBusy(name);
-    try {
-      const result = await invoke<string>(`${command}_branch`, {
-        branch: name,
-      });
-      await refresh();
-      showSuccessNotification({
-        title: `${command === "switch" ? "Switched" : "Checked out"} ${name}`,
-        message: result,
-      });
-    } catch (error) {
-      showErrorNotification({
-        title: `Failed to ${command} ${name}`,
-        message: error,
-      });
-    } finally {
-      setBusy(null);
-    }
+  };
+  const finishWork = () => {
+    busyRef.current = null;
+    setBusy(null);
   };
 
-  const handleCreate = async (checkout: boolean) => {
+  const handleAction = useCallback(
+    async (name: string, command: "switch" | "rebase") => {
+      if (busyRef.current !== null) {
+        return;
+      }
+
+      startWork(name);
+      try {
+        const result = await invoke<string>(
+          command === "switch" ? "switch_branch" : "rebase",
+          { branch: name },
+        );
+        await refresh();
+        showSuccessNotification({
+          title:
+            command === "switch"
+              ? `Switched to ${name}`
+              : `Rebased onto ${name}`,
+          message: result,
+        });
+      } catch (error) {
+        showErrorNotification({
+          title: `Failed to ${command} ${name}`,
+          message: error,
+        });
+      } finally {
+        finishWork();
+      }
+    },
+    [refresh],
+  );
+
+  const handleCreate = async () => {
     const name = newBranch.trim();
-    if (name.length === 0 || busy !== null) {
+    if (name.length === 0 || busyRef.current !== null) {
       return;
     }
 
-    setBusy("");
+    startWork("");
     try {
-      const result = await invoke<string>("create_branch", { name, checkout });
+      const result = await invoke<string>("create_branch", { name });
       await refresh();
       setNewBranch("");
       showSuccessNotification({
@@ -319,7 +336,7 @@ export default function BranchesTab() {
         message: error,
       });
     } finally {
-      setBusy(null);
+      finishWork();
     }
   };
 
@@ -352,7 +369,7 @@ export default function BranchesTab() {
           description="branches from the current HEAD"
           value={newBranch}
           onChange={(event) => setNewBranch(event.currentTarget.value)}
-          onKeyDown={getHotkeyHandler([["Enter", () => handleCreate(false)]])}
+          onKeyDown={getHotkeyHandler([["Enter", handleCreate]])}
           style={{ flex: 1, minWidth: 220 }}
         />
         <Button
@@ -360,19 +377,9 @@ export default function BranchesTab() {
           leftSection={<IconPlus size={16} />}
           loading={busy === ""}
           disabled={newBranch.trim().length === 0}
-          onClick={() => handleCreate(false)}
+          onClick={handleCreate}
         >
           Create &amp; switch
-        </Button>
-        <Button
-          radius="md"
-          variant="light"
-          leftSection={<IconPlus size={16} />}
-          loading={busy === ""}
-          disabled={newBranch.trim().length === 0}
-          onClick={() => handleCreate(true)}
-        >
-          Create &amp; checkout
         </Button>
         <TextInput
           radius="lg"
@@ -412,13 +419,15 @@ export default function BranchesTab() {
               label="Local"
               branches={local}
               busy={busy}
-              onMove={handleMove}
+              localNames={localNames}
+              onAction={handleAction}
             />
             <BranchSection
               label="Remote"
               branches={remote}
               busy={busy}
-              onMove={handleMove}
+              localNames={localNames}
+              onAction={handleAction}
             />
           </Stack>
         )}
