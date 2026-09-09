@@ -16,7 +16,8 @@ const RECORD_SEP: char = '\x1e';
 /// first *paragraph*, so a message with no blank line after the header comes
 /// back as one run-on subject with an empty body. We split on the first line
 /// instead, which is right whether or not the blank line is there.
-const LOG_FORMAT: &str = "%H%x1f%h%x1f%an%x1f%ae%x1f%aI%x1f%B%x1e";
+/// Includes `%d` to capture decorated refs (branches/tags this commit belongs to).
+const LOG_FORMAT: &str = "%H%x1f%h%x1f%an%x1f%ae%x1f%aI%x1f%d%x1f%B%x1e";
 
 /// `%(HEAD)` marks the checked out branch with `*`, and `%(upstream:track)`
 /// gives the `[ahead 1, behind 2]` summary parsed out below.
@@ -91,6 +92,8 @@ pub struct Commit {
     pub author_email: String,
     /// ISO 8601, straight from `%aI`.
     pub date: String,
+    /// Branch/ref this commit belongs to, e.g. "main", "origin/develop".
+    pub ref_name: Option<String>,
     pub subject: String,
     pub body: String,
 }
@@ -246,6 +249,52 @@ fn remotes(root: &Path) -> Result<Vec<Remote>, String> {
     Ok(remotes)
 }
 
+/// Parses git's decorated refs format from %d: "(HEAD -> main, feature, tag: v1.0)"
+/// Returns the first non-HEAD ref, or the current branch if that's all there is.
+/// Examples:
+///   "(HEAD -> main)" → Some("main")
+///   "(HEAD -> main, feature)" → Some("feature")
+///   "(feature)" → Some("feature")
+///   "" → None
+fn parse_decorated_refs(decorated: &str) -> Option<String> {
+    // Strip outer parentheses and whitespace
+    let inner = decorated.trim().trim_start_matches('(').trim_end_matches(')').trim();
+    
+    if inner.is_empty() {
+        return None;
+    }
+
+    // Split by commas and find the best ref to display
+    let refs: Vec<&str> = inner.split(',').map(|s| s.trim()).collect();
+    
+    // Prefer a regular branch ref over HEAD and tags
+    let selected_ref = refs.iter()
+        .find(|r| !r.starts_with("HEAD") && !r.starts_with("tag:"))
+        .copied()
+        .or_else(|| {
+            // Fall back to the HEAD -> branch_name entry
+            refs.iter()
+                .find(|r| r.contains("HEAD ->"))
+                .copied()
+        })
+        .or_else(|| refs.first().copied())
+        .unwrap_or("");
+
+    // Extract the actual branch name
+    let cleaned = selected_ref
+        .strip_prefix("HEAD -> ")
+        .unwrap_or(selected_ref)
+        .strip_prefix("tag: ")
+        .unwrap_or_else(|| selected_ref.strip_prefix("HEAD -> ").unwrap_or(selected_ref))
+        .trim();
+
+    if cleaned.is_empty() {
+        None
+    } else {
+        Some(cleaned.to_string())
+    }
+}
+
 /// Reads `[ahead 1, behind 2]`, `[gone]`, or an empty string into counts.
 fn parse_track(track: &str) -> (u32, u32, bool) {
     let inner = track.trim().trim_start_matches('[').trim_end_matches(']');
@@ -362,6 +411,7 @@ fn commits(root: &Path, limit: usize) -> Result<Vec<Commit>, String> {
         let author_name = next();
         let author_email = next();
         let date = next();
+        let decorated_refs = next();
 
         // First line is the header, everything after it is the body. Trimming
         // drops the blank separator line and git's trailing newline.
@@ -370,12 +420,17 @@ fn commits(root: &Path, limit: usize) -> Result<Vec<Commit>, String> {
         let subject = lines.next().unwrap_or_default().trim().to_string();
         let body = lines.next().unwrap_or_default().trim().to_string();
 
+        // Parse decorated_refs: git's %d format gives us "(HEAD -> main, feature)" or empty string.
+        // We want to extract the actual branch name, preferring non-HEAD refs.
+        let ref_name = parse_decorated_refs(&decorated_refs);
+
         commits.push(Commit {
             hash,
             short_hash,
             author_name,
             author_email,
             date,
+            ref_name,
             subject,
             body,
         });

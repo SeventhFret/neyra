@@ -19,8 +19,10 @@ pub fn run() {
     // Captured before anything can change the process cwd: the repo we operate
     // on is the one the shell command was run from.
     let launch_dir = env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+    // let launch_dir = PathBuf::from("/home/mmarchuk/projects/demo-git-repo");
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_opener::init())
         .manage(git::LaunchDir(launch_dir))
