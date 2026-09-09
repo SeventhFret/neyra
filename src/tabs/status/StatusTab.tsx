@@ -11,6 +11,7 @@ import {
   Stack,
 } from "@mantine/core";
 import { invoke } from "@tauri-apps/api/core";
+import SelectWithDescription from "../../components/SelectWithDescription";
 import { showSuccessNotification, showErrorNotification } from "../../utils";
 import { useHotkeys } from "@mantine/hooks";
 import {
@@ -173,14 +174,19 @@ export default function StatusTab() {
         </Paper>
         <Stack>
           <Group>
-            <Select
+            <SelectWithDescription
+              value={remote}
+              onChange={setRemote}
+              data={remotes.map((val) => ({
+                value: val.name,
+                label: val.name,
+                description: val.fetchUrl,
+              }))}
               placeholder={
                 remotes.length > 0 ? remotes[0].name : "No remote found"
               }
-              value={remote}
-              onChange={setRemote}
-              data={remotes.map((val) => val.name)}
             />
+            <Select />
             <Checkbox
               checked={rebase}
               onChange={(event) => setRebase(event.currentTarget.checked)}
