@@ -9,13 +9,11 @@ import {
   RenderTreeNodePayload,
   Tree,
   TreeNodeData,
-  UnstyledButton,
   ScrollArea,
   Button,
   useTree,
   ActionIcon,
   Box,
-  Anchor,
   Avatar,
 } from "@mantine/core";
 import { usePullRequestsData } from "../../stores";
@@ -26,19 +24,16 @@ import {
   IconChevronRight,
   IconArrowsMaximize,
   IconArrowsMinimize,
-  IconGitMerge,
   IconNumber,
   IconLink,
   IconGitBranch,
   IconArrowRight,
   IconCheck,
   IconX,
-  IconRotateClockwise,
   IconClockCheck,
-  IconClockPause,
-  IconClockPlay,
 } from "@tabler/icons-react";
-import { useEffect, useState, useMemo } from "react";
+import { openUrl } from "@tauri-apps/plugin-opener";
+import { useEffect, useMemo } from "react";
 
 type PrNode = Record<string, unknown>;
 
@@ -255,13 +250,20 @@ export default function PullRequestsTab() {
                             </Badge>
                           ) : null}
                         </Group>
-                        <ActionIcon color="transparent">
+                        <ActionIcon
+                          color="transparent"
+                          onClick={() => {
+                            openUrl(glSelectedPr?.web_url);
+                          }}
+                        >
                           <IconLink size={16} />
                         </ActionIcon>
                       </Group>
                       <Text fw={600}>{glSelectedPr.title}</Text>
                       <Text fw={400} c="dimmed">
-                        {glSelectedPr?.description?.length > 0 ? glSelectedPr?.description : "No description provided"}
+                        {glSelectedPr?.description?.length > 0
+                          ? glSelectedPr?.description
+                          : "No description provided"}
                       </Text>
                       <Group>
                         {/* Assignee */}
@@ -356,7 +358,7 @@ export default function PullRequestsTab() {
                       </Group>
                     </Stack>
                   ) : (
-                    <Text>Select MR/PR</Text>
+                    <Text c="dimmed">No merge or pull request selected</Text>
                   )}
                   <Text></Text>
                 </Paper>

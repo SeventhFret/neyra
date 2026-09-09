@@ -40,6 +40,8 @@ export interface Commit {
     date: string;
     subject: string;
     body: string;
+    /** Branch/ref this commit belongs to, e.g. "main", "origin/develop" */
+    refName: string | null;
 }
 
 export interface Branch {

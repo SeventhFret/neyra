@@ -88,6 +88,14 @@ function CommitRow({ commit }: { commit: Commit }) {
           )}
         </Group>
 
+        {commit.refName && (
+          <Group gap="xs">
+            <Badge size="sm" radius="sm" color="blue" variant="light" leftSection={<IconGitBranch size={12} />}>
+              {commit.refName}
+            </Badge>
+          </Group>
+        )}
+
         {commit.body.length > 0 && (
           <Text
             size="sm"
@@ -149,6 +157,8 @@ export default function LogTab() {
   const currentBranch = useRepoData((state) => state.currentBranch);
   const isLoading = useRepoData((state) => state.isLoading);
   const error = useRepoData((state) => state.error);
+
+  console.log(commits)
 
   // 100vh with the list scrolling inside it: the body has overflow hidden, so
   // the page itself must never grow past the window.

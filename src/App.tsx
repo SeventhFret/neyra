@@ -16,6 +16,7 @@ import {
   IconFolder,
   IconDoorExit,
   IconGitMerge,
+  IconMessageOff,
 } from "@tabler/icons-react";
 import { useRepoData } from "./stores";
 import "./App.css";
@@ -24,6 +25,7 @@ import BranchesTab from "./tabs/branches/BranchesTab";
 import FilesTab from "./tabs/files/FilesTab";
 import ConfigTab from "./tabs/config/ConfigTab";
 import PullRequestsTab from "./tabs/pull-requests/PullRequestsTab";
+import { notifications } from "@mantine/notifications";
 
 function App() {
   const [currentTab, setCurrentTab] = useState<string | null>("pull-requests");
@@ -53,6 +55,7 @@ function App() {
       ["ctrl+P", () => setCurrentTab("pull-requests")],
       ["ctrl+R", () => void refresh()],
       ["ctrl+alt+C", copyBranch],
+      ["ctrl+alt+L", () => notifications.clean()],
       ["ctrl+Q", async () => await exit(0)],
     ],
     [],
@@ -180,6 +183,15 @@ function App() {
               onClick={copyBranch}
             >
               {clipboard.copied ? <IconClipboardCheck /> : <IconClipboard />}
+            </ActionIcon>
+            <ActionIcon
+              tabIndex={-1}
+              size="lg"
+              onClick={() => {
+                notifications.clean();
+              }}
+            >
+              <IconMessageOff />
             </ActionIcon>
             <ActionIcon
               tabIndex={-1}
