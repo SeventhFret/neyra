@@ -10,6 +10,7 @@ import {
   IconListDetails,
   IconGitBranch,
   IconRefresh,
+  IconSettings,
   IconClipboard,
   IconClipboardCheck,
   IconFolder,
@@ -20,10 +21,13 @@ import "./App.css";
 import LogTab from "./tabs/log/LogTab";
 import BranchesTab from "./tabs/branches/BranchesTab";
 import FilesTab from "./tabs/files/FilesTab";
+import ConfigTab from "./tabs/config/ConfigTab";
 
 function App() {
   const [currentTab, setCurrentTab] = useState<string | null>("committer");
-  const [refreshing, setRefreshing] = useState(false);
+  // The store already tracks the refresh it is running; a second flag next to
+  // it only ever went true and false again inside the same handler.
+  const refreshing = useRepoData((state) => state.isLoading);
   const refresh = useRepoData((state) => state.refresh);
   const currentBranch = useRepoData((state) => state.currentBranch);
 
@@ -39,14 +43,8 @@ function App() {
       ["ctrl+B", () => setCurrentTab("branches")],
       ["ctrl+E", () => setCurrentTab("log")],
       ["ctrl+D", () => setCurrentTab("files")],
-      [
-        "ctrl+R",
-        () => {
-          setRefreshing(true);
-          refresh();
-          setRefreshing(false);
-        },
-      ],
+      ["ctrl+K", () => setCurrentTab("config")],
+      ["ctrl+R", () => void refresh()],
       ["ctrl+Q", async () => await exit(0)],
     ],
     [],
@@ -102,6 +100,17 @@ function App() {
             Branches
           </Tabs.Tab>
           <Tabs.Tab
+            value="files"
+            leftSection={<IconFolder />}
+            rightSection={
+              <div>
+                <Kbd size="xs">Ctrl</Kbd> + <Kbd size="xs">D</Kbd>
+              </div>
+            }
+          >
+            Files
+          </Tabs.Tab>
+          <Tabs.Tab
             value="log"
             leftSection={<IconListDetails />}
             rightSection={
@@ -113,25 +122,21 @@ function App() {
             Log
           </Tabs.Tab>
           <Tabs.Tab
-            value="files"
-            leftSection={<IconFolder />}
+            value="config"
+            leftSection={<IconSettings />}
             rightSection={
               <div>
-                <Kbd size="xs">Ctrl</Kbd> + <Kbd size="xs">D</Kbd>
+                <Kbd size="xs">Ctrl</Kbd> + <Kbd size="xs">K</Kbd>
               </div>
             }
           >
-            Files
+            Config
           </Tabs.Tab>
           <Group mt="auto" px="xs" py="xs" justify="center">
             <ActionIcon
               loading={refreshing}
               size="lg"
-              onClick={() => {
-                setRefreshing(true);
-                refresh();
-                setRefreshing(false);
-              }}
+              onClick={() => void refresh()}
             >
               <IconRefresh />
             </ActionIcon>
@@ -166,11 +171,14 @@ function App() {
         <Tabs.Panel value="branches">
           <BranchesTab />
         </Tabs.Panel>
+        <Tabs.Panel value="files">
+          <FilesTab />
+        </Tabs.Panel>
         <Tabs.Panel value="log">
           <LogTab />
         </Tabs.Panel>
-        <Tabs.Panel value="files">
-          <FilesTab />
+        <Tabs.Panel value="config">
+          <ConfigTab />
         </Tabs.Panel>
       </Tabs>
     </main>
