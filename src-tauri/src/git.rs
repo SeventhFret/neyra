@@ -160,10 +160,14 @@ fn current_branch(root: &Path) -> Option<String> {
 }
 
 fn status(root: &Path) -> Result<Vec<StatusEntry>, String> {
-    // No --untracked-files=all: listing every file inside an untracked
-    // directory is slow on large trees, and plain `git status` — what the
-    // Status tab shows — collapses them into the directory anyway.
-    let raw = git(root, &["status", "--porcelain", "-z"])?;
+    // --untracked-files=all so the Files tree gets one entry per new file:
+    // without it git collapses an untracked directory into a single `dir/` row,
+    // which cannot be shown or staged file by file. Ignored files are still
+    // excluded, so this walks the working tree, not everything on disk.
+    let raw = git(
+        root,
+        &["status", "--porcelain", "-z", "--untracked-files=all"],
+    )?;
 
     // NUL-separated records of the form "XY path". Renames and copies are
     // followed by a second record holding the original path.
@@ -447,6 +451,42 @@ pub fn switch_branch(branch: String, launch_dir: State<LaunchDir>) -> Result<Str
     }
 
     Err(format!("There is no branch named {branch}"))
+}
+
+/// Stages paths — `git add`. With no paths, stages everything (`git add --all`).
+#[tauri::command]
+pub fn stage(paths: Option<Vec<String>>, launch_dir: State<LaunchDir>) -> Result<String, String> {
+    let root = repo_root(&launch_dir.0)?;
+    let paths = paths.unwrap_or_default();
+
+    if paths.is_empty() {
+        return git_verbose(&root, &["add", "--all"]);
+    }
+
+    // `--` keeps a path that looks like a flag from being read as one.
+    let mut args = vec!["add", "--"];
+    args.extend(paths.iter().map(String::as_str));
+    git_verbose(&root, &args)
+}
+
+/// Unstages paths — `git restore --staged`, falling back to `git rm --cached`
+/// before the first commit, where there is no HEAD to restore the index from.
+#[tauri::command]
+pub fn unstage(paths: Vec<String>, launch_dir: State<LaunchDir>) -> Result<String, String> {
+    if paths.is_empty() {
+        return Err("No paths given".to_string());
+    }
+
+    let root = repo_root(&launch_dir.0)?;
+    let has_head = git(&root, &["rev-parse", "--verify", "--quiet", "HEAD"]).is_ok();
+
+    let mut args = if has_head {
+        vec!["restore", "--staged", "--"]
+    } else {
+        vec!["rm", "--cached", "-r", "--"]
+    };
+    args.extend(paths.iter().map(String::as_str));
+    git_verbose(&root, &args)
 }
 
 /// Replays the current branch onto `branch` — plain `git rebase <branch>`.

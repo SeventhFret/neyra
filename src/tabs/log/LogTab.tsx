@@ -158,7 +158,7 @@ export default function LogTab() {
         <div className="header-container">
           <h1>Log</h1>
         </div>
-        <Group gap="xs" pb="xs">
+        <Group gap="xs" pb="xs" wrap="nowrap" style={{ flex: "none" }}>
           <Badge
             variant="light"
             radius="sm"

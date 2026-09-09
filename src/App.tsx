@@ -11,11 +11,13 @@ import {
   IconRefresh,
   IconClipboard,
   IconClipboardCheck,
+  IconFolder,
 } from "@tabler/icons-react";
 import { useRepoData } from "./stores";
 import "./App.css";
 import LogTab from "./tabs/log/LogTab";
 import BranchesTab from "./tabs/branches/BranchesTab";
+import FilesTab from "./tabs/files/FilesTab";
 
 function App() {
   const [currentTab, setCurrentTab] = useState<string | null>("committer");
@@ -34,6 +36,7 @@ function App() {
       ["ctrl+C", () => setCurrentTab("committer")],
       ["ctrl+B", () => setCurrentTab("branches")],
       ["ctrl+E", () => setCurrentTab("log")],
+      ["ctrl+D", () => setCurrentTab("files")],
       [
         "ctrl+R",
         () => {
@@ -106,6 +109,17 @@ function App() {
           >
             Log
           </Tabs.Tab>
+          <Tabs.Tab
+            value="files"
+            leftSection={<IconFolder />}
+            rightSection={
+              <div>
+                <Kbd size="xs">Ctrl</Kbd> + <Kbd size="xs">D</Kbd>
+              </div>
+            }
+          >
+            Files
+          </Tabs.Tab>
           <Group mt="auto" px="xs" py="xs">
             <ActionIcon
               loading={refreshing}
@@ -142,6 +156,9 @@ function App() {
         </Tabs.Panel>
         <Tabs.Panel value="log">
           <LogTab />
+        </Tabs.Panel>
+        <Tabs.Panel value="files">
+          <FilesTab />
         </Tabs.Panel>
       </Tabs>
     </main>
