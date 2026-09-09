@@ -1,5 +1,19 @@
 import { invoke } from '@tauri-apps/api/core'
 import { create } from 'zustand'
+import { buildQueryParams } from './utils'
+import { fetch } from '@tauri-apps/plugin-http';
+
+
+const GITLAB_API_BASE_URL = "https://gitlab.com/api/v4/"
+// const MR_QUERY = "merge_requests?state=opened&scope=created_by_me&created_after=2026-01-01T00:00:00Z&order_by=updated_at"
+
+const MR_QUERIES = {
+    state: "opened",
+    scope: "created_by_me",
+    updated_after: new Date(Date.now() - 180 * 864e5).toISOString(),
+    per_page: "100",
+    order_by: "updated_at"
+}
 
 export interface StatusEntry {
     /** Porcelain code for the index side, e.g. "M", "A", "?", " ". */
@@ -68,6 +82,18 @@ export interface GitRepoDataAction {
     refresh: () => Promise<void>;
 }
 
+
+type PrNode = Record<string, unknown>;
+export interface PRDataState {
+    glPullRequests: PrNode[],
+    glSelectedPr: PrNode
+}
+
+export interface PRDataAction {
+    getGlPullRequests: () => void;
+    selectGlPr: (pr: PrNode) => void;
+}
+
 export const useRepoData = create<GitRepoDataState & GitRepoDataAction>((set) => ({
     root: "",
     currentBranch: null,
@@ -87,5 +113,26 @@ export const useRepoData = create<GitRepoDataState & GitRepoDataAction>((set) =>
         } catch (error) {
             set({ error: String(error), isLoading: false })
         }
+    }
+}))
+
+
+export async function fetchMergeRequests() {
+    const fullUrl = GITLAB_API_BASE_URL + "merge_requests" + buildQueryParams(MR_QUERIES);
+    const res = await fetch(fullUrl, {
+        headers: { 'PRIVATE-TOKEN': import.meta.env.VITE_GITLAB_PERSONAL_TOKEN },
+    });
+    if (!res.ok) throw new Error(`GitLab ${res.status}: ${await res.text()}`);
+    return res.json();
+}
+
+export const usePullRequestsData = create<PRDataState & PRDataAction>((set) => ({
+    glPullRequests: [],
+    glSelectedPr: {},
+    selectGlPr: (pr) => {
+        set({ glSelectedPr: pr })
+    },
+    getGlPullRequests: async () => {
+        fetchMergeRequests().then((mrs) => set({ glPullRequests: mrs })).catch((err) => console.log(err))
     }
 }))

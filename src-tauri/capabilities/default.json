@@ -8,6 +8,13 @@
   "permissions": [
     "core:default",
     "opener:default",
-    "process:default"
+    "process:default",
+    {
+      "identifier": "http:default",
+      "allow": [
+        "https://gitlab.com/api/v4",
+        "https://api.github.com/"
+      ]
+    }
   ]
 }

@@ -15,6 +15,7 @@ import {
   IconClipboardCheck,
   IconFolder,
   IconDoorExit,
+  IconGitMerge,
 } from "@tabler/icons-react";
 import { useRepoData } from "./stores";
 import "./App.css";
@@ -22,9 +23,10 @@ import LogTab from "./tabs/log/LogTab";
 import BranchesTab from "./tabs/branches/BranchesTab";
 import FilesTab from "./tabs/files/FilesTab";
 import ConfigTab from "./tabs/config/ConfigTab";
+import PullRequestsTab from "./tabs/pull-requests/PullRequestsTab";
 
 function App() {
-  const [currentTab, setCurrentTab] = useState<string | null>("committer");
+  const [currentTab, setCurrentTab] = useState<string | null>("pull-requests");
   // The store already tracks the refresh it is running; a second flag next to
   // it only ever went true and false again inside the same handler.
   const refreshing = useRepoData((state) => state.isLoading);
@@ -48,6 +50,7 @@ function App() {
       ["ctrl+E", () => setCurrentTab("log")],
       ["ctrl+D", () => setCurrentTab("files")],
       ["ctrl+K", () => setCurrentTab("config")],
+      ["ctrl+P", () => setCurrentTab("pull-requests")],
       ["ctrl+R", () => void refresh()],
       ["ctrl+alt+C", copyBranch],
       ["ctrl+Q", async () => await exit(0)],
@@ -124,6 +127,18 @@ function App() {
           </Tabs.Tab>
           <Tabs.Tab
             tabIndex={-1}
+            value="pull-requests"
+            leftSection={<IconGitMerge />}
+            rightSection={
+              <div>
+                <Kbd size="xs">Ctrl</Kbd> + <Kbd size="xs">P</Kbd>
+              </div>
+            }
+          >
+            MR / PR
+          </Tabs.Tab>
+          <Tabs.Tab
+            tabIndex={-1}
             value="log"
             leftSection={<IconListDetails />}
             rightSection={
@@ -189,6 +204,9 @@ function App() {
         </Tabs.Panel>
         <Tabs.Panel value="files">
           <FilesTab />
+        </Tabs.Panel>
+        <Tabs.Panel value="pull-requests">
+          <PullRequestsTab />
         </Tabs.Panel>
         <Tabs.Panel value="log">
           <LogTab />
