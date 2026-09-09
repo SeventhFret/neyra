@@ -152,6 +152,7 @@ export default function CommitterTab() {
           })
         : await invoke<string>("push", { forceWithLease: forceWithLease });
       await refresh();
+      await resetFields();
       showSuccessNotification({
         title: performCommit ? "Commit is successful" : "Push is successful",
         message: result,
@@ -176,6 +177,14 @@ export default function CommitterTab() {
     ],
     [],
   );
+
+  const resetFields = async () => {
+    setCommitMsg("");
+    setCommitDescription("");
+    setCommitScope("");
+    setCommitSuffix("");
+    setCommitType("");
+  };
 
   return (
     // One width authority for the whole tab: every row below stretches to this

@@ -28,7 +28,7 @@ import PullRequestsTab from "./tabs/pull-requests/PullRequestsTab";
 import { notifications } from "@mantine/notifications";
 
 function App() {
-  const [currentTab, setCurrentTab] = useState<string | null>("pull-requests");
+  const [currentTab, setCurrentTab] = useState<string | null>("committer");
   // The store already tracks the refresh it is running; a second flag next to
   // it only ever went true and false again inside the same handler.
   const refreshing = useRepoData((state) => state.isLoading);

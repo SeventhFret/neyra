@@ -16,7 +16,7 @@ import {
   Box,
   Avatar,
 } from "@mantine/core";
-import { usePullRequestsData } from "../../stores";
+import { usePullRequestsData, type GitLabMergeRequest } from "../../stores";
 import {
   IconBrandGitlab,
   IconBrandGithub,
@@ -35,22 +35,20 @@ import {
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { useEffect, useMemo } from "react";
 
-type PrNode = Record<string, unknown>;
-
 type TreeNode =
   | { type: "group"; name: string; children: TreeNode[] }
-  | { type: "pr"; pr: PrNode };
+  | { type: "pr"; pr: GitLabMergeRequest };
 
 type PrTreeNode = TreeNodeData & {
-  pr?: PrNode;
+  pr?: GitLabMergeRequest;
   children?: PrTreeNode[];
 };
 
-const getClearPath = (prData: Record<string, any>) => {
-  return prData?.references?.full?.replace(prData?.reference, "");
+const getClearPath = (prData: GitLabMergeRequest) => {
+  return prData.references.full.replace(prData.reference, "");
 };
 
-function groupPrsByPath(prs: PrNode[]): PrTreeNode[] {
+function groupPrsByPath(prs: GitLabMergeRequest[]): PrTreeNode[] {
   const root: PrTreeNode[] = [];
 
   for (const pr of prs) {
@@ -89,7 +87,7 @@ function groupPrsByPath(prs: PrNode[]): PrTreeNode[] {
 }
 
 type PrTreeProps = {
-  prs: PrNode[];
+  prs: GitLabMergeRequest[];
 };
 
 export function PrTree({ prs }: PrTreeProps) {
@@ -134,7 +132,7 @@ function TreeNode({
       <Button
         px="sm"
         justify="flex-start"
-        onClick={() => setSelectedGlPr(appNode?.pr)}
+        onClick={() => setSelectedGlPr(appNode.pr!)}
         py="6"
         fullWidth
         color="transparent"
@@ -142,7 +140,7 @@ function TreeNode({
         <Text
           {...elementProps}
           size="xs"
-          onClick={() => setSelectedGlPr(appNode?.pr)}
+          onClick={() => setSelectedGlPr(appNode.pr!)}
         >
           {appNode.pr.title}
         </Text>
@@ -227,8 +225,7 @@ export default function PullRequestsTab() {
                   flex={1}
                   radius="lg"
                 >
-                  {typeof glSelectedPr === "object" &&
-                  Object.keys(glSelectedPr).length > 0 ? (
+                  {glSelectedPr ? (
                     <Stack>
                       <Group w="100%">
                         <Group flex={1}>
@@ -253,7 +250,7 @@ export default function PullRequestsTab() {
                         <ActionIcon
                           color="transparent"
                           onClick={() => {
-                            openUrl(glSelectedPr?.web_url);
+                            openUrl(glSelectedPr.web_url);
                           }}
                         >
                           <IconLink size={16} />
@@ -261,8 +258,8 @@ export default function PullRequestsTab() {
                       </Group>
                       <Text fw={600}>{glSelectedPr.title}</Text>
                       <Text fw={400} c="dimmed">
-                        {glSelectedPr?.description?.length > 0
-                          ? glSelectedPr?.description
+                        {glSelectedPr.description.length > 0
+                          ? glSelectedPr.description
                           : "No description provided"}
                       </Text>
                       <Group>
@@ -275,11 +272,11 @@ export default function PullRequestsTab() {
                             <Avatar
                               size="sm"
                               name={
-                                glSelectedPr?.assignee?.name ?? "Not assigned"
+                                glSelectedPr.assignee?.name ?? "Not assigned"
                               }
                             ></Avatar>
                             <Text size="sm">
-                              {glSelectedPr?.assignee?.name ?? "Not assigned"}
+                              {glSelectedPr.assignee?.name ?? "Not assigned"}
                             </Text>
                           </Group>
                         </Stack>
@@ -293,12 +290,12 @@ export default function PullRequestsTab() {
                             <Avatar
                               size="sm"
                               name={
-                                glSelectedPr?.reviewers.at(0)?.name ??
+                                glSelectedPr.reviewers[0]?.name ??
                                 "Not assigned"
                               }
                             ></Avatar>
                             <Text size="sm">
-                              {glSelectedPr?.reviewers.at(0)?.name ??
+                              {glSelectedPr.reviewers[0]?.name ??
                                 "Not assigned"}
                             </Text>
                           </Group>
@@ -312,7 +309,7 @@ export default function PullRequestsTab() {
                           size="lg"
                           leftSection={<IconGitBranch stroke={1.5} size={16} />}
                         >
-                          {glSelectedPr["source_branch"]}
+                          {glSelectedPr.source_branch}
                         </Badge>
                         <IconArrowRight size={18} />
                         <Badge
@@ -322,7 +319,7 @@ export default function PullRequestsTab() {
                           fw={400}
                           leftSection={<IconGitBranch stroke={1.5} size={16} />}
                         >
-                          {glSelectedPr["target_branch"]}
+                          {glSelectedPr.target_branch}
                         </Badge>
                       </Group>
                       <Group>
@@ -343,7 +340,7 @@ export default function PullRequestsTab() {
                             <Text size="sm">Set to automerge</Text>
                           </Group>
                         ) : null}
-                        {glSelectedPr.detailed_merge_status !==
+                        {glSelectedPr.detailed_merge_status ===
                         "need_rebase" ? (
                           <Group gap="xs">
                             <IconGitBranch color="#e03131" size={22} />
