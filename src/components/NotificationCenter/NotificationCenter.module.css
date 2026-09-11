@@ -1,0 +1,59 @@
+.read,
+.unread {
+  cursor: pointer;
+
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    opacity 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.unread {
+  background: color-mix(
+    in srgb,
+    var(--neyra-primary) 6%,
+    var(--neyra-surface-2)
+  );
+
+  border-color: var(--neyra-border-accent);
+
+  box-shadow: inset 3px 0 0 var(--neyra-primary);
+}
+
+.unread:hover {
+  background: color-mix(
+    in srgb,
+    var(--neyra-primary) 9%,
+    var(--neyra-surface-2)
+  );
+}
+
+.read {
+  background: var(--neyra-surface-1);
+  border-color: var(--neyra-border-soft);
+
+  opacity: 0.78;
+}
+
+.read:hover {
+  opacity: 1;
+
+  background: var(--neyra-surface-2);
+  border-color: var(--neyra-border);
+}
+
+.unreadDot {
+  display: inline-block;
+
+  width: 6px;
+  height: 6px;
+
+  flex: 0 0 6px;
+
+  border-radius: 50%;
+
+  background: var(--neyra-primary);
+
+  box-shadow: 0 0 8px color-mix(in srgb, var(--neyra-primary) 45%, transparent);
+}

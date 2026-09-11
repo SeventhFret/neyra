@@ -5,6 +5,7 @@ import {
   IconExclamationCircle,
   IconLink,
 } from "@tabler/icons-react";
+import { useNotificationStore } from "./stores/notifications/store";
 import { openUrl } from "@tauri-apps/plugin-opener";
 
 export interface GitNotification {
@@ -97,12 +98,17 @@ export function showSuccessNotification({
   message,
   prUrl,
 }: GitNotificationSuccess) {
+  useNotificationStore.getState().add({
+    type: "success",
+    title: title,
+    message: String(message),
+  });
   notifications.show({
     ...SHARED,
 
     title,
+    autoClose: 5000,
     message: gitOutput(message, prUrl),
-
     color: "green",
 
     icon: <IconCircleCheck size={20} color="var(--neyra-success)" />,
@@ -112,12 +118,17 @@ export function showSuccessNotification({
 export function showErrorNotification({ title, message }: GitNotification) {
   console.error(`${title}:`, message);
 
+  useNotificationStore.getState().add({
+    type: "error",
+    title: title,
+    message: String(message),
+  });
   notifications.show({
     ...SHARED,
 
     title,
+    autoClose: 5000,
     message: gitOutput(message),
-
     color: "red",
 
     icon: <IconExclamationCircle size={20} color="var(--neyra-danger)" />,
@@ -146,4 +157,42 @@ export function buildQueryParams(params: Record<string, string>): string {
     .join("&");
 
   return query ? `?${query}` : "";
+}
+
+export function formatNotificationTime(timestamp: number): string {
+  const now = Date.now();
+  const diff = now - timestamp;
+
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (seconds < 10) {
+    return "Just now";
+  }
+
+  if (seconds < 60) {
+    return `${seconds}s ago`;
+  }
+
+  if (minutes < 60) {
+    return `${minutes}m ago`;
+  }
+
+  if (hours < 24) {
+    return `${hours}h ago`;
+  }
+
+  if (days < 7) {
+    return `${days}d ago`;
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(timestamp));
 }

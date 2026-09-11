@@ -5,6 +5,8 @@ import { exit } from "@tauri-apps/plugin-process";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { IconExclamationCircle, IconCircleCheck } from "@tabler/icons-react";
+import { formatNotificationTime } from "./utils";
 
 import CommitterTab from "./tabs/committer/CommitterTab";
 import StatusTab from "./tabs/status/StatusTab";
@@ -16,9 +18,17 @@ import PullRequestsTab from "./tabs/pull-requests/PullRequestsTab";
 
 import { NeyraDock } from "./components/NeyraDock/NeyraDock";
 import { useRepoData } from "./stores";
-
+import { useNotificationStore } from "./stores/notifications/store";
 import "./App.css";
-import { Drawer } from "@mantine/core";
+import {
+  Drawer,
+  Stack,
+  Notification,
+  Text,
+  Group,
+  Button,
+} from "@mantine/core";
+import { NotificationCenter } from "./components/NotificationCenter/NotificationCenter";
 
 export type TabId =
   | "status"
@@ -41,11 +51,29 @@ const TAB_ORDER: TabId[] = [
 
 function App() {
   const [currentTab, setCurrentTab] = useState<TabId>("committer");
-  const [notificationsOpened, { open, close }] = useDisclosure(false);
+  const neyraNotifications = useNotificationStore((state) => state.items);
+  const deleteNotification = useNotificationStore((state) => state.remove);
+  const clearNotifications = useNotificationStore((state) => state.clear);
 
+  const markRead = useNotificationStore((state) => state.markRead);
+
+  const markAllRead = useNotificationStore((state) => state.markAllRead);
+  const unreadCount = useNotificationStore(
+    (state) => state.items.filter((item) => !item.read).length,
+  );
+  const [notificationsOpened, { open, close }] = useDisclosure(false);
   const refreshing = useRepoData((state) => state.isLoading);
   const refresh = useRepoData((state) => state.refresh);
   const currentBranch = useRepoData((state) => state.currentBranch);
+
+  const testNotification = {
+    createdAt: 1789150161096,
+    id: "14b94315-34d7-478d-8be2-5fda4c790348",
+    message: "Finished fetching",
+    read: false,
+    title: "Fetch is successful",
+    type: "success",
+  };
 
   const clipboard = useClipboard({ timeout: 1500 });
 
@@ -67,17 +95,17 @@ function App() {
 
   useHotkeys(
     [
-      ["mod+T", () => selectTab("status")],
-      ["mod+C", () => selectTab("committer")],
-      ["mod+B", () => selectTab("branches")],
-      ["mod+E", () => selectTab("log")],
-      ["mod+D", () => selectTab("files")],
-      ["mod+K", () => selectTab("settings")],
-      ["mod+P", () => selectTab("pull-requests")],
+      ["mod+T", () => selectTab("status"), { usePhysicalKeys: true }],
+      ["mod+G", () => selectTab("committer"), { usePhysicalKeys: true }],
+      ["mod+B", () => selectTab("branches"), { usePhysicalKeys: true }],
+      ["mod+E", () => selectTab("log"), { usePhysicalKeys: true }],
+      ["mod+D", () => selectTab("files"), { usePhysicalKeys: true }],
+      ["mod+K", () => selectTab("settings"), { usePhysicalKeys: true }],
+      ["mod+P", () => selectTab("pull-requests"), { usePhysicalKeys: true }],
 
-      ["mod+R", () => void refresh()],
-      ["mod+alt+C", () => copyBranch()],
-      ["mod+alt+L", () => notifications.clean()],
+      ["mod+R", () => void refresh(), { usePhysicalKeys: true }],
+      ["mod+alt+C", () => copyBranch(), { usePhysicalKeys: true }],
+      ["mod+alt+L", () => notifications.clean(), { usePhysicalKeys: true }],
       ["mod+Q", () => void exit(0)],
     ],
     [],
@@ -115,17 +143,7 @@ function App() {
         </Page>
       </div>
 
-      <Drawer
-        radius="lg"
-        offset={10}
-        position="right"
-        title="Notifications"
-        opened={notificationsOpened}
-        onClose={close}
-      >
-        <p>notifications here...</p>
-      </Drawer>
-
+      <NotificationCenter opened={notificationsOpened} onClose={close} />
       <NeyraDock
         value={currentTab}
         onChange={selectTab}
@@ -135,8 +153,7 @@ function App() {
         onCopyBranch={copyBranch}
         onOpenNotifications={() => open()}
         onExit={() => void exit(0)}
-        unreadNotifications={5}
-        // unreadNotifications={0}
+        unreadNotifications={unreadCount}
       />
     </main>
   );

@@ -16,8 +16,6 @@ export default function GitConfig() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  // `--global` reads a different file, so the fields are refetched whenever the
-  // scope flips rather than showing values from the other config.
   useEffect(() => {
     let isCurrent = true;
 
@@ -35,8 +33,6 @@ export default function GitConfig() {
           }),
         ]);
 
-        // A scope switched again while this was in flight would otherwise
-        // overwrite the newer values with these.
         if (!isCurrent) {
           return;
         }
@@ -62,8 +58,6 @@ export default function GitConfig() {
     };
   }, [isGlobal]);
 
-  // Both values are blank until the first read lands, and writing an empty one
-  // leaves an empty entry in the config, which is worse than none at all.
   const canSave =
     !isLoading &&
     !isSaving &&
@@ -108,8 +102,12 @@ export default function GitConfig() {
 
   useHotkeys(
     [
-      ["ctrl+G", () => setIsGlobal((state) => !state)],
-      ["ctrl+S", handleSave],
+      [
+        "mod+alt+G",
+        () => setIsGlobal((state) => !state),
+        { usePhysicalKeys: true },
+      ],
+      ["mod+S", handleSave, { usePhysicalKeys: true }],
     ],
     [],
   );
@@ -155,7 +153,7 @@ export default function GitConfig() {
               Use
               <code style={{ fontWeight: 600 }}>--global</code>
               flag
-              <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "G" }} />
+              <ShortcutKeys shortcut={{ modifiers: ["mod", "alt"], key: "G" }} />
             </Group>
           }
         />
