@@ -298,7 +298,7 @@ export default function FilesTab() {
         ) : data.length === 0 ? (
           <Center style={{ flex: 1 }} p="xl">
             <Stack align="center" gap="xs">
-              <IconFolder size={34} color="var(--neyra-text-muted)" />
+              <IconFolder size={34} stroke={1.7} color="var(--neyra-text-muted)" />
               <Text c="dimmed">
                 {status.length === 0
                   ? "Working tree clean"

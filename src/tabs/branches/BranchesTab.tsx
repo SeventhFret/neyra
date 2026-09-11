@@ -407,7 +407,11 @@ export default function BranchesTab() {
         ) : local.length === 0 && remote.length === 0 ? (
           <Center py="xl">
             <Stack align="center" gap="xs">
-              <IconGitBranch size={34} className={classes.emptyIcon} />
+              <IconGitBranch
+                size={34}
+                stroke={1.7}
+                className={classes.emptyIcon}
+              />
 
               <Text c="dimmed">
                 {branches.length === 0

@@ -1,0 +1,80 @@
+.page {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.tabs {
+  flex: 1;
+  min-height: 0;
+}
+
+.list {
+  width: 190px;
+
+  align-self: flex-start;
+
+  gap: 4px;
+
+  padding: 6px;
+
+  background: var(--neyra-surface-1);
+
+  border: 1px solid var(--neyra-border);
+  border-radius: var(--mantine-radius-lg);
+}
+
+/* Remove Mantine's normal Tabs indicator/border behavior */
+.list::before {
+  display: none;
+}
+
+.tab {
+  justify-content: flex-start;
+
+  width: 100%;
+  min-height: 42px;
+
+  padding-inline: 12px;
+
+  border: 1px solid transparent;
+  border-radius: var(--mantine-radius-md);
+
+  color: var(--neyra-text-muted);
+
+  font-weight: 500;
+
+  transition:
+    color 120ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.tab:hover:not([data-disabled]) {
+  color: var(--neyra-text-primary);
+
+  background: var(--neyra-surface-2);
+}
+
+.tab[data-active] {
+  color: var(--mantine-color-neyraBlue-3);
+
+  background: color-mix(in srgb, var(--neyra-primary) 12%, transparent);
+
+  border-color: var(--neyra-border-accent);
+}
+
+.tab[data-active]:hover {
+  background: color-mix(in srgb, var(--neyra-primary) 15%, transparent);
+}
+
+.tab[data-disabled] {
+  color: color-mix(in srgb, var(--neyra-text-muted) 50%, transparent);
+
+  opacity: 1;
+}
+
+.panel {
+  min-width: 0;
+
+  padding-left: 28px;
+}
