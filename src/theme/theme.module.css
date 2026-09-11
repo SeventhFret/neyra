@@ -404,3 +404,12 @@
 
   backdrop-filter: blur(2px);
 }
+
+.notifications {
+  bottom: 100px;
+  pointer-events: none;
+}
+
+.notifications > * {
+  pointer-events: auto;
+}

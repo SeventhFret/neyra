@@ -170,10 +170,22 @@ export default function CommitterTab() {
 
   useHotkeys(
     [
-      ["ctrl+Enter", handleCommit],
-      ["ctrl+H", () => setPerformCommit((commit) => !commit)],
-      ["ctrl+P", () => setPushToBranch((push) => !push)],
-      ["ctrl+F", () => setForceWithLease((force) => !force)],
+      ["mod+Enter", handleCommit, { usePhysicalKeys: true }],
+      [
+        "mod+shift+H",
+        () => setPerformCommit((commit) => !commit),
+        { usePhysicalKeys: true },
+      ],
+      [
+        "mod+shift+P",
+        () => setPushToBranch((push) => !push),
+        { usePhysicalKeys: true },
+      ],
+      [
+        "mod+F",
+        () => setForceWithLease((force) => !force),
+        { usePhysicalKeys: true },
+      ],
     ],
     [],
   );
@@ -287,7 +299,9 @@ export default function CommitterTab() {
           label={
             <Group gap="xs">
               Perform commit
-              <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "H" }} />
+              <ShortcutKeys
+                shortcut={{ modifiers: ["mod", "shift"], key: "H" }}
+              />
             </Group>
           }
         />
@@ -299,7 +313,9 @@ export default function CommitterTab() {
             <Group gap="xs">
               Push to current branch
               <code style={{ fontWeight: 600 }}>{currentBranch}</code>
-              <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "P" }} />
+              <ShortcutKeys
+                shortcut={{ modifiers: ["mod", "shift"], key: "P" }}
+              />
             </Group>
           }
         />

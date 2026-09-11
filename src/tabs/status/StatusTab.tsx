@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Text,
   Paper,
@@ -28,12 +28,25 @@ export default function StatusTab() {
   const currentBranch = useRepoData((state) => state.currentBranch);
 
   const [rebase, setRebase] = useState(false);
-  const [remote, setRemote] = useState(
-    remotes.length > 0 ? remotes[0].name : null,
-  );
+  const [remote, setRemote] = useState<string | null>(null);
   const [isPulling, setIsPulling] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [pullOutput, setPullOutput] = useState("");
+
+  useEffect(() => {
+    if (remotes.length === 0) {
+      setRemote(null);
+      return;
+    }
+
+    setRemote((current) => {
+      if (current && remotes.some((item) => item.name === current)) {
+        return current;
+      }
+
+      return remotes[0].name;
+    });
+  }, [remotes]);
 
   const handlePull = async () => {
     setIsPulling(true);
@@ -80,14 +93,15 @@ export default function StatusTab() {
   useHotkeys(
     [
       [
-        "ctrl+alt+R",
+        "mod+alt+R",
         () => {
           setRebase((current) => !current);
         },
+        { usePhysicalKeys: true },
       ],
-      ["ctrl+F", handleFetch],
-      ["ctrl+enter", handlePull],
-      ["ctrl+L", () => setPullOutput("")],
+      ["mod+F", handleFetch, { usePhysicalKeys: true }],
+      ["mod+enter", handlePull, { usePhysicalKeys: true }],
+      ["mod+L", () => setPullOutput(""), { usePhysicalKeys: true }],
     ],
     [],
   );
