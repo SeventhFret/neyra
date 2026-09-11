@@ -3,7 +3,6 @@ import {
   Text,
   Paper,
   Group,
-  Kbd,
   Button,
   Checkbox,
   Badge,
@@ -20,6 +19,7 @@ import {
   IconPlaylistX,
 } from "@tabler/icons-react";
 import { useRepoData } from "../../stores";
+import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
 
 export default function StatusTab() {
   const status = useRepoData((state) => state.statusMessage);
@@ -190,10 +190,9 @@ export default function StatusTab() {
                   Use
                   <code style={{ fontWeight: 600 }}>--rebase</code>
                   flag
-                  <div>
-                    <Kbd size="xs">Ctrl</Kbd> + <Kbd size="xs">Alt</Kbd> +{" "}
-                    <Kbd size="xs">R</Kbd>
-                  </div>
+                  <ShortcutKeys
+                    shortcut={{ modifiers: ["mod", "alt"], key: "R" }}
+                  />
                 </Group>
               }
             />
@@ -210,9 +209,7 @@ export default function StatusTab() {
             >
               {rebase ? "Pull & Rebase" : "Pull"}
             </Button>
-            <div>
-              <Kbd size="sm">Ctrl</Kbd> + <Kbd size="sm">Enter</Kbd>
-            </div>
+            <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "Enter" }} />
             <Button
               radius="lg"
               size="lg"
@@ -224,9 +221,7 @@ export default function StatusTab() {
             >
               Fetch
             </Button>
-            <div>
-              <Kbd size="sm">Ctrl</Kbd> + <Kbd size="sm">F</Kbd>
-            </div>
+            <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "F" }} />
             <Button
               radius="lg"
               size="lg"
@@ -236,9 +231,7 @@ export default function StatusTab() {
             >
               Clear output
             </Button>
-            <div>
-              <Kbd size="sm">Ctrl</Kbd> + <Kbd size="sm">L</Kbd>
-            </div>
+            <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "L" }} />
           </Group>
         </Stack>
       </div>

@@ -2,7 +2,6 @@ import {
   Button,
   Checkbox,
   Group,
-  Kbd,
   Stack,
   Text,
   TextInput,
@@ -12,6 +11,7 @@ import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "@mantine/hooks";
 import { showErrorNotification, showSuccessNotification } from "../../utils";
+import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
 
 export default function SettingsTab() {
   const [name, setName] = useState<string>("");
@@ -162,9 +162,7 @@ export default function SettingsTab() {
               Use
               <code style={{ fontWeight: 600 }}>--global</code>
               flag
-              <div>
-                <Kbd size="xs">Ctrl</Kbd> + <Kbd size="xs">G</Kbd>
-              </div>
+              <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "G" }} />
             </Group>
           }
         />
@@ -180,9 +178,7 @@ export default function SettingsTab() {
           >
             Save config
           </Button>
-          <Group gap="xs">
-            <Kbd>Ctrl</Kbd> + <Kbd>S</Kbd>
-          </Group>
+          <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "S" }} />
         </Group>
       </Stack>
     </Stack>

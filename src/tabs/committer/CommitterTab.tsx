@@ -9,7 +9,6 @@ import {
   Stack,
   Group,
   Textarea,
-  Kbd,
   Grid,
 } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
@@ -22,6 +21,7 @@ import {
   showSuccessNotification,
   parseUrlFromCommitStatus,
 } from "../../utils";
+import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
 
 /** The Conventional Commits types, with what each one is for. */
 const COMMIT_TYPES: Record<string, string> = {
@@ -193,7 +193,13 @@ export default function CommitterTab() {
       <div className="header-container">
         <h1>Committer</h1>
       </div>
-      <Paper c="#d4d4d8" bg="var(--neyra-surface-2)" shadow="md" p="lg" radius="lg">
+      <Paper
+        c="#d4d4d8"
+        bg="var(--neyra-surface-2)"
+        shadow="md"
+        p="lg"
+        radius="lg"
+      >
         <Text
           c={performCommit ? "#d4d4d8" : "dimmed"}
           style={{ whiteSpace: "pre-wrap" }}
@@ -281,9 +287,7 @@ export default function CommitterTab() {
           label={
             <Group gap="xs">
               Perform commit
-              <div>
-                <Kbd size="xs">Ctrl</Kbd> + <Kbd size="xs">H</Kbd>
-              </div>
+              <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "H" }} />
             </Group>
           }
         />
@@ -295,9 +299,7 @@ export default function CommitterTab() {
             <Group gap="xs">
               Push to current branch
               <code style={{ fontWeight: 600 }}>{currentBranch}</code>
-              <div>
-                <Kbd size="xs">Ctrl</Kbd> + <Kbd size="xs">P</Kbd>
-              </div>
+              <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "P" }} />
             </Group>
           }
         />
@@ -310,9 +312,7 @@ export default function CommitterTab() {
               Use
               <code style={{ fontWeight: 600 }}>--force-with-lease</code>
               flag
-              <div>
-                <Kbd size="xs">Ctrl</Kbd> + <Kbd size="xs">F</Kbd>
-              </div>
+              <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "F" }} />
             </Group>
           }
         />
@@ -336,9 +336,7 @@ export default function CommitterTab() {
               ? "Force Push"
               : "Push"}
         </Button>
-        <div>
-          <Kbd size="sm">Ctrl</Kbd> + <Kbd size="sm">Enter</Kbd>
-        </div>
+        <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "Enter" }} />
       </Group>
     </Stack>
   );

@@ -4,11 +4,9 @@ import {
   Divider,
   Group,
   Indicator,
-  Kbd,
   Text,
   Tooltip,
 } from "@mantine/core";
-import { platform } from "@tauri-apps/plugin-os";
 
 import {
   IconBell,
@@ -25,6 +23,8 @@ import {
   IconTerminal2,
 } from "@tabler/icons-react";
 
+import type { Shortcut } from "../ShortcutKeys/ShortcutKeys.types";
+import ShortcutKeys from "../ShortcutKeys/ShortcutKeys";
 import type { TabId } from "../../App";
 import classes from "./NeyraDock.module.css";
 
@@ -42,13 +42,6 @@ interface NeyraDockProps {
 
   unreadNotifications?: number;
 }
-
-type ShortcutModifier = "mod" | "alt" | "shift";
-
-type Shortcut = {
-  modifiers?: ShortcutModifier[];
-  key: string;
-};
 
 const tabs: {
   id: TabId;
@@ -99,44 +92,6 @@ const tabs: {
     icon: IconSettings,
   },
 ];
-
-const currentPlatform = platform();
-const isMac = currentPlatform === "macos";
-
-function ShortcutKeys({ shortcut }: { shortcut: Shortcut }) {
-  const modifiers = shortcut.modifiers ?? [];
-
-  return (
-    <Group gap={4} wrap="nowrap">
-      {modifiers.map((modifier) => {
-        switch (modifier) {
-          case "mod":
-            return (
-              <Kbd key="mod" size="xs">
-                {isMac ? "⌘" : "Ctrl"}
-              </Kbd>
-            );
-
-          case "alt":
-            return (
-              <Kbd key="alt" size="xs">
-                {isMac ? "⌥" : "Alt"}
-              </Kbd>
-            );
-
-          case "shift":
-            return (
-              <Kbd key="shift" size="xs">
-                {isMac ? "⇧" : "Shift"}
-              </Kbd>
-            );
-        }
-      })}
-
-      <Kbd size="xs">{shortcut.key}</Kbd>
-    </Group>
-  );
-}
 
 function DockTooltip({
   label,

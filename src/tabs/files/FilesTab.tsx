@@ -4,7 +4,6 @@ import {
   Center,
   Checkbox,
   Group,
-  Kbd,
   Loader,
   Paper,
   Stack,
@@ -28,6 +27,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRepoData, type StatusEntry } from "../../stores";
 import { showErrorNotification } from "../../utils";
 import classes from "./FilesTab.module.css";
+import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
 
 /** Vibrant takes on the usual VS Code status colours. Untracked stays the
  *  normal text colour; the rest are the bright end of the Mantine palette. */
@@ -281,9 +281,7 @@ export default function FilesTab() {
         >
           Stage all
         </Button>
-        <div>
-          <Kbd size="sm">Ctrl</Kbd> + <Kbd size="sm">Enter</Kbd>
-        </div>
+        <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "Enter" }} />
       </Group>
 
       <Paper
@@ -300,7 +298,7 @@ export default function FilesTab() {
         ) : data.length === 0 ? (
           <Center style={{ flex: 1 }} p="xl">
             <Stack align="center" gap="xs">
-              <IconFolder size={34} color="#4a4a4a" />
+              <IconFolder size={34} color="var(--neyra-text-muted)" />
               <Text c="dimmed">
                 {status.length === 0
                   ? "Working tree clean"
