@@ -158,12 +158,10 @@ export default function LogTab() {
   const isLoading = useRepoData((state) => state.isLoading);
   const error = useRepoData((state) => state.error);
 
-  console.log(commits)
-
   // 100vh with the list scrolling inside it: the body has overflow hidden, so
   // the page itself must never grow past the window.
   return (
-    <Stack h="100vh" px="xl" py="md" gap="md">
+    <Stack px="xl" gap="md">
       <Group justify="space-between" align="flex-end" wrap="nowrap">
         <div className="header-container">
           <h1>Log</h1>

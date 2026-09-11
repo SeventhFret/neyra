@@ -7,7 +7,6 @@ import {
   Button,
   Checkbox,
   Badge,
-  Select,
   Stack,
 } from "@mantine/core";
 import { invoke } from "@tauri-apps/api/core";
@@ -94,12 +93,9 @@ export default function StatusTab() {
   );
 
   return (
-    <div
+    <Stack
+      px="xl"
       style={{
-        marginLeft: "15px",
-        marginRight: "15px",
-        paddingBottom: "15px",
-        height: "100dvh",
         display: "flex",
         flexDirection: "column",
         overflowY: "auto",
@@ -186,7 +182,6 @@ export default function StatusTab() {
                 remotes.length > 0 ? remotes[0].name : "No remote found"
               }
             />
-            <Select />
             <Checkbox
               checked={rebase}
               onChange={(event) => setRebase(event.currentTarget.checked)}
@@ -206,6 +201,7 @@ export default function StatusTab() {
           <Group>
             <Button
               radius="lg"
+              variant="filled"
               size="lg"
               loading={isPulling}
               disabled={isPulling}
@@ -234,8 +230,7 @@ export default function StatusTab() {
             <Button
               radius="lg"
               size="lg"
-              variant="light"
-              color="gray.8"
+              variant="subtle"
               leftSection={<IconPlaylistX />}
               onClick={() => setPullOutput("")}
             >
@@ -247,6 +242,6 @@ export default function StatusTab() {
           </Group>
         </Stack>
       </div>
-    </div>
+    </Stack>
   );
 }

@@ -11,11 +11,12 @@
   display: flex;
   gap: 12px;
   padding: 14px 18px;
+  background-color: var(--neyra-surface-2);
   transition: background-color 120ms ease;
 }
 
 .row:hover {
-  background-color: #2c2c2c;
+  background-color: var(--neyra-surface-3);
 }
 
 .row + .row {
@@ -53,7 +54,7 @@
   bottom: -14px;
   width: 2px;
   transform: translateX(-50%);
-  background-color: #3a3a3a;
+  background-color: var(--neyra-surface-4);
 }
 
 .row:first-of-type .rail::before {

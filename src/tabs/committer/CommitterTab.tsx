@@ -193,7 +193,7 @@ export default function CommitterTab() {
       <div className="header-container">
         <h1>Committer</h1>
       </div>
-      <Paper c="#d4d4d8" bg="#252525" shadow="md" p="lg" radius="lg">
+      <Paper c="#d4d4d8" bg="var(--neyra-surface-2)" shadow="md" p="lg" radius="lg">
         <Text
           c={performCommit ? "#d4d4d8" : "dimmed"}
           style={{ whiteSpace: "pre-wrap" }}
@@ -321,6 +321,7 @@ export default function CommitterTab() {
         <Button
           radius="lg"
           size="lg"
+          variant="filled"
           leftSection={performCommit ? <IconGitCommit /> : <IconCloudUpload />}
           loading={isCommitting}
           onClick={handleCommit}

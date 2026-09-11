@@ -95,13 +95,17 @@ export function formatRelativeDate(iso: string): string {
 export function showSuccessNotification({
   title,
   message,
-  prUrl = undefined,
+  prUrl,
 }: GitNotificationSuccess) {
   notifications.show({
     ...SHARED,
+
     title,
     message: gitOutput(message, prUrl),
-    icon: <IconCircleCheck color="#37b24d" />,
+
+    color: "green",
+
+    icon: <IconCircleCheck size={20} color="var(--neyra-success)" />,
   });
 }
 
@@ -110,9 +114,13 @@ export function showErrorNotification({ title, message }: GitNotification) {
 
   notifications.show({
     ...SHARED,
+
     title,
     message: gitOutput(message),
-    icon: <IconExclamationCircle color="#f03e3e" />,
+
+    color: "red",
+
+    icon: <IconExclamationCircle size={20} color="var(--neyra-danger)" />,
   });
 }
 

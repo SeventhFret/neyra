@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { useHotkeys } from "@mantine/hooks";
 import { showErrorNotification, showSuccessNotification } from "../../utils";
 
-export default function ConfigTab() {
+export default function SettingsTab() {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [isGlobal, setIsGlobal] = useState<boolean>(false);
@@ -69,7 +69,10 @@ export default function ConfigTab() {
   // Both values are blank until the first read lands, and writing an empty one
   // leaves an empty entry in the config, which is worse than none at all.
   const canSave =
-    !isLoading && !isSaving && name.trim().length > 0 && email.trim().length > 0;
+    !isLoading &&
+    !isSaving &&
+    name.trim().length > 0 &&
+    email.trim().length > 0;
 
   const handleSave = async () => {
     if (!canSave) {
@@ -116,16 +119,14 @@ export default function ConfigTab() {
   );
 
   return (
-    <div
+    <Stack
+      px="lg"
       style={{
-        marginLeft: "15px",
-        marginRight: "15px",
-        paddingBottom: "15px",
         overflowY: "auto",
       }}
     >
       <div className="header-container">
-        <h1>Config</h1>
+        <h1>Settings</h1>
       </div>
 
       {/* The fields stretch to the Stack instead of sizing to their own
@@ -171,6 +172,7 @@ export default function ConfigTab() {
           <Button
             radius="lg"
             size="md"
+            variant="filled"
             leftSection={<IconDeviceFloppy />}
             loading={isSaving}
             disabled={!canSave}
@@ -183,6 +185,6 @@ export default function ConfigTab() {
           </Group>
         </Group>
       </Stack>
-    </div>
+    </Stack>
   );
 }

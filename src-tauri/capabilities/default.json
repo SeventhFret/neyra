@@ -12,9 +12,10 @@
     {
       "identifier": "http:default",
       "allow": [
-        "https://gitlab.com/api/v4",
+        "https://gitlab.com/",
         "https://api.github.com/"
       ]
-    }
+    },
+    "os:default"
   ]
 }
