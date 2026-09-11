@@ -4,7 +4,6 @@ import {
   Center,
   Checkbox,
   Group,
-  Kbd,
   Loader,
   Paper,
   Stack,
@@ -28,6 +27,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRepoData, type StatusEntry } from "../../stores";
 import { showErrorNotification } from "../../utils";
 import classes from "./FilesTab.module.css";
+import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
 
 /** Vibrant takes on the usual VS Code status colours. Untracked stays the
  *  normal text colour; the rest are the bright end of the Mantine palette. */
@@ -124,7 +124,9 @@ function buildTree(entries: StatusEntry[]): {
   const meta = new Map<string, NodeMeta>();
 
   const convert = (node: RawNode): TreeNodeData => {
-    const children = [...node.children.values()].sort(compareNodes).map(convert);
+    const children = [...node.children.values()]
+      .sort(compareNodes)
+      .map(convert);
     const isDir = children.length > 0;
 
     let staged = 0;
@@ -241,7 +243,7 @@ export default function FilesTab() {
   );
 
   return (
-    <Stack h="100vh" px="xl" py="md" gap="md">
+    <Stack px="xl" gap="md">
       <Group justify="space-between" align="flex-end" wrap="nowrap">
         <div className="header-container">
           <h1>Files</h1>
@@ -271,6 +273,7 @@ export default function FilesTab() {
         />
         <Button
           radius="md"
+          variant="filled"
           leftSection={<IconPlus size={16} />}
           loading={isWorking}
           disabled={status.length === 0}
@@ -278,15 +281,13 @@ export default function FilesTab() {
         >
           Stage all
         </Button>
-        <div>
-          <Kbd size="sm">Ctrl</Kbd> + <Kbd size="sm">Enter</Kbd>
-        </div>
+        <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "Enter" }} />
       </Group>
 
       <Paper
-        bg="#252525"
         shadow="md"
         radius="lg"
+        bg="var(--neyra-surface-1)"
         p="sm"
         style={{ flex: 1, minWidth: 0, minHeight: 0, display: "flex" }}
       >
@@ -297,7 +298,7 @@ export default function FilesTab() {
         ) : data.length === 0 ? (
           <Center style={{ flex: 1 }} p="xl">
             <Stack align="center" gap="xs">
-              <IconFolder size={34} color="#4a4a4a" />
+              <IconFolder size={34} stroke={1.7} color="var(--neyra-text-muted)" />
               <Text c="dimmed">
                 {status.length === 0
                   ? "Working tree clean"

@@ -167,28 +167,22 @@ export default function PullRequestsTab() {
   );
   const glSelectedPr = usePullRequestsData((state) => state.glSelectedPr);
 
-  console.log(glPullRequests);
   useEffect(() => {
     getGlPullRequests();
   }, []);
 
   return (
-    <div
+    <Stack
+      px="lg"
       style={{
-        marginLeft: "15px",
-        marginRight: "15px",
-        paddingBottom: "15px",
-        height: "100dvh",
         display: "flex",
         flexDirection: "column",
         overflowY: "auto",
       }}
     >
-      <Group align="center" wrap="nowrap">
-        <div className="header-container">
-          <h1>Merge/Pull requests</h1>
-        </div>
-      </Group>
+      <div className="header-container">
+        <h1>Merge/Pull requests</h1>
+      </div>
 
       <div
         style={{
@@ -221,7 +215,6 @@ export default function PullRequestsTab() {
                   p="md"
                   h="100%"
                   w="100%"
-                  bg="#252525"
                   flex={1}
                   radius="lg"
                 >
@@ -377,6 +370,6 @@ export default function PullRequestsTab() {
           </Accordion.Item>
         </Accordion>
       </div>
-    </div>
+    </Stack>
   );
 }

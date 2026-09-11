@@ -1,19 +1,15 @@
-import {
-  Button,
-  Checkbox,
-  Group,
-  Kbd,
-  Stack,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { Button, Checkbox, Group, Stack, Text, TextInput } from "@mantine/core";
 import { invoke } from "@tauri-apps/api/core";
 import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "@mantine/hooks";
-import { showErrorNotification, showSuccessNotification } from "../../utils";
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from "../../../../utils";
+import ShortcutKeys from "../../../../components/ShortcutKeys/ShortcutKeys";
 
-export default function ConfigTab() {
+export default function GitConfig() {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [isGlobal, setIsGlobal] = useState<boolean>(false);
@@ -69,7 +65,10 @@ export default function ConfigTab() {
   // Both values are blank until the first read lands, and writing an empty one
   // leaves an empty entry in the config, which is worse than none at all.
   const canSave =
-    !isLoading && !isSaving && name.trim().length > 0 && email.trim().length > 0;
+    !isLoading &&
+    !isSaving &&
+    name.trim().length > 0 &&
+    email.trim().length > 0;
 
   const handleSave = async () => {
     if (!canSave) {
@@ -116,21 +115,16 @@ export default function ConfigTab() {
   );
 
   return (
-    <div
-      style={{
-        marginLeft: "15px",
-        marginRight: "15px",
-        paddingBottom: "15px",
-        overflowY: "auto",
-      }}
-    >
-      <div className="header-container">
-        <h1>Config</h1>
-      </div>
+    <Stack gap="md">
+      <Stack gap={2}>
+        <Text fw={600} size="lg">
+          Git configuration
+        </Text>
 
-      {/* The fields stretch to the Stack instead of sizing to their own
-          content: an input sized to content is one default-width text box, so
-          anything longer than that is scrolled inside it rather than shown. */}
+        <Text c="dimmed" size="sm">
+          Configure the Git identity used for this repository.
+        </Text>
+      </Stack>
       <Stack w="100%" maw="450px">
         <TextInput
           label="Name"
@@ -161,9 +155,7 @@ export default function ConfigTab() {
               Use
               <code style={{ fontWeight: 600 }}>--global</code>
               flag
-              <div>
-                <Kbd size="xs">Ctrl</Kbd> + <Kbd size="xs">G</Kbd>
-              </div>
+              <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "G" }} />
             </Group>
           }
         />
@@ -171,6 +163,7 @@ export default function ConfigTab() {
           <Button
             radius="lg"
             size="md"
+            variant="filled"
             leftSection={<IconDeviceFloppy />}
             loading={isSaving}
             disabled={!canSave}
@@ -178,11 +171,9 @@ export default function ConfigTab() {
           >
             Save config
           </Button>
-          <Group gap="xs">
-            <Kbd>Ctrl</Kbd> + <Kbd>S</Kbd>
-          </Group>
+          <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "S" }} />
         </Group>
       </Stack>
-    </div>
+    </Stack>
   );
 }

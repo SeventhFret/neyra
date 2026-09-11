@@ -28,9 +28,6 @@ import {
 } from "../../utils";
 import classes from "./BranchesTab.module.css";
 
-/** Memoised: a repo with hundreds of branches re-renders this list on every
- *  keystroke in the filter box otherwise. Props are primitives and stable
- *  callbacks so the comparison actually holds. */
 const BranchRow = memo(function BranchRow({
   branch,
   isBusy,
@@ -41,7 +38,6 @@ const BranchRow = memo(function BranchRow({
   branch: Branch;
   isBusy: boolean;
   otherIsBusy: boolean;
-  /** False for a remote branch with no local counterpart to switch to. */
   canSwitch: boolean;
   onAction: (name: string, command: "switch" | "rebase") => void;
 }) {
@@ -49,30 +45,24 @@ const BranchRow = memo(function BranchRow({
     <div
       className={`${classes.row} ${branch.isCurrent ? classes.current : ""}`}
     >
-      <div style={{ flex: "none", display: "flex" }}>
+      <div
+        className={`${classes.branchIcon} ${
+          branch.isCurrent ? classes.branchIconCurrent : ""
+        }`}
+      >
         {branch.isRemote ? (
-          <IconCloud size={16} color="#6b6b6b" />
+          <IconCloud size={16} />
         ) : (
-          <IconGitBranch
-            size={16}
-            color={
-              branch.isCurrent
-                ? "var(--mantine-primary-color-filled)"
-                : "#6b6b6b"
-            }
-          />
+          <IconGitBranch size={16} />
         )}
       </div>
 
       <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
         <Group gap="xs" wrap="nowrap">
-          {/* Native title rather than Mantine Tooltip throughout the row: each
-              Tooltip mounts a floating-ui popover, and six per row across
-              hundreds of branches is what made this list crawl. */}
           <Text
             fw={600}
             ff="monospace"
-            c="#e4e4e7"
+            c="var(--neyra-text-primary)"
             truncate
             title={branch.name}
             style={{ minWidth: 0 }}
@@ -81,18 +71,17 @@ const BranchRow = memo(function BranchRow({
           </Text>
 
           {branch.isCurrent && (
-            <Badge size="xs" radius="sm" variant="light">
+            <Badge size="xs" radius="sm" variant="light" color="neyraBlue">
               current
             </Badge>
           )}
 
-          {/* Ahead and behind are relative to the tracked upstream. */}
           {branch.ahead > 0 && (
             <Badge
               size="xs"
               radius="sm"
               variant="light"
-              color="teal"
+              color="neyraCyan"
               leftSection={<IconArrowUp size={10} />}
               title={`${branch.ahead} commit(s) not pushed to ${branch.upstream}`}
             >
@@ -105,7 +94,7 @@ const BranchRow = memo(function BranchRow({
               size="xs"
               radius="sm"
               variant="light"
-              color="orange"
+              color="yellow"
               leftSection={<IconArrowDown size={10} />}
               title={`${branch.behind} commit(s) on ${branch.upstream} not pulled`}
             >
@@ -130,9 +119,11 @@ const BranchRow = memo(function BranchRow({
           <Text size="xs" ff="monospace" c="dimmed">
             {branch.shortHash}
           </Text>
+
           <Text size="xs" c="dimmed" truncate>
             {branch.subject}
           </Text>
+
           <Text size="xs" c="dimmed" style={{ flex: "none" }}>
             · {formatRelativeDate(branch.date)}
           </Text>
@@ -150,17 +141,18 @@ const BranchRow = memo(function BranchRow({
             title={
               canSwitch
                 ? `git switch ${branch.name}`
-                : `no local branch to switch to — fetch or create it first`
+                : "no local branch to switch to — fetch or create it first"
             }
             onClick={() => onAction(branch.name, "switch")}
           >
             Switch
           </Button>
+
           <Button
             size="xs"
             radius="md"
             variant="subtle"
-            color="orange"
+            color="yellow"
             loading={isBusy}
             disabled={otherIsBusy}
             title={`git rebase ${branch.name} — replays the current branch onto this one`}
@@ -197,14 +189,13 @@ function BranchSection({
         <Text size="xs" c="dimmed" fw={700} className={classes.sectionLabel}>
           {label}
         </Text>
+
         <Text size="xs" c="dimmed">
           {branches.length}
         </Text>
       </Group>
-      {/* No overflow: hidden here — clipping a scrolled subtree to a rounded
-          rect forces a compositing mask, which is what blurs text mid-scroll in
-          the Linux webview. The rows round their own outer corners instead. */}
-      <Paper bg="#252525" shadow="md" radius="lg" p={0}>
+
+      <Paper radius="lg" p={0} className={classes.section}>
         {branches.map((branch) => (
           <BranchRow
             key={branch.name}
@@ -228,6 +219,7 @@ export default function BranchesTab() {
   const currentBranch = useRepoData((state) => state.currentBranch);
   const isLoading = useRepoData((state) => state.isLoading);
   const refresh = useRepoData((state) => state.refresh);
+
   const filterInputRef = useRef<HTMLInputElement | null>(null);
   const newBranchRef = useRef<HTMLInputElement | null>(null);
 
@@ -236,26 +228,26 @@ export default function BranchesTab() {
       [
         "ctrl+F",
         () => {
-          filterInputRef?.current?.focus();
+          filterInputRef.current?.focus();
         },
       ],
       [
         "ctrl+N",
         () => {
-          newBranchRef?.current?.focus();
+          newBranchRef.current?.focus();
         },
       ],
     ],
     [],
   );
 
-  const [filter, setFilter] = useState<string>("");
-  const [newBranch, setNewBranch] = useState<string>("");
-  /** Name of the branch being switched to, or "" while creating one. */
+  const [filter, setFilter] = useState("");
+  const [newBranch, setNewBranch] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
 
   const { local, remote, localNames } = useMemo(() => {
     const query = filter.trim().toLowerCase();
+
     const matching = query
       ? branches.filter((branch) => branch.name.toLowerCase().includes(query))
       : branches;
@@ -263,21 +255,21 @@ export default function BranchesTab() {
     return {
       local: matching.filter((branch) => !branch.isRemote),
       remote: matching.filter((branch) => branch.isRemote),
-      // Every local branch, not just the filtered ones: a remote row needs to
-      // know whether its local counterpart exists regardless of the filter.
       localNames: new Set(
-        branches.filter((branch) => !branch.isRemote).map((b) => b.name),
+        branches
+          .filter((branch) => !branch.isRemote)
+          .map((branch) => branch.name),
       ),
     };
   }, [branches, filter]);
 
-  // Kept out of the busy state so the callback identity survives a re-render
-  // and the memoised rows are not thrown away on every keystroke.
   const busyRef = useRef<string | null>(null);
+
   const startWork = (name: string) => {
     busyRef.current = name;
     setBusy(name);
   };
+
   const finishWork = () => {
     busyRef.current = null;
     setBusy(null);
@@ -290,12 +282,15 @@ export default function BranchesTab() {
       }
 
       startWork(name);
+
       try {
         const result = await invoke<string>(
           command === "switch" ? "switch_branch" : "rebase",
           { branch: name },
         );
+
         await refresh();
+
         showSuccessNotification({
           title:
             command === "switch"
@@ -317,15 +312,22 @@ export default function BranchesTab() {
 
   const handleCreate = async () => {
     const name = newBranch.trim();
+
     if (name.length === 0 || busyRef.current !== null) {
       return;
     }
 
     startWork("");
+
     try {
-      const result = await invoke<string>("create_branch", { name });
+      const result = await invoke<string>("create_branch", {
+        name,
+      });
+
       await refresh();
+
       setNewBranch("");
+
       showSuccessNotification({
         title: `Created ${name}`,
         message: result,
@@ -341,16 +343,18 @@ export default function BranchesTab() {
   };
 
   return (
-    <Stack h="100vh" px="xl" py="md" gap="md">
+    <Stack px="xl" gap="md">
       <Group justify="space-between" align="flex-end" wrap="nowrap">
         <div className="header-container">
           <h1>Branches</h1>
         </div>
+
         <Group gap="xs" pb="xs" wrap="nowrap" style={{ flex: "none" }}>
           <Badge
             size="lg"
             variant="light"
             radius="sm"
+            color="neyraBlue"
             leftSection={<IconGitBranch size={16} />}
           >
             {currentBranch ?? "detached HEAD"}
@@ -358,8 +362,6 @@ export default function BranchesTab() {
         </Group>
       </Group>
 
-      {/* wrap="wrap" so a narrow window stacks these instead of pushing the
-          buttons off the edge. */}
       <Group gap="sm" align="flex-end">
         <TextInput
           radius="lg"
@@ -369,10 +371,15 @@ export default function BranchesTab() {
           value={newBranch}
           onChange={(event) => setNewBranch(event.currentTarget.value)}
           onKeyDown={getHotkeyHandler([["Enter", handleCreate]])}
-          style={{ flex: 1, minWidth: 220 }}
+          style={{
+            flex: 1,
+            minWidth: 220,
+          }}
         />
+
         <Button
           radius="md"
+          variant="filled"
           leftSection={<IconPlus size={16} />}
           loading={busy === ""}
           disabled={newBranch.trim().length === 0}
@@ -380,11 +387,12 @@ export default function BranchesTab() {
         >
           Create &amp; switch
         </Button>
+
         <TextInput
           radius="lg"
           ref={filterInputRef}
           placeholder="Filter branches"
-          leftSection={<IconSearch size={16} />}
+          leftSection={<IconSearch size={16} color="var(--neyra-text-muted)" />}
           value={filter}
           onChange={(event) => setFilter(event.currentTarget.value)}
           w={200}
@@ -399,12 +407,18 @@ export default function BranchesTab() {
         ) : local.length === 0 && remote.length === 0 ? (
           <Center py="xl">
             <Stack align="center" gap="xs">
-              <IconGitBranch size={34} color="#4a4a4a" />
+              <IconGitBranch
+                size={34}
+                stroke={1.7}
+                className={classes.emptyIcon}
+              />
+
               <Text c="dimmed">
                 {branches.length === 0
                   ? "No branches yet"
                   : "No branches match that filter"}
               </Text>
+
               {branches.length === 0 && (
                 <Text size="xs" c="dimmed">
                   A branch appears once the repository has its first commit.
@@ -421,6 +435,7 @@ export default function BranchesTab() {
               localNames={localNames}
               onAction={handleAction}
             />
+
             <BranchSection
               label="Remote"
               branches={remote}

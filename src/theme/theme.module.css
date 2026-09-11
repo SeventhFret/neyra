@@ -1,0 +1,406 @@
+.input {
+  background-color: var(--neyra-surface-1);
+  border-color: var(--neyra-border);
+  color: var(--neyra-text-primary);
+}
+
+.input::placeholder {
+  color: var(--neyra-text-muted);
+  opacity: 1;
+}
+
+.input:hover {
+  border-color: #2b3a4c;
+}
+
+.input:focus,
+.input:focus-within {
+  border-color: var(--mantine-color-neyraBlue-5);
+}
+
+.input:disabled,
+.input[data-disabled] {
+  background-color: var(--neyra-disabled-bg);
+  border-color: var(--neyra-border-soft);
+  color: var(--neyra-text-muted);
+
+  cursor: not-allowed;
+}
+
+.input:disabled::placeholder,
+.input[data-disabled]::placeholder {
+  color: color-mix(in srgb, var(--neyra-text-muted) 65%, transparent);
+}
+
+.autocompleteDropdown {
+  background-color: var(--neyra-surface-3);
+  border-color: var(--neyra-border);
+}
+
+.autocompleteOption {
+  color: var(--neyra-text-secondary);
+  border-radius: var(--mantine-radius-sm);
+}
+
+.autocompleteOption:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-color-neyraCyan-5) 10%,
+    transparent
+  );
+
+  color: var(--neyra-text-primary);
+}
+
+.autocompleteOption[data-combobox-selected] {
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-color-neyraBlue-5) 14%,
+    transparent
+  );
+
+  color: var(--neyra-text-primary);
+}
+
+/* ============================================
+   BUTTON
+   ============================================ */
+
+.button {
+  font-weight: 600;
+
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease,
+    box-shadow 120ms ease,
+    transform 80ms ease;
+}
+
+.button:active:not([data-disabled]) {
+  transform: translateY(1px);
+}
+
+.button[data-variant="filled"]:hover:not([data-disabled]) {
+  box-shadow: 0 4px 15px
+    color-mix(in srgb, var(--mantine-color-neyraBlue-6) 18%, transparent);
+}
+
+.button[data-variant="gradient"] {
+  box-shadow: 0 5px 18px
+    color-mix(in srgb, var(--mantine-color-neyraBlue-6) 18%, transparent);
+}
+
+/* Disabled */
+
+.button[data-disabled],
+.button:disabled {
+  --button-bg: var(--neyra-disabled-bg);
+  --button-hover: var(--neyra-disabled-bg);
+  --button-color: var(--neyra-text-muted);
+  --button-bd: 1px solid var(--neyra-border-soft);
+
+  box-shadow: none;
+  transform: none;
+  opacity: 1;
+
+  cursor: not-allowed;
+}
+
+.button[data-variant="filled"][data-disabled],
+.button[data-variant="filled"]:disabled {
+  --button-bg: color-mix(
+    in srgb,
+    var(--neyra-primary) 10%,
+    var(--neyra-disabled-bg)
+  );
+
+  --button-color: var(--neyra-text-muted);
+
+  --button-bd: 1px solid
+    color-mix(in srgb, var(--neyra-primary) 14%, var(--neyra-border-soft));
+}
+
+.button[data-variant="light"][data-disabled],
+.button[data-variant="light"]:disabled {
+  --button-bg: var(--neyra-disabled-bg);
+  --button-color: var(--neyra-text-muted);
+  --button-bd: 1px solid var(--neyra-border-soft);
+}
+
+/* ============================================
+   CHECKBOX
+   ============================================ */
+
+.checkboxInput {
+  background-color: var(--neyra-surface-1);
+  border-color: var(--neyra-border);
+
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.checkboxInput:hover:not(:disabled) {
+  border-color: var(--neyra-border-strong);
+}
+
+/* Checked — same visual language as filled Button */
+
+.checkboxInput:checked,
+.checkboxInput[data-checked] {
+  background-color: var(--neyra-primary);
+  border-color: color-mix(
+    in srgb,
+    var(--mantine-color-neyraBlue-3) 35%,
+    var(--neyra-primary)
+  );
+}
+
+.checkboxInput:checked:hover:not(:disabled),
+.checkboxInput[data-checked]:hover:not(:disabled) {
+  background-color: var(--neyra-primary-hover);
+  border-color: var(--neyra-primary-hover);
+}
+
+/* Checkmark */
+
+.checkboxIcon {
+  color: var(--neyra-primary-fg);
+}
+
+/* Focus */
+
+.checkboxInput:focus-visible {
+  outline: none;
+
+  box-shadow:
+    0 0 0 2px var(--neyra-bg),
+    0 0 0 4px color-mix(in srgb, var(--neyra-primary) 40%, transparent);
+}
+
+/* Label */
+
+.checkboxLabel {
+  color: var(--neyra-text-secondary);
+}
+
+.checkboxDescription {
+  color: var(--neyra-text-muted);
+}
+
+/* Disabled */
+
+.checkboxInput:disabled,
+.checkboxInput[data-disabled] {
+  background-color: var(--neyra-disabled-bg);
+  border-color: var(--neyra-border-soft);
+
+  cursor: not-allowed;
+}
+
+.checkboxRoot[data-disabled] .checkboxLabel,
+.checkboxRoot[data-disabled] .checkboxDescription {
+  color: var(--neyra-text-muted);
+}
+
+/* Indeterminate — cyan remains a secondary Neyra accent */
+
+.checkboxInput[data-indeterminate] {
+  background-color: var(--mantine-color-neyraCyan-6);
+  border-color: var(--mantine-color-neyraCyan-5);
+}
+
+/* ============================================
+   KBD / HOTKEYS
+   ============================================ */
+
+.kbd {
+  min-width: 24px;
+  height: 24px;
+
+  padding-inline: 7px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--neyra-surface-2);
+  border: 1px solid var(--neyra-border-strong);
+
+  color: var(--neyra-text-secondary);
+
+  border-radius: 7px;
+
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+
+  box-shadow:
+    inset 0 -1px 0 color-mix(in srgb, var(--neyra-text-primary) 6%, transparent),
+    0 1px 2px rgba(0, 0, 0, 0.25);
+
+  transition:
+    color 120ms ease,
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+/* ============================================
+   SELECT
+   ============================================ */
+
+.selectDropdown {
+  background-color: var(--neyra-surface-3);
+  border-color: var(--neyra-border);
+
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+}
+
+.selectOption {
+  color: var(--neyra-text-secondary);
+
+  border-radius: var(--mantine-radius-sm);
+
+  transition:
+    background-color 100ms ease,
+    color 100ms ease;
+}
+
+.selectOption:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-color-neyraCyan-5) 10%,
+    transparent
+  );
+
+  color: var(--neyra-text-primary);
+}
+
+.selectOption[data-combobox-selected] {
+  background-color: color-mix(in srgb, var(--neyra-primary) 14%, transparent);
+
+  color: var(--neyra-text-primary);
+}
+
+/* ============================================
+   NOTIFICATIONS
+   ============================================ */
+
+.notification {
+  background: var(--neyra-surface-2);
+  border: 1px solid var(--neyra-border);
+
+  color: var(--neyra-text-primary);
+
+  border-radius: var(--mantine-radius-lg);
+
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.32),
+    0 0 0 1px color-mix(in srgb, var(--neyra-text-primary) 2%, transparent);
+}
+
+.notificationBody {
+  min-width: 0;
+}
+
+.notificationTitle {
+  color: var(--neyra-text-primary);
+
+  font-weight: 600;
+}
+
+.notificationDescription {
+  color: var(--neyra-text-secondary);
+
+  font-size: var(--mantine-font-size-sm);
+}
+
+.notificationIcon {
+  background: transparent;
+}
+
+.notificationClose {
+  color: var(--neyra-text-muted);
+
+  transition:
+    color 100ms ease,
+    background-color 100ms ease;
+}
+
+.notificationClose:hover {
+  color: var(--neyra-text-primary);
+
+  background: var(--neyra-surface-3);
+}
+
+/* ============================================
+   DRAWER
+   ============================================ */
+
+.drawerContent {
+  background: var(--neyra-surface-2);
+
+  border: 1px solid var(--neyra-border-accent);
+  border-radius: var(--mantine-radius-xl);
+
+  overflow: hidden;
+
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--neyra-text-primary) 3%, transparent),
+    0 20px 55px rgba(0, 0, 0, 0.42);
+}
+
+/* Header */
+
+.drawerHeader {
+  min-height: 64px;
+  padding: 16px 18px;
+
+  background: var(--neyra-surface-2);
+
+  border-bottom: 1px solid var(--neyra-border-soft);
+}
+
+.drawerTitle {
+  color: var(--neyra-text-primary);
+
+  font-size: var(--mantine-font-size-lg);
+  font-weight: 600;
+}
+
+/* Content */
+
+.drawerBody {
+  background: var(--neyra-surface-2);
+  color: var(--neyra-text-primary);
+
+  padding: 16px;
+}
+
+/* Close button */
+
+.drawerClose {
+  color: var(--neyra-text-muted);
+
+  border-radius: var(--mantine-radius-md);
+
+  transition:
+    color 120ms ease,
+    background-color 120ms ease;
+}
+
+.drawerClose:hover {
+  color: var(--neyra-text-primary);
+  background: var(--neyra-surface-3);
+}
+
+/* Overlay */
+
+.drawerOverlay {
+  background: rgba(2, 5, 9, 0.42);
+
+  backdrop-filter: blur(2px);
+}

@@ -1,31 +1,40 @@
-/* Same palette and row treatment as the Log tab: #252525 paper, lifted hover,
-   thin separators. */
-
 .scroll {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
 }
 
+.section {
+  background: var(--neyra-surface-1);
+  border: 1px solid var(--neyra-border);
+  border-radius: var(--mantine-radius-lg);
+
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.16);
+}
+
 .row {
   display: flex;
   align-items: center;
   gap: 12px;
+
   padding: 12px 18px;
-  transition: background-color 120ms ease;
+
+  background: transparent;
+
+  transition:
+    background-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .row:hover {
-  background-color: #2c2c2c;
+  background-color: var(--neyra-surface-2);
 }
 
 .row + .row {
-  border-top: 1px solid #2f2f2f;
+  border-top: 1px solid var(--neyra-border-soft);
 }
 
-/* Rows round their own outer corners, so the Paper does not need
-   overflow: hidden — a rounded clip around scrolling content is what makes the
-   Linux webview rasterise the subtree into a layer and blur it. */
 .row:first-of-type {
   border-top-left-radius: var(--mantine-radius-lg);
   border-top-right-radius: var(--mantine-radius-lg);
@@ -36,21 +45,32 @@
   border-bottom-right-radius: var(--mantine-radius-lg);
 }
 
-/* The checked out branch keeps a permanent accent stripe down its left edge. */
 .current {
-  background-color: #2a2f2e;
-  box-shadow: inset 3px 0 0 0 var(--mantine-primary-color-filled);
+  background-color:
+    color-mix(
+      in srgb,
+      var(--neyra-primary) 7%,
+      var(--neyra-surface-1)
+    );
+
+  box-shadow:
+    inset 3px 0 0 var(--neyra-primary);
 }
 
 .current:hover {
-  background-color: #303534;
+  background-color:
+    color-mix(
+      in srgb,
+      var(--neyra-primary) 9%,
+      var(--neyra-surface-1)
+    );
 }
 
-/* Faint until the row is hovered, so 40 branches do not read as 80 buttons.
-   flex: none keeps the buttons at full width while the name truncates. */
 .action {
   flex: none;
-  opacity: 0.25;
+
+  opacity: 0.28;
+
   transition: opacity 120ms ease;
 }
 
@@ -62,4 +82,22 @@
 .sectionLabel {
   text-transform: uppercase;
   letter-spacing: 1px;
+
+  color: var(--neyra-text-muted);
+}
+
+.branchIcon {
+  flex: none;
+  display: flex;
+
+  color: var(--neyra-text-muted);
+}
+
+.branchIconCurrent {
+  color: var(--neyra-primary);
+}
+
+.emptyIcon {
+  color: var(--neyra-text-muted);
+  opacity: 0.65;
 }

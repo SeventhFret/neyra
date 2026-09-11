@@ -3,11 +3,9 @@ import {
   Text,
   Paper,
   Group,
-  Kbd,
   Button,
   Checkbox,
   Badge,
-  Select,
   Stack,
 } from "@mantine/core";
 import { invoke } from "@tauri-apps/api/core";
@@ -21,6 +19,7 @@ import {
   IconPlaylistX,
 } from "@tabler/icons-react";
 import { useRepoData } from "../../stores";
+import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
 
 export default function StatusTab() {
   const status = useRepoData((state) => state.statusMessage);
@@ -94,12 +93,9 @@ export default function StatusTab() {
   );
 
   return (
-    <div
+    <Stack
+      px="xl"
       style={{
-        marginLeft: "15px",
-        marginRight: "15px",
-        paddingBottom: "15px",
-        height: "100dvh",
         display: "flex",
         flexDirection: "column",
         overflowY: "auto",
@@ -186,7 +182,6 @@ export default function StatusTab() {
                 remotes.length > 0 ? remotes[0].name : "No remote found"
               }
             />
-            <Select />
             <Checkbox
               checked={rebase}
               onChange={(event) => setRebase(event.currentTarget.checked)}
@@ -195,10 +190,9 @@ export default function StatusTab() {
                   Use
                   <code style={{ fontWeight: 600 }}>--rebase</code>
                   flag
-                  <div>
-                    <Kbd size="xs">Ctrl</Kbd> + <Kbd size="xs">Alt</Kbd> +{" "}
-                    <Kbd size="xs">R</Kbd>
-                  </div>
+                  <ShortcutKeys
+                    shortcut={{ modifiers: ["mod", "alt"], key: "R" }}
+                  />
                 </Group>
               }
             />
@@ -206,6 +200,7 @@ export default function StatusTab() {
           <Group>
             <Button
               radius="lg"
+              variant="filled"
               size="lg"
               loading={isPulling}
               disabled={isPulling}
@@ -214,9 +209,7 @@ export default function StatusTab() {
             >
               {rebase ? "Pull & Rebase" : "Pull"}
             </Button>
-            <div>
-              <Kbd size="sm">Ctrl</Kbd> + <Kbd size="sm">Enter</Kbd>
-            </div>
+            <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "Enter" }} />
             <Button
               radius="lg"
               size="lg"
@@ -228,25 +221,20 @@ export default function StatusTab() {
             >
               Fetch
             </Button>
-            <div>
-              <Kbd size="sm">Ctrl</Kbd> + <Kbd size="sm">F</Kbd>
-            </div>
+            <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "F" }} />
             <Button
               radius="lg"
               size="lg"
-              variant="light"
-              color="gray.8"
+              variant="subtle"
               leftSection={<IconPlaylistX />}
               onClick={() => setPullOutput("")}
             >
               Clear output
             </Button>
-            <div>
-              <Kbd size="sm">Ctrl</Kbd> + <Kbd size="sm">L</Kbd>
-            </div>
+            <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "L" }} />
           </Group>
         </Stack>
       </div>
-    </div>
+    </Stack>
   );
 }

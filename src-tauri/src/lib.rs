@@ -22,6 +22,7 @@ pub fn run() {
     // let launch_dir = PathBuf::from("/home/mmarchuk/projects/demo-git-repo");
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_opener::init())

@@ -258,24 +258,27 @@ fn remotes(root: &Path) -> Result<Vec<Remote>, String> {
 ///   "" → None
 fn parse_decorated_refs(decorated: &str) -> Option<String> {
     // Strip outer parentheses and whitespace
-    let inner = decorated.trim().trim_start_matches('(').trim_end_matches(')').trim();
-    
+    let inner = decorated
+        .trim()
+        .trim_start_matches('(')
+        .trim_end_matches(')')
+        .trim();
+
     if inner.is_empty() {
         return None;
     }
 
     // Split by commas and find the best ref to display
     let refs: Vec<&str> = inner.split(',').map(|s| s.trim()).collect();
-    
+
     // Prefer a regular branch ref over HEAD and tags
-    let selected_ref = refs.iter()
+    let selected_ref = refs
+        .iter()
         .find(|r| !r.starts_with("HEAD") && !r.starts_with("tag:"))
         .copied()
         .or_else(|| {
             // Fall back to the HEAD -> branch_name entry
-            refs.iter()
-                .find(|r| r.contains("HEAD ->"))
-                .copied()
+            refs.iter().find(|r| r.contains("HEAD ->")).copied()
         })
         .or_else(|| refs.first().copied())
         .unwrap_or("");
@@ -285,7 +288,11 @@ fn parse_decorated_refs(decorated: &str) -> Option<String> {
         .strip_prefix("HEAD -> ")
         .unwrap_or(selected_ref)
         .strip_prefix("tag: ")
-        .unwrap_or_else(|| selected_ref.strip_prefix("HEAD -> ").unwrap_or(selected_ref))
+        .unwrap_or_else(|| {
+            selected_ref
+                .strip_prefix("HEAD -> ")
+                .unwrap_or(selected_ref)
+        })
         .trim();
 
     if cleaned.is_empty() {
