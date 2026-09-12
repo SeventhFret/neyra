@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "neyra",
+  "productName": "Neyra",
   "version": "0.1.0",
   "identifier": "com.seventhfret.neyra",
   "build": {
@@ -12,9 +12,11 @@
   "app": {
     "windows": [
       {
-        "title": "neyra",
-        "width": 1200,
-        "height": 800
+        "title": "Neyra",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 900,
+        "minHeight": 650
       }
     ],
     "security": {
