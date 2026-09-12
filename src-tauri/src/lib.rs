@@ -1,45 +1,55 @@
-use std::env;
-use std::path::PathBuf;
+use std::{env, path::PathBuf};
 
-mod git;
+use tauri::Manager;
+
+mod commands;
+mod core;
+mod state;
+
+use state::RepositoryManager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    // WebKitGTK renders through DMABUF by default, which misbehaves on WSLg and
-    // virtualised GPUs: scrolled content is rasterised once at the wrong scale
-    // and stays blurry afterwards. Both variables are the standard workarounds
-    // and must be set before the webview starts. Drop the compositing one first
-    // if you want hardware compositing back and the blur is gone.
     #[cfg(target_os = "linux")]
     {
         env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
         env::set_var("WEBKIT_DISABLE_COMPOSITING_MODE", "1");
     }
 
-    // Captured before anything can change the process cwd: the repo we operate
-    // on is the one the shell command was run from.
     let launch_dir = env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-    // let launch_dir = PathBuf::from("/home/mmarchuk/projects/demo-git-repo");
+
+    let repository_manager = RepositoryManager::new(&launch_dir);
 
     tauri::Builder::default()
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_opener::init())
-        .manage(git::LaunchDir(launch_dir))
+        .manage(repository_manager)
+        .setup(|app| {
+            let state = app.state::<RepositoryManager>();
+
+            if let Err(error) = state.restart_watcher(app.handle().clone()) {
+                eprintln!("Failed to start repository watcher: {error}");
+            }
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
-            git::get_repo_data,
-            git::commit,
-            git::push,
-            git::pull,
-            git::fetch,
-            git::switch_branch,
-            git::rebase,
-            git::create_branch,
-            git::stage,
-            git::unstage,
-            git::get_config,
-            git::set_config,
+            commands::git::get_repo_data,
+            commands::git::get_repository_root,
+            commands::git::select_repository,
+            commands::git::commit,
+            commands::git::push,
+            commands::git::pull,
+            commands::git::fetch,
+            commands::git::switch_branch,
+            commands::git::rebase,
+            commands::git::create_branch,
+            commands::git::stage,
+            commands::git::unstage,
+            commands::git::get_config,
+            commands::git::set_config,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
