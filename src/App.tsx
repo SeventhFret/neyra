@@ -5,8 +5,6 @@ import { exit } from "@tauri-apps/plugin-process";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { IconExclamationCircle, IconCircleCheck } from "@tabler/icons-react";
-import { formatNotificationTime } from "./utils";
 
 import CommitterTab from "./tabs/committer/CommitterTab";
 import StatusTab from "./tabs/status/StatusTab";
@@ -20,14 +18,6 @@ import { NeyraDock } from "./components/NeyraDock/NeyraDock";
 import { useRepoData } from "./stores";
 import { useNotificationStore } from "./stores/notifications/store";
 import "./App.css";
-import {
-  Drawer,
-  Stack,
-  Notification,
-  Text,
-  Group,
-  Button,
-} from "@mantine/core";
 import { NotificationCenter } from "./components/NotificationCenter/NotificationCenter";
 
 export type TabId =
@@ -51,13 +41,6 @@ const TAB_ORDER: TabId[] = [
 
 function App() {
   const [currentTab, setCurrentTab] = useState<TabId>("committer");
-  const neyraNotifications = useNotificationStore((state) => state.items);
-  const deleteNotification = useNotificationStore((state) => state.remove);
-  const clearNotifications = useNotificationStore((state) => state.clear);
-
-  const markRead = useNotificationStore((state) => state.markRead);
-
-  const markAllRead = useNotificationStore((state) => state.markAllRead);
   const unreadCount = useNotificationStore(
     (state) => state.items.filter((item) => !item.read).length,
   );
@@ -65,15 +48,6 @@ function App() {
   const refreshing = useRepoData((state) => state.isLoading);
   const refresh = useRepoData((state) => state.refresh);
   const currentBranch = useRepoData((state) => state.currentBranch);
-
-  const testNotification = {
-    createdAt: 1789150161096,
-    id: "14b94315-34d7-478d-8be2-5fda4c790348",
-    message: "Finished fetching",
-    read: false,
-    title: "Fetch is successful",
-    type: "success",
-  };
 
   const clipboard = useClipboard({ timeout: 1500 });
 
