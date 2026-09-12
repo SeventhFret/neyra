@@ -1,0 +1,80 @@
+.logo {
+  border-radius: 22px;
+}
+
+.panel {
+  width: min(760px, 65vw);
+  max-height: 58vh;
+
+  overflow: auto;
+
+  background: var(--neyra-surface-1);
+
+  border: 1px solid var(--neyra-border-accent);
+
+  box-shadow:
+    0 20px 55px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 color-mix(in srgb, var(--neyra-text-primary) 2%, transparent);
+}
+
+.repoRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-height: 64px;
+
+  padding: 10px 12px;
+
+  border: 1px solid transparent;
+  border-radius: var(--mantine-radius-lg);
+
+  background: transparent;
+
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    transform 80ms ease;
+}
+
+.repoRow:hover {
+  background: var(--neyra-surface-2);
+
+  border-color: var(--neyra-border);
+}
+
+.repoRow:active {
+  transform: translateY(1px);
+}
+
+.repoIcon {
+  width: 40px;
+  height: 40px;
+
+  flex: 0 0 40px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: var(--mantine-radius-md);
+
+  color: var(--mantine-color-neyraCyan-4);
+
+  background: color-mix(
+    in srgb,
+    var(--mantine-color-neyraCyan-5) 9%,
+    transparent
+  );
+
+  border: 1px solid
+    color-mix(in srgb, var(--mantine-color-neyraCyan-5) 14%, transparent);
+}
+
+.repoInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.buttonsBox {
+  width: min(760px, 65vw);
+}
