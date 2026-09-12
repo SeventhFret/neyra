@@ -29,8 +29,6 @@ import { showErrorNotification } from "../../utils";
 import classes from "./FilesTab.module.css";
 import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
 
-/** Vibrant takes on the usual VS Code status colours. Untracked stays the
- *  normal text colour; the rest are the bright end of the Mantine palette. */
 const STATUS_COLORS = {
   conflicted: "#da77f2",
   deleted: "#ff6b6b",
@@ -44,7 +42,6 @@ const FOLDER_COLOR = "#a1a1aa";
 
 type StatusKind = keyof typeof STATUS_COLORS;
 
-/** Worst-first, so a file that is both added and deleted reads as deleted. */
 function statusKind(entry: StatusEntry): StatusKind {
   const codes = `${entry.indexStatus}${entry.worktreeStatus}`;
 
@@ -56,8 +53,6 @@ function statusKind(entry: StatusEntry): StatusKind {
   return "untracked";
 }
 
-/** A file is staged when the index column carries a change. `?` is untracked
- *  and a blank means the change is only in the working tree. */
 function isStaged(entry: StatusEntry): boolean {
   return entry.indexStatus !== " " && entry.indexStatus !== "?";
 }
@@ -65,10 +60,7 @@ function isStaged(entry: StatusEntry): boolean {
 interface NodeMeta {
   isDir: boolean;
   color: string;
-  /** Porcelain codes, e.g. `M` or `MM`. Null for directories. */
   codes: string | null;
-  /** Staged and total file counts in this subtree — a directory checkbox is
-   *  indeterminate between the two. */
   staged: number;
   total: number;
 }
@@ -80,7 +72,6 @@ interface RawNode {
   entry?: StatusEntry;
 }
 
-/** Directories first, then alphabetical — the order a file explorer uses. */
 function compareNodes(a: RawNode, b: RawNode): number {
   const aIsDir = a.children.size > 0;
   const bIsDir = b.children.size > 0;
@@ -170,7 +161,11 @@ function buildTree(entries: StatusEntry[]): {
   };
 }
 
-export default function FilesTab() {
+interface FilesTabProps {
+  active: boolean;
+}
+
+export default function FilesTab({ active }: FilesTabProps) {
   const status = useRepoData((state) => state.status);
   const isLoading = useRepoData((state) => state.isLoading);
   const refresh = useRepoData((state) => state.refresh);
@@ -235,10 +230,12 @@ export default function FilesTab() {
   }, [run, status.length]);
 
   useHotkeys(
-    [
-      ["ctrl+Enter", stageAll],
-      ["ctrl+F", () => filterInputRef.current?.focus()],
-    ],
+    active
+      ? [
+          ["ctrl+Enter", stageAll],
+          ["ctrl+F", () => filterInputRef.current?.focus()],
+        ]
+      : [],
     [],
   );
 
@@ -298,7 +295,11 @@ export default function FilesTab() {
         ) : data.length === 0 ? (
           <Center style={{ flex: 1 }} p="xl">
             <Stack align="center" gap="xs">
-              <IconFolder size={34} stroke={1.7} color="var(--neyra-text-muted)" />
+              <IconFolder
+                size={34}
+                stroke={1.7}
+                color="var(--neyra-text-muted)"
+              />
               <Text c="dimmed">
                 {status.length === 0
                   ? "Working tree clean"

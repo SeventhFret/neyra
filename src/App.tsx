@@ -105,19 +105,19 @@ function App() {
     <main className="app">
       <div className="pageViewport">
         <Page tab="status" currentTab={currentTab}>
-          <StatusTab />
+          <StatusTab active={currentTab === "status"} />
         </Page>
 
         <Page tab="committer" currentTab={currentTab}>
-          <CommitterTab />
+          <CommitterTab active={currentTab === "committer"} />
         </Page>
 
         <Page tab="branches" currentTab={currentTab}>
-          <BranchesTab />
+          <BranchesTab active={currentTab === "branches"} />
         </Page>
 
         <Page tab="files" currentTab={currentTab}>
-          <FilesTab />
+          <FilesTab active={currentTab === "files"} />
         </Page>
 
         <Page tab="pull-requests" currentTab={currentTab}>

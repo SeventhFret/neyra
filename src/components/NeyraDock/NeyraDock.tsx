@@ -58,7 +58,7 @@ const tabs: {
   {
     id: "committer",
     label: "Commit",
-    shortcut: { modifiers: ["mod"], key: "C" },
+    shortcut: { modifiers: ["mod"], key: "G" },
     icon: IconGitCommit,
   },
   {

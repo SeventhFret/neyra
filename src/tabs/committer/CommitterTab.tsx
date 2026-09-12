@@ -55,7 +55,11 @@ const COMMON_SCOPES = [
 /** The `scope` of a `type(scope): subject` header. */
 const SCOPE_PATTERN = /^\w+\(([^)]+)\)!?:/;
 
-export default function CommitterTab() {
+interface CommitterTabProps {
+  active: boolean;
+}
+
+export default function CommitterTab({ active }: CommitterTabProps) {
   const refresh = useRepoData((state) => state.refresh);
   const commits = useRepoData((state) => state.commits);
   const [fullCommitMsg, setFullCommitMsg] = useState<string>("");
@@ -169,24 +173,26 @@ export default function CommitterTab() {
   };
 
   useHotkeys(
-    [
-      ["mod+Enter", handleCommit, { usePhysicalKeys: true }],
-      [
-        "mod+shift+H",
-        () => setPerformCommit((commit) => !commit),
-        { usePhysicalKeys: true },
-      ],
-      [
-        "mod+shift+P",
-        () => setPushToBranch((push) => !push),
-        { usePhysicalKeys: true },
-      ],
-      [
-        "mod+F",
-        () => setForceWithLease((force) => !force),
-        { usePhysicalKeys: true },
-      ],
-    ],
+    active
+      ? [
+          ["mod+Enter", handleCommit, { usePhysicalKeys: true }],
+          [
+            "mod+shift+H",
+            () => setPerformCommit((commit) => !commit),
+            { usePhysicalKeys: true },
+          ],
+          [
+            "mod+shift+P",
+            () => setPushToBranch((push) => !push),
+            { usePhysicalKeys: true },
+          ],
+          [
+            "mod+F",
+            () => setForceWithLease((force) => !force),
+            { usePhysicalKeys: true },
+          ],
+        ]
+      : [],
     [],
   );
 

@@ -214,7 +214,11 @@ function BranchSection({
   );
 }
 
-export default function BranchesTab() {
+interface BranchesTabProps {
+  active: boolean;
+}
+
+export default function BranchesTab({ active }: BranchesTabProps) {
   const branches = useRepoData((state) => state.branches);
   const currentBranch = useRepoData((state) => state.currentBranch);
   const isLoading = useRepoData((state) => state.isLoading);
@@ -224,20 +228,22 @@ export default function BranchesTab() {
   const newBranchRef = useRef<HTMLInputElement | null>(null);
 
   useHotkeys(
-    [
-      [
-        "ctrl+F",
-        () => {
-          filterInputRef.current?.focus();
-        },
-      ],
-      [
-        "ctrl+N",
-        () => {
-          newBranchRef.current?.focus();
-        },
-      ],
-    ],
+    active
+      ? [
+          [
+            "ctrl+F",
+            () => {
+              filterInputRef.current?.focus();
+            },
+          ],
+          [
+            "ctrl+N",
+            () => {
+              newBranchRef.current?.focus();
+            },
+          ],
+        ]
+      : [],
     [],
   );
 

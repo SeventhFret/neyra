@@ -21,7 +21,11 @@ import {
 import { useRepoData } from "../../stores";
 import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
 
-export default function StatusTab() {
+interface StatusTabProps {
+  active: boolean;
+}
+
+export default function StatusTab({ active }: StatusTabProps) {
   const status = useRepoData((state) => state.statusMessage);
   const remotes = useRepoData((state) => state.remotes);
   const refresh = useRepoData((state) => state.refresh);
@@ -91,18 +95,20 @@ export default function StatusTab() {
   };
 
   useHotkeys(
-    [
-      [
-        "mod+alt+R",
-        () => {
-          setRebase((current) => !current);
-        },
-        { usePhysicalKeys: true },
-      ],
-      ["mod+F", handleFetch, { usePhysicalKeys: true }],
-      ["mod+enter", handlePull, { usePhysicalKeys: true }],
-      ["mod+L", () => setPullOutput(""), { usePhysicalKeys: true }],
-    ],
+    active
+      ? [
+          [
+            "mod+alt+R",
+            () => {
+              setRebase((current) => !current);
+            },
+            { usePhysicalKeys: true },
+          ],
+          ["mod+F", handleFetch, { usePhysicalKeys: true }],
+          ["mod+enter", handlePull, { usePhysicalKeys: true }],
+          ["mod+L", () => setPullOutput(""), { usePhysicalKeys: true }],
+        ]
+      : [],
     [],
   );
 
