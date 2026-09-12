@@ -2,6 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { create } from "zustand";
 import { buildQueryParams } from "./utils";
 import { fetch } from "@tauri-apps/plugin-http";
+import { listen } from "@tauri-apps/api/event";
 
 const GITLAB_API_BASE_URL = "https://gitlab.com/api/v4/";
 // const MR_QUERY = "merge_requests?state=opened&scope=created_by_me&created_after=2026-01-01T00:00:00Z&order_by=updated_at"
@@ -180,6 +181,18 @@ export interface PRDataAction {
   selectGlPr: (pr: GitLabMergeRequest) => void;
 }
 
+let refreshRunning = false;
+let refreshPending = false;
+interface RepoChangedEvent {
+  root: string;
+}
+
+export async function listenForRepoChanges() {
+  return listen<RepoChangedEvent>("repo-changed", () => {
+    void useRepoData.getState().refresh();
+  });
+}
+
 export const useRepoData = create<GitRepoDataState & GitRepoDataAction>(
   (set) => ({
     root: "",
@@ -189,18 +202,49 @@ export const useRepoData = create<GitRepoDataState & GitRepoDataAction>(
     remotes: [],
     branches: [],
     commits: [],
+
     isLoading: false,
     error: null,
+
     setCurrentBranch: (currentBranch) => {
-      set({ currentBranch: currentBranch });
+      set({ currentBranch });
     },
+
     refresh: async () => {
-      set({ isLoading: true, error: null });
+      console.log("refreshing!");
+      if (refreshRunning) {
+        refreshPending = true;
+        return;
+      }
+
+      refreshRunning = true;
+
       try {
-        const repoData = await invoke<RepoData>("get_repo_data");
-        set({ ...repoData, isLoading: false });
-      } catch (error) {
-        set({ error: String(error), isLoading: false });
+        do {
+          refreshPending = false;
+
+          set({
+            isLoading: true,
+            error: null,
+          });
+
+          try {
+            const repoData = await invoke<RepoData>("get_repo_data");
+
+            set({
+              ...repoData,
+              isLoading: false,
+              error: null,
+            });
+          } catch (error) {
+            set({
+              error: String(error),
+              isLoading: false,
+            });
+          }
+        } while (refreshPending);
+      } finally {
+        refreshRunning = false;
       }
     },
   }),

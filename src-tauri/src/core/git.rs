@@ -100,7 +100,13 @@ pub fn current_branch(repo: &Repository) -> Option<String> {
 fn status(root: &Path) -> Result<Vec<StatusEntry>, String> {
     let raw = git(
         root,
-        &["status", "--porcelain", "-z", "--untracked-files=all"],
+        &[
+            "--no-optional-locks",
+            "status",
+            "--porcelain",
+            "-z",
+            "--untracked-files=all",
+        ],
     )?;
 
     let mut fields = raw.split('\0').filter(|field| !field.is_empty());

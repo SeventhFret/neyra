@@ -15,7 +15,7 @@ import SettingsTab from "./tabs/settings/SettingsTab";
 import PullRequestsTab from "./tabs/pull-requests/PullRequestsTab";
 
 import { NeyraDock } from "./components/NeyraDock/NeyraDock";
-import { useRepoData } from "./stores";
+import { useRepoData, listenForRepoChanges } from "./stores";
 import { useNotificationStore } from "./stores/notifications/store";
 import "./App.css";
 import { NotificationCenter } from "./components/NotificationCenter/NotificationCenter";
@@ -56,7 +56,23 @@ function App() {
   };
 
   useEffect(() => {
-    void refresh();
+    refresh();
+
+    let unlisten: (() => void) | undefined;
+    let disposed = false;
+
+    listenForRepoChanges().then((stop) => {
+      if (disposed) {
+        stop();
+      } else {
+        unlisten = stop;
+      }
+    });
+
+    return () => {
+      disposed = true;
+      unlisten?.();
+    };
   }, [refresh]);
 
   const selectTab = (nextTab: TabId) => {
