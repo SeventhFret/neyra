@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 import { invoke } from "@tauri-apps/api/core";
 import {
   RepositorySelectionAction,
@@ -56,7 +56,7 @@ export const useRepositorySelectionStore = create<
     });
 
     try {
-      console.log("SELECTING REPO")
+      console.log("SELECTING REPO");
       const root = await invoke<string>("select_repository", { path });
 
       await useRepoData.getState().refresh();
@@ -89,7 +89,7 @@ export const useRepoHistoryStore = create<
   RepositoryHistoryState & RepositoryHistoryAction
 >()(
   persist<RepositoryHistoryState & RepositoryHistoryAction>(
-    (set, get) => ({
+    (set, _) => ({
       repositories: [],
       addEntry: (path) => {
         set((state) => {
