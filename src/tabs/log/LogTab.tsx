@@ -185,7 +185,6 @@ export default function LogTab() {
       </Group>
 
       <Paper
-        bg="#252525"
         shadow="md"
         radius="lg"
         p={0}
@@ -215,7 +214,7 @@ export default function LogTab() {
         ) : commits.length === 0 ? (
           <Center style={{ flex: 1 }} p="xl">
             <Stack align="center" gap="xs">
-              <IconGitCommit size={34} color="#4a4a4a" />
+              <IconGitCommit size={34} stroke={1.7} color="var(--neyra-text-muted)" />
               <Text c="dimmed">No commits yet</Text>
               <Text size="xs" c="dimmed">
                 The first one you make in the Committer tab shows up here.

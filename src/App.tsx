@@ -17,8 +17,11 @@ import PullRequestsTab from "./tabs/pull-requests/PullRequestsTab";
 import { NeyraDock } from "./components/NeyraDock/NeyraDock";
 import { useRepoData, listenForRepoChanges } from "./stores";
 import { useNotificationStore } from "./stores/notifications/store";
+import { useRepositorySelectionStore } from "./stores/repoSelector/store";
 import "./App.css";
 import { NotificationCenter } from "./components/NotificationCenter/NotificationCenter";
+import NeyraRepoSelector from "./components/NeyraRepoSelector/NeyraRepoSelector";
+import NeyraStatusBar from "./components/NeyraStatusBar/NeyraStatusBar";
 
 export type TabId =
   | "status"
@@ -48,6 +51,10 @@ function App() {
   const refreshing = useRepoData((state) => state.isLoading);
   const refresh = useRepoData((state) => state.refresh);
   const currentBranch = useRepoData((state) => state.currentBranch);
+  const repoStatus = useRepositorySelectionStore((state) => state.status);
+  const initializeRepo = useRepositorySelectionStore(
+    (state) => state.initialize,
+  );
 
   const clipboard = useClipboard({ timeout: 1500 });
 
@@ -75,6 +82,10 @@ function App() {
     };
   }, [refresh]);
 
+  useEffect(() => {
+    initializeRepo();
+  }, [initializeRepo]);
+
   const selectTab = (nextTab: TabId) => {
     if (nextTab === currentTab) {
       return;
@@ -101,8 +112,13 @@ function App() {
     [],
   );
 
+  if (repoStatus === "none") {
+    return <NeyraRepoSelector />;
+  }
+
   return (
     <main className="app">
+      <NeyraStatusBar />
       <div className="pageViewport">
         <Page tab="status" currentTab={currentTab}>
           <StatusTab active={currentTab === "status"} />

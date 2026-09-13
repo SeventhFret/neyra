@@ -1,0 +1,64 @@
+.statusBar {
+  position: relative;
+
+  width: 100%;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+
+  padding-inline: 10px;
+
+  background: color-mix(in srgb, var(--neyra-surface-2) 88%, transparent);
+
+  border: 1px solid var(--neyra-border-soft);
+  border-radius: var(--mantine-radius-md);
+
+  backdrop-filter: blur(8px);
+}
+
+.neyraLogo {
+  width: 24px;
+  height: 24px;
+
+  flex-shrink: 0;
+}
+
+.repository {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  max-width: 55%;
+
+  transform: translate(-50%, -50%);
+}
+
+.repoName {
+  color: var(--neyra-text-secondary);
+}
+
+.repoPath {
+  color: var(--neyra-text-muted);
+  opacity: 0.65;
+}
+
+.branch {
+  margin-left: auto;
+  max-width: 25%;
+
+  padding: 3px 7px;
+
+  color: var(--mantine-color-neyraBlue-3);
+
+  background: color-mix(
+    in srgb,
+    var(--mantine-color-neyraBlue-5) 8%,
+    transparent
+  );
+
+  border: 1px solid
+    color-mix(in srgb, var(--mantine-color-neyraBlue-5) 12%, transparent);
+
+  border-radius: var(--mantine-radius-sm);
+}

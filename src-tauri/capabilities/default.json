@@ -16,6 +16,7 @@
         "https://api.github.com/"
       ]
     },
-    "os:default"
+    "os:default",
+    "dialog:default"
   ]
 }

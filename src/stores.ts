@@ -211,7 +211,6 @@ export const useRepoData = create<GitRepoDataState & GitRepoDataAction>(
     },
 
     refresh: async () => {
-      console.log("refreshing!");
       if (refreshRunning) {
         refreshPending = true;
         return;

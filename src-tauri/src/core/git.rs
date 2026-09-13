@@ -88,13 +88,19 @@ pub fn repo_root(repo: &Repository) -> Result<PathBuf, String> {
 }
 
 pub fn current_branch(repo: &Repository) -> Option<String> {
-    let head = repo.head().ok()?;
+    match repo.head() {
+        Ok(head) => head.shorthand().ok().map(str::to_string),
 
-    if !head.is_branch() {
-        return None;
+        Err(error) if error.code() == git2::ErrorCode::UnbornBranch => {
+            let head = std::fs::read_to_string(repo.path().join("HEAD")).ok()?;
+
+            head.trim()
+                .strip_prefix("ref: refs/heads/")
+                .map(str::to_string)
+        }
+
+        Err(_) => None,
     }
-
-    head.shorthand().ok().map(str::to_string)
 }
 
 fn status(root: &Path) -> Result<Vec<StatusEntry>, String> {
