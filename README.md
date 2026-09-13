@@ -1,6 +1,6 @@
 # Neyra
 
-![Neyra logo](src/assets/logo/neyra-logo-1024.png)
+<img src="src/assets/logo/neyra-logo-1024.png" width="150" alt="Neyra logo" />
 
 **A lightweight, cross-platform desktop Git client with a modern
 interface.**
@@ -9,7 +9,7 @@ interface.**
 release**](https://github.com/SeventhFret/neyra/releases/latest) ·
 [Report an issue](https://github.com/SeventhFret/neyra/issues)
 
-------------------------------------------------------------------------
+---
 
 ## About
 
@@ -30,34 +30,36 @@ interface](src/assets/ui-screenshots/neyra-ui-screenshot.png)
 
 ## Features
 
--   Open Git repositories and quickly return to recently used
-    repositories
--   View repository status and changed files
--   Stage and unstage files
--   Create commits
--   Push changes, including force-with-lease
--   Fetch and pull from remotes
--   Pull with rebase
--   Browse local and remote branches
--   Switch and create branches
--   Rebase branches
--   Browse commit history
--   View and edit Git user configuration
--   Automatic repository change detection
--   Keyboard shortcuts for common actions
--   In-app notifications
--   Built-in application updates
+- Open Git repositories and quickly return to recently used
+  repositories
+- View repository status and changed files
+- Stage and unstage files
+- Create commits
+- Push changes, including force-with-lease
+- Fetch and pull from remotes
+- Pull with rebase
+- Browse local and remote branches
+- Switch and create branches
+- Rebase branches
+- Browse commit history
+- View and edit Git user configuration
+- Automatic repository change detection
+- Keyboard shortcuts for common actions
+- In-app notifications
+- Built-in application updates
 
 ## Downloads
 
 Prebuilt releases are available from [GitHub
 Releases](https://github.com/SeventhFret/neyra/releases/latest).
 
-  Platform   Architecture            Support
-  ---------- ----------------------- -----------
-  macOS      Apple Silicon (arm64)   Supported
-  Windows    x86-64                  Supported
-  Linux      x86-64                  Supported
+Platform Architecture Support
+
+---
+
+macOS Apple Silicon (arm64) Supported
+Windows x86-64 Supported
+Linux x86-64 Supported
 
 ### macOS
 
@@ -89,46 +91,46 @@ corresponding shortcuts use **Ctrl**.
 
 To build Neyra locally, you will need:
 
--   [Node.js](https://nodejs.org/)
--   [Rust](https://www.rust-lang.org/tools/install)
--   [Git](https://git-scm.com/)
--   The platform-specific prerequisites required by
-    [Tauri](https://v2.tauri.app/start/prerequisites/)
+- [Node.js](https://nodejs.org/)
+- [Rust](https://www.rust-lang.org/tools/install)
+- [Git](https://git-scm.com/)
+- The platform-specific prerequisites required by
+  [Tauri](https://v2.tauri.app/start/prerequisites/)
 
 Clone the repository:
 
-``` bash
+```bash
 git clone https://github.com/SeventhFret/neyra.git
 cd neyra
 ```
 
 Install frontend dependencies:
 
-``` bash
+```bash
 npm install
 ```
 
 Run the application in development mode:
 
-``` bash
+```bash
 npx tauri dev
 ```
 
 Build a release:
 
-``` bash
+```bash
 npx tauri build
 ```
 
 ## Tech stack
 
--   **Desktop runtime:** Tauri
--   **Backend:** Rust
--   **Git integration:** git2
--   **Frontend:** React + TypeScript
--   **UI:** Mantine
--   **State management:** Zustand
--   **Animations:** Motion
+- **Desktop runtime:** Tauri
+- **Backend:** Rust
+- **Git integration:** git2
+- **Frontend:** React + TypeScript
+- **UI:** Mantine
+- **State management:** Zustand
+- **Animations:** Motion
 
 ## Project status
 
