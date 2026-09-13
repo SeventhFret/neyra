@@ -150,5 +150,6 @@ jobs:
           generateReleaseNotes: true
 
           uploadWorkflowArtifacts: true
+          updaterJsonPreferNsis: true
 
           releaseAssetNamePattern: "Neyra_[version]_[platform]_[arch][setup].[ext]"
