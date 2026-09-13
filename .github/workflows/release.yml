@@ -13,8 +13,12 @@ permissions:
 jobs:
   create-release:
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
+
+    outputs:
+      release_id: ${{ steps.release.outputs.release_id }}
 
     steps:
       - name: Checkout repository
@@ -22,18 +26,47 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create GitHub Release
+      - name: Create or find GitHub Release
+        id: release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
         run: |
-          if ! gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
-            gh release create "${GITHUB_REF_NAME}" \
+          TAG="${GITHUB_REF_NAME}"
+
+          RELEASE_ID="$(
+            gh api \
+              "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" \
+              --jq '.id' \
+              2>/dev/null || true
+          )"
+
+          if [ -z "$RELEASE_ID" ]; then
+            echo "Creating release for ${TAG}"
+
+            gh release create "$TAG" \
               --verify-tag \
-              --title "Neyra ${GITHUB_REF_NAME}" \
+              --title "Neyra ${TAG}" \
               --generate-notes
+
+            RELEASE_ID="$(
+              gh api \
+                "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" \
+                --jq '.id'
+            )"
+          else
+            echo "Release for ${TAG} already exists"
           fi
+
+          echo "release_id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
+          echo "Release ID: $RELEASE_ID"
+
   build:
     needs: create-release
+
+    permissions:
+      contents: write
+
     strategy:
       fail-fast: false
 
@@ -155,23 +188,10 @@ jobs:
         with:
           args: ${{ matrix.args }}
 
-          tagName: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
-
-          releaseName: ${{ github.ref_type == 'tag' && format('Neyra {0}', github.ref_name) || '' }}
-
-          releaseBody: |
-            Neyra ${{ github.ref_name }}
-
-            Builds:
-            - macOS Apple Silicon
-            - Windows x64
-            - Linux x64
-
-          releaseDraft: true
-          prerelease: false
-          generateReleaseNotes: true
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          tagName: ${{ github.ref_name }}
 
           uploadWorkflowArtifacts: true
           updaterJsonPreferNsis: true
 
-          releaseAssetNamePattern: "Neyra_[version]_[platform]_[arch][setup].[ext]"
+          releaseAssetNamePattern: "Neyra_[version]_[platform]_[arch].[ext]"
