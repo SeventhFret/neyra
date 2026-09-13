@@ -22,6 +22,7 @@ import "./App.css";
 import { NotificationCenter } from "./components/NotificationCenter/NotificationCenter";
 import NeyraRepoSelector from "./components/NeyraRepoSelector/NeyraRepoSelector";
 import NeyraStatusBar from "./components/NeyraStatusBar/NeyraStatusBar";
+import { IconCloudDownload } from "@tabler/icons-react";
 
 export type TabId =
   | "status"
@@ -61,6 +62,36 @@ function App() {
   const copyBranch = () => {
     clipboard.copy(currentBranch ?? "no branch");
   };
+
+  useEffect(() => {
+    useNotificationStore.getState().add({
+      title: "Update available",
+      message: "New version of Neyra is available",
+      type: "update",
+      actions: [
+        {
+          label: "Update now",
+          icon: IconCloudDownload,
+          onClick: () => console.log("Update now clicked"),
+        },
+      ],
+    });
+    useNotificationStore.getState().add({
+      title: "Information",
+      message: "Cool stuff happens bro",
+      type: "info",
+    });
+    useNotificationStore.getState().add({
+      title: "Warning",
+      message: "Something is not cool, but you can ignore it",
+      type: "warning",
+    });
+    useNotificationStore.getState().add({
+      title: "Error",
+      message: "Something is bad but pls don't ignore it",
+      type: "error",
+    });
+  }, []);
 
   useEffect(() => {
     refresh();
