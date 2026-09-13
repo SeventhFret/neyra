@@ -1,6 +1,8 @@
 # Neyra
 
-<img src="src/assets/logo/neyra-logo-1024.png" width="150" alt="Neyra logo" />
+<div align="center">
+  <img src="src/assets/logo/neyra-logo-1024.png" width="150" alt="Neyra logo">
+</div>
 
 **A lightweight, cross-platform desktop Git client with a modern
 interface.**
