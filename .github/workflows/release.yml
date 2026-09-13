@@ -1,0 +1,152 @@
+name: Build and Release Neyra
+
+on:
+  push:
+    tags:
+      - "v*"
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+
+      matrix:
+        include:
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+            args: --target aarch64-apple-darwin
+
+          - platform: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            args: ""
+
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+            args: ""
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine version
+        id: version
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="0.0.0-dev"
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Building version $VERSION"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            xdg-utils
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Set package.json version
+        shell: bash
+        run: |
+          npm version "${{ steps.version.outputs.version }}" \
+            --no-git-tag-version \
+            --allow-same-version
+
+      - name: Set Cargo.toml version
+        shell: bash
+        run: |
+          python - <<'PY'
+          import pathlib
+          import re
+
+          version = "${{ steps.version.outputs.version }}"
+          path = pathlib.Path("src-tauri/Cargo.toml")
+
+          text = path.read_text()
+
+          text, count = re.subn(
+              r'(?ms)(^\[package\].*?^version\s*=\s*)"[^"]+"',
+              rf'\1"{version}"',
+              text,
+              count=1,
+          )
+
+          if count != 1:
+              raise SystemExit(
+                  "Could not update [package] version in src-tauri/Cargo.toml"
+              )
+
+          path.write_text(text)
+          PY
+
+      - name: Verify versions
+        shell: bash
+        run: |
+          node -e "console.log('package.json:', require('./package.json').version)"
+          grep -A5 '^\[package\]' src-tauri/Cargo.toml
+
+      - name: Build Neyra
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # Ad-hoc signing for unsigned macOS builds.
+          APPLE_SIGNING_IDENTITY: "-"
+
+        with:
+          args: ${{ matrix.args }}
+
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+
+          releaseName: ${{ github.ref_type == 'tag' && format('Neyra {0}', github.ref_name) || '' }}
+
+          releaseBody: |
+            Neyra ${{ github.ref_name }}
+
+            Builds:
+            - macOS Apple Silicon
+            - Windows x64
+            - Linux x64
+
+          releaseDraft: false
+          prerelease: false
+          generateReleaseNotes: true
+
+          uploadWorkflowArtifacts: true
+
+          releaseAssetNamePattern: "Neyra_[version]_[platform]_[arch][setup].[ext]"
