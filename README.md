@@ -145,4 +145,4 @@ Bug reports, feature requests, and contributions are welcome through
 
 ## License
 
-Neyra is released under the [MIT License](LICENSE).
+Neyra is released under the [MIT License](LICENSE.md).
