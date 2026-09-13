@@ -9,8 +9,7 @@
   border: 1px solid var(--neyra-border);
   border-radius: var(--mantine-radius-lg);
 
-  box-shadow:
-    0 10px 26px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.16);
 }
 
 .row {
@@ -46,24 +45,21 @@
 }
 
 .current {
-  background-color:
-    color-mix(
-      in srgb,
-      var(--neyra-primary) 7%,
-      var(--neyra-surface-1)
-    );
+  background-color: color-mix(
+    in srgb,
+    var(--neyra-primary) 7%,
+    var(--neyra-surface-1)
+  );
 
-  box-shadow:
-    inset 3px 0 0 var(--neyra-primary);
+  box-shadow: inset 3px 0 0 var(--neyra-primary);
 }
 
 .current:hover {
-  background-color:
-    color-mix(
-      in srgb,
-      var(--neyra-primary) 9%,
-      var(--neyra-surface-1)
-    );
+  background-color: color-mix(
+    in srgb,
+    var(--neyra-primary) 9%,
+    var(--neyra-surface-1)
+  );
 }
 
 .action {
@@ -100,4 +96,13 @@
 .emptyIcon {
   color: var(--neyra-text-muted);
   opacity: 0.65;
+}
+
+.dangerButton {
+  color: var(--neyra-danger);
+}
+
+.dangerButton:hover {
+  color: var(--neyra-danger);
+  background: color-mix(in srgb, var(--neyra-danger) 18%, transparent);
 }
