@@ -145,7 +145,7 @@ jobs:
             - Windows x64
             - Linux x64
 
-          releaseDraft: false
+          releaseDraft: true
           prerelease: false
           generateReleaseNotes: true
 
