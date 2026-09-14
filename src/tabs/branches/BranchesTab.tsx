@@ -24,6 +24,7 @@ import { useRepoData, type Branch } from "../../stores";
 import { showAppNotification } from "../../components/NotificationCenter/helper";
 import { formatRelativeTime } from "../../lib/time";
 import classes from "./BranchesTab.module.css";
+import { TEXT_INPUT_ADDITIONAL_PROPS } from "../../lib/constants/input";
 
 const BranchRow = memo(function BranchRow({
   branch,
@@ -376,6 +377,7 @@ export default function BranchesTab({ active }: BranchesTabProps) {
 
       <Group gap="sm" align="flex-end">
         <TextInput
+          {...TEXT_INPUT_ADDITIONAL_PROPS}
           radius="lg"
           ref={newBranchRef}
           placeholder="new-branch-name"
@@ -401,6 +403,7 @@ export default function BranchesTab({ active }: BranchesTabProps) {
         </Button>
 
         <TextInput
+          {...TEXT_INPUT_ADDITIONAL_PROPS}
           radius="lg"
           ref={filterInputRef}
           placeholder="Filter branches"
