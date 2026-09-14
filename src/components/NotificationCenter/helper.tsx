@@ -10,7 +10,7 @@ import { Stack, Group, Button } from "@mantine/core";
 const MANTINE_NOTIFICATION_PROPS = {
   autoClose: false,
   withBorder: true,
-  radius: "lg",
+  radius: "xl",
   color: "primary",
   styles: {
     root: { alignItems: "flex-start" },
@@ -24,7 +24,7 @@ export function showAppNotification({
   message,
   messageFormat = "text",
   actions,
-  autoClose = 5000,
+  autoClose = 3000,
 }: AppNotificationInput) {
   const text = String(message);
 
