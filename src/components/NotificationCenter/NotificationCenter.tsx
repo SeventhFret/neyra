@@ -46,6 +46,7 @@ export function NotificationCenter({
       title="Notifications"
       opened={opened}
       onClose={onClose}
+      zIndex={500}
       classNames={{
         content: classes.drawerContent,
         body: classes.drawerBody,
