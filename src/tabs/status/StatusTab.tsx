@@ -127,6 +127,7 @@ export default function StatusTab({ active }: StatusTabProps) {
   return (
     <Stack
       px="xl"
+      pb="xl"
       style={{
         display: "flex",
         flexDirection: "column",

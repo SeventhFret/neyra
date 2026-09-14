@@ -16,6 +16,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       defaultColorScheme="dark"
     >
       <Notifications
+        zIndex={400}
         notificationMaxHeight={500}
         className={themeClasses.notifications}
       />
