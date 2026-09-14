@@ -20,9 +20,7 @@
 
   background: var(--neyra-primary);
 
-  box-shadow:
-    0 0 8px
-    color-mix(in srgb, var(--neyra-primary) 45%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--neyra-primary) 45%, transparent);
 }
 
 /* ============================================
@@ -75,8 +73,7 @@
 
   opacity: 0.78;
 
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.13) !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.13) !important;
 }
 
 .notification.read:hover {
@@ -85,46 +82,39 @@
   background: var(--neyra-surface-2);
   border-color: var(--neyra-border);
 
-  box-shadow:
-    0 3px 7px rgba(0, 0, 0, 0.16) !important;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.16) !important;
 }
 
 .notification.unread {
-  background:
-    color-mix(
-      in srgb,
-      var(--neyra-primary) 6%,
-      var(--neyra-surface-2)
-    );
+  background: color-mix(
+    in srgb,
+    var(--neyra-primary) 6%,
+    var(--neyra-surface-2)
+  );
 
-  border-color:
-    color-mix(
-      in srgb,
-      var(--neyra-primary) 18%,
-      var(--neyra-border)
-    );
+  border-color: color-mix(
+    in srgb,
+    var(--neyra-primary) 18%,
+    var(--neyra-border)
+  );
 
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15) !important;
 }
 
 .notification.unread:hover {
-  background:
-    color-mix(
-      in srgb,
-      var(--neyra-primary) 9%,
-      var(--neyra-surface-2)
-    );
+  background: color-mix(
+    in srgb,
+    var(--neyra-primary) 9%,
+    var(--neyra-surface-2)
+  );
 
-  border-color:
-    color-mix(
-      in srgb,
-      var(--neyra-primary) 25%,
-      var(--neyra-border)
-    );
+  border-color: color-mix(
+    in srgb,
+    var(--neyra-primary) 25%,
+    var(--neyra-border)
+  );
 
-  box-shadow:
-    0 3px 7px rgba(0, 0, 0, 0.18) !important;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.18) !important;
 }
 
 .notification :global(.mantine-Notification-icon) {
@@ -144,64 +134,15 @@
 .destructiveAction {
   color: var(--neyra-danger);
 
-  border:
-    1px solid
-    color-mix(
-      in srgb,
-      var(--neyra-danger) 35%,
-      transparent
-    );
+  border: 1px solid color-mix(in srgb, var(--neyra-danger) 35%, transparent);
 
-  background:
-    color-mix(
-      in srgb,
-      var(--neyra-danger) 12%,
-      transparent
-    );
+  background: color-mix(in srgb, var(--neyra-danger) 12%, transparent);
 }
 
 .destructiveAction:hover {
   color: var(--neyra-danger);
 
-  background:
-    color-mix(
-      in srgb,
-      var(--neyra-danger) 18%,
-      transparent
-    );
+  background: color-mix(in srgb, var(--neyra-danger) 18%, transparent);
 
-  border-color:
-    color-mix(
-      in srgb,
-      var(--neyra-danger) 50%,
-      transparent
-    );
-}
-
-/* ============================================
-   SCROLLBAR
-   ============================================ */
-
-.scrollbar {
-  background: transparent;
-}
-
-.scrollbarThumb {
-  background:
-    color-mix(
-      in srgb,
-      var(--neyra-primary) 45%,
-      var(--neyra-surface-2)
-    );
-
-  border-radius: 999px;
-}
-
-.scrollbarThumb:hover {
-  background:
-    color-mix(
-      in srgb,
-      var(--neyra-primary) 65%,
-      var(--neyra-surface-2)
-    );
+  border-color: color-mix(in srgb, var(--neyra-danger) 50%, transparent);
 }
