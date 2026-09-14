@@ -17,8 +17,8 @@ export function parsePullRequestAction(
   const lower = output.toLowerCase();
 
   const kind =
-    lower.includes("create merge request") ||
-    lower.includes("create pull request")
+    lower.includes("create a merge request") ||
+    lower.includes("create a pull request")
       ? "create"
       : "open";
 

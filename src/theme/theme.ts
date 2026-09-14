@@ -8,6 +8,7 @@ import {
   Notification,
   Drawer,
   Kbd,
+  ScrollArea,
   Select,
   CSSVariablesResolver,
   defaultVariantColorsResolver,
@@ -273,6 +274,26 @@ export const theme = createTheme({
         body: classes.drawerBody,
         close: classes.drawerClose,
         overlay: classes.drawerOverlay,
+      },
+    }),
+    ScrollArea: ScrollArea.extend({
+      defaultProps: {
+        scrollbarSize: 6,
+      },
+
+      styles: {
+        scrollbar: {
+          background: "transparent",
+        },
+
+        thumb: {
+          background: `color-mix(
+            in srgb,
+            var(--neyra-primary) 45%,
+            var(--neyra-surface-2)
+          )`,
+          borderRadius: "999px",
+        },
       },
     }),
   },

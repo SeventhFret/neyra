@@ -81,11 +81,6 @@ export function NotificationCenter({
           <ScrollArea
             type="hover"
             className={classes.notificationList}
-            classNames={{
-              viewport: classes.notificationViewport,
-              scrollbar: classes.scrollbar,
-              thumb: classes.scrollbarThumb,
-            }}
             offsetScrollbars
             scrollbarSize={6}
           >
