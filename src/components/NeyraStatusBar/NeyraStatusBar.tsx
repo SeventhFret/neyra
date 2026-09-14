@@ -1,7 +1,7 @@
 import { Group, Text } from "@mantine/core";
 
 import { useRepoData } from "../../stores";
-import { repoName } from "../NeyraRepoSelector/NeyraRepoSelector";
+import { repoName } from "../../lib/strings";
 import { IconGitBranch } from "@tabler/icons-react";
 import neyraLogo from "../../assets/logo/neyra-logo-1024.png";
 import classes from "./NeyraStatusBar.module.css";

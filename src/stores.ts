@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { create } from "zustand";
-import { buildQueryParams } from "./utils";
+import { buildQueryParams } from "./lib/urls";
 import { fetch } from "@tauri-apps/plugin-http";
 import { listen } from "@tauri-apps/api/event";
 
