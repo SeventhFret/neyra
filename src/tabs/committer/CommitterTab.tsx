@@ -1,27 +1,28 @@
 import {
   Autocomplete,
   AutocompleteProps,
-  TextInput,
+  Badge,
   Button,
   Checkbox,
-  Paper,
-  Text,
-  Stack,
-  Group,
-  Textarea,
   Grid,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Textarea,
+  TextInput,
 } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
 import { IconCloudUpload, IconGitCommit, IconLink } from "@tabler/icons-react";
 import { invoke } from "@tauri-apps/api/core";
-import { useEffect, useMemo, useState } from "react";
+import { openUrl } from "@tauri-apps/plugin-opener";
+import { useMemo, useState } from "react";
+
 import { useRepoData } from "../../stores";
 import { showAppNotification } from "../../components/NotificationCenter/helper";
 import { parsePullRequestAction } from "../../lib/git";
 import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
-import { openUrl } from "@tauri-apps/plugin-opener";
 
-/** The Conventional Commits types, with what each one is for. */
 const COMMIT_TYPES: Record<string, string> = {
   feat: "Adds a feature",
   fix: "Fixes a bug",
@@ -36,7 +37,20 @@ const COMMIT_TYPES: Record<string, string> = {
   revert: "Reverts an earlier commit",
 };
 
-/** Fallbacks for a repository whose log has no scopes to learn from yet. */
+const TYPE_COLORS: Record<string, string> = {
+  feat: "teal",
+  fix: "red",
+  refactor: "violet",
+  perf: "orange",
+  docs: "blue",
+  test: "yellow",
+  chore: "gray",
+  build: "cyan",
+  ci: "cyan",
+  style: "pink",
+  revert: "grape",
+};
+
 const COMMON_SCOPES = [
   "ui",
   "api",
@@ -50,8 +64,14 @@ const COMMON_SCOPES = [
   "release",
 ];
 
-/** The `scope` of a `type(scope): subject` header. */
 const SCOPE_PATTERN = /^\w+\(([^)]+)\)!?:/;
+
+const TEXT_INPUT_PROPS = {
+  autoComplete: "off",
+  autoCorrect: "off",
+  autoCapitalize: "off",
+  spellCheck: false,
+} as const;
 
 interface CommitterTabProps {
   active: boolean;
@@ -60,54 +80,55 @@ interface CommitterTabProps {
 export default function CommitterTab({ active }: CommitterTabProps) {
   const refresh = useRepoData((state) => state.refresh);
   const commits = useRepoData((state) => state.commits);
-  const [fullCommitMsg, setFullCommitMsg] = useState<string>("");
-  const [commitType, setCommitType] = useState<string>("");
-  const [commitScope, setCommitScope] = useState<string>("");
-  const [commitMsg, setCommitMsg] = useState<string>("");
-  const [commitSuffix, setCommitSuffix] = useState<string>("");
-  const [commitDescription, setCommitDescription] = useState<string>("");
-  const [performCommit, setPerformCommit] = useState<boolean>(true);
-  const [pushToBranch, setPushToBranch] = useState<boolean>(true);
-  const [forceWithLease, setForceWithLease] = useState<boolean>(false);
-  const [isCommitting, setIsCommitting] = useState<boolean>(false);
   const currentBranch = useRepoData((state) => state.currentBranch);
 
-  useEffect(() => {
-    let newCommitMsg = "";
+  const [commitType, setCommitType] = useState("");
+  const [commitScope, setCommitScope] = useState("");
+  const [commitMsg, setCommitMsg] = useState("");
+  const [commitSuffix, setCommitSuffix] = useState("");
+  const [commitDescription, setCommitDescription] = useState("");
 
-    if (commitType.length > 0) {
-      newCommitMsg += commitType;
+  const [performCommit, setPerformCommit] = useState(true);
+  const [pushToBranch, setPushToBranch] = useState(true);
+  const [forceWithLease, setForceWithLease] = useState(false);
+  const [isCommitting, setIsCommitting] = useState(false);
+
+  const fullCommitMsg = useMemo(() => {
+    let message = "";
+
+    if (commitType) {
+      message += commitType;
     }
 
-    if (commitScope.length > 0) {
-      newCommitMsg += `(${commitScope})`;
+    if (commitScope) {
+      message += `(${commitScope})`;
     }
 
-    if (commitMsg.length > 0) {
-      if (commitType.length > 0 || commitScope.length > 0) {
-        newCommitMsg += `: `;
+    if (commitMsg) {
+      if (commitType || commitScope) {
+        message += ": ";
       }
-      newCommitMsg += `${commitMsg}`;
+
+      message += commitMsg;
     }
 
-    if (commitSuffix.length > 0) {
-      newCommitMsg += ` [${commitSuffix}]`;
+    if (commitSuffix) {
+      message += ` [${commitSuffix}]`;
     }
 
-    if (commitDescription.length > 0) {
-      newCommitMsg += `\n${commitDescription}`;
+    if (commitDescription) {
+      message += `\n${commitDescription}`;
     }
 
-    setFullCommitMsg(newCommitMsg);
-  }, [commitMsg, commitScope, commitType, commitSuffix, commitDescription]);
+    return message;
+  }, [commitType, commitScope, commitMsg, commitSuffix, commitDescription]);
 
-  // Scopes this repository actually uses, newest first, since a canned list is
-  // rarely the one a project settled on. The common ones fill in behind them.
   const scopes = useMemo(() => {
     const seen = new Set<string>();
 
     for (const commit of commits) {
       const scope = commit.subject.match(SCOPE_PATTERN)?.[1];
+
       if (scope) {
         seen.add(scope.trim());
       }
@@ -120,22 +141,53 @@ export default function CommitterTab({ active }: CommitterTabProps) {
     return [...seen];
   }, [commits]);
 
-  // The type's meaning is what makes the list worth having, so it goes in the
-  // dropdown next to the type itself.
-  const renderType: AutocompleteProps["renderOption"] = ({ option }) => (
-    <div>
-      <Text size="sm" fw={500}>
-        {option.value}
-      </Text>
-      <Text size="xs" c="dimmed">
-        {COMMIT_TYPES[option.value]}
-      </Text>
-    </div>
-  );
+  const renderType: AutocompleteProps["renderOption"] = ({ option }) => {
+    const color = TYPE_COLORS[option.value] ?? "gray";
 
-  // Without a commit there is nothing left to do but push, so the push itself
-  // is not optional in that mode.
+    return (
+      <Group gap="sm" wrap="nowrap" w="100%">
+        <div
+          style={{
+            width: 86,
+            flex: "0 0 86px",
+            display: "flex",
+          }}
+        >
+          <Badge
+            size="sm"
+            radius="sm"
+            variant="light"
+            color={color}
+            ff="var(--mantine-font-family-monospace)"
+            fw={700}
+            style={{
+              maxWidth: "none",
+              overflow: "visible",
+              textOverflow: "clip",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {option.value}
+          </Badge>
+        </div>
+
+        <Text size="xs" c="dimmed" style={{ minWidth: 0 }}>
+          {COMMIT_TYPES[option.value]}
+        </Text>
+      </Group>
+    );
+  };
+
   const willPush = !performCommit || pushToBranch;
+  const typeColor = TYPE_COLORS[commitType] ?? "gray";
+
+  const resetFields = () => {
+    setCommitMsg("");
+    setCommitDescription("");
+    setCommitScope("");
+    setCommitSuffix("");
+    setCommitType("");
+  };
 
   const handleCommit = async () => {
     if (isCommitting || (performCommit && fullCommitMsg.length === 0)) {
@@ -143,18 +195,20 @@ export default function CommitterTab({ active }: CommitterTabProps) {
     }
 
     setIsCommitting(true);
+
     try {
-      // Push-only goes to its own command rather than `commit` with an empty
-      // message, which git refuses.
       const result = performCommit
         ? await invoke<string>("commit", {
             message: fullCommitMsg,
             push: pushToBranch,
-            forceWithLease: forceWithLease,
+            forceWithLease,
           })
-        : await invoke<string>("push", { forceWithLease: forceWithLease });
+        : await invoke<string>("push", {
+            forceWithLease,
+          });
+
       await refresh();
-      await resetFields();
+      resetFields();
 
       const prAction = parsePullRequestAction(result);
 
@@ -194,17 +248,17 @@ export default function CommitterTab({ active }: CommitterTabProps) {
           ["mod+Enter", handleCommit, { usePhysicalKeys: true }],
           [
             "mod+shift+H",
-            () => setPerformCommit((commit) => !commit),
+            () => setPerformCommit((value) => !value),
             { usePhysicalKeys: true },
           ],
           [
             "mod+shift+P",
-            () => setPushToBranch((push) => !push),
+            () => setPushToBranch((value) => !value),
             { usePhysicalKeys: true },
           ],
           [
             "mod+F",
-            () => setForceWithLease((force) => !force),
+            () => setForceWithLease((value) => !value),
             { usePhysicalKeys: true },
           ],
         ]
@@ -212,46 +266,117 @@ export default function CommitterTab({ active }: CommitterTabProps) {
     [],
   );
 
-  const resetFields = async () => {
-    setCommitMsg("");
-    setCommitDescription("");
-    setCommitScope("");
-    setCommitSuffix("");
-    setCommitType("");
-  };
-
   return (
-    // One width authority for the whole tab: every row below stretches to this
-    // Stack, so the preview and the fields line up on both edges.
     <Stack w="100%" px="xl" gap="md">
       <div className="header-container">
         <h1>Committer</h1>
       </div>
-      <Paper
-        c="#d4d4d8"
-        bg="var(--neyra-surface-2)"
-        shadow="md"
-        p="lg"
-        radius="lg"
-      >
-        <Text
-          c={performCommit ? "#d4d4d8" : "dimmed"}
-          style={{ whiteSpace: "pre-wrap" }}
-        >
-          {performCommit
-            ? fullCommitMsg.length > 0
-              ? fullCommitMsg
-              : "..."
-            : `No commit — pushing ${currentBranch ?? "detached HEAD"} as it is`}
-        </Text>
+
+      <Paper bg="var(--neyra-surface-2)" shadow="md" p="lg" radius="lg">
+        {performCommit ? (
+          fullCommitMsg ? (
+            <Stack gap={6}>
+              <Text
+                component="div"
+                ff="var(--mantine-font-family-monospace)"
+                size="md"
+                style={{
+                  whiteSpace: "pre-wrap",
+                  overflowWrap: "anywhere",
+                }}
+              >
+                {commitType && (
+                  <Text component="span" inherit c={typeColor} fw={750}>
+                    {commitType}
+                  </Text>
+                )}
+
+                {commitScope && (
+                  <Text
+                    component="span"
+                    inherit
+                    c="var(--neyra-text-primary)"
+                    fw={700}
+                  >
+                    ({commitScope})
+                  </Text>
+                )}
+
+                {commitMsg && (
+                  <>
+                    {(commitType || commitScope) && (
+                      <Text
+                        component="span"
+                        inherit
+                        c="var(--neyra-text-muted)"
+                      >
+                        :{" "}
+                      </Text>
+                    )}
+
+                    <Text
+                      component="span"
+                      inherit
+                      c="var(--neyra-text-secondary)"
+                      fw={500}
+                    >
+                      {commitMsg}
+                    </Text>
+                  </>
+                )}
+
+                {commitSuffix && (
+                  <Text
+                    component="span"
+                    inherit
+                    c="var(--neyra-text-muted)"
+                    fw={550}
+                  >
+                    {" "}
+                    [{commitSuffix}]
+                  </Text>
+                )}
+              </Text>
+
+              {commitDescription && (
+                <Text
+                  ff="var(--mantine-font-family-monospace)"
+                  size="sm"
+                  c="var(--neyra-text-muted)"
+                  style={{
+                    whiteSpace: "pre-wrap",
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  {commitDescription}
+                </Text>
+              )}
+            </Stack>
+          ) : (
+            <Text ff="var(--mantine-font-family-monospace)" c="dimmed">
+              Start writing a commit message…
+            </Text>
+          )
+        ) : (
+          <Text ff="var(--mantine-font-family-monospace)" c="dimmed">
+            No commit — pushing{" "}
+            <Text
+              component="span"
+              inherit
+              fw={700}
+              c="var(--neyra-text-secondary)"
+            >
+              {currentBranch ?? "detached HEAD"}
+            </Text>{" "}
+            as it is
+          </Text>
+        )}
       </Paper>
-      {/* 12 columns keeps the original proportions while the gap comes out of
-          the columns instead of overflowing the row like percentages did. */}
+
       <Grid gap="md" align="end">
         <Grid.Col span={2}>
-          {/* Autocomplete rather than Select: the list is a shortcut, not a
-              constraint — anything typed that is not in it is kept as is. */}
           <Autocomplete
+            {...TEXT_INPUT_PROPS}
             size="lg"
             radius="lg"
             description="type"
@@ -261,12 +386,17 @@ export default function CommitterTab({ active }: CommitterTabProps) {
             renderOption={renderType}
             value={commitType}
             onChange={setCommitType}
-            comboboxProps={{ width: 320, position: "bottom-start" }}
+            comboboxProps={{
+              width: 320,
+              position: "bottom-start",
+            }}
             maxDropdownHeight={300}
           />
         </Grid.Col>
+
         <Grid.Col span={2}>
           <Autocomplete
+            {...TEXT_INPUT_PROPS}
             size="lg"
             radius="lg"
             description="scope"
@@ -275,14 +405,14 @@ export default function CommitterTab({ active }: CommitterTabProps) {
             data={scopes}
             value={commitScope}
             onChange={setCommitScope}
-            // The list is long and every entry is one word, so it does not need
-            // the dropdown to follow the field's own size.
             comboboxProps={{ size: "sm" }}
             maxDropdownHeight={300}
           />
         </Grid.Col>
+
         <Grid.Col span={6}>
           <TextInput
+            {...TEXT_INPUT_PROPS}
             size="lg"
             radius="lg"
             description="message"
@@ -292,8 +422,10 @@ export default function CommitterTab({ active }: CommitterTabProps) {
             onChange={(event) => setCommitMsg(event.target.value)}
           />
         </Grid.Col>
+
         <Grid.Col span={2}>
           <TextInput
+            {...TEXT_INPUT_PROPS}
             size="lg"
             radius="lg"
             description="suffix"
@@ -304,7 +436,9 @@ export default function CommitterTab({ active }: CommitterTabProps) {
           />
         </Grid.Col>
       </Grid>
+
       <Textarea
+        {...TEXT_INPUT_PROPS}
         description="description"
         value={commitDescription}
         onChange={(event) => setCommitDescription(event.target.value)}
@@ -314,6 +448,7 @@ export default function CommitterTab({ active }: CommitterTabProps) {
         autosize
         minRows={3}
       />
+
       <Stack gap="xs">
         <Checkbox
           checked={performCommit}
@@ -322,11 +457,15 @@ export default function CommitterTab({ active }: CommitterTabProps) {
             <Group gap="xs">
               Perform commit
               <ShortcutKeys
-                shortcut={{ modifiers: ["mod", "shift"], key: "H" }}
+                shortcut={{
+                  modifiers: ["mod", "shift"],
+                  key: "H",
+                }}
               />
             </Group>
           }
         />
+
         <Checkbox
           checked={willPush}
           disabled={!performCommit}
@@ -336,11 +475,15 @@ export default function CommitterTab({ active }: CommitterTabProps) {
               Push to current branch
               <code style={{ fontWeight: 600 }}>{currentBranch}</code>
               <ShortcutKeys
-                shortcut={{ modifiers: ["mod", "shift"], key: "P" }}
+                shortcut={{
+                  modifiers: ["mod", "shift"],
+                  key: "P",
+                }}
               />
             </Group>
           }
         />
+
         <Checkbox
           checked={forceWithLease}
           disabled={!willPush}
@@ -350,11 +493,17 @@ export default function CommitterTab({ active }: CommitterTabProps) {
               Use
               <code style={{ fontWeight: 600 }}>--force-with-lease</code>
               flag
-              <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "F" }} />
+              <ShortcutKeys
+                shortcut={{
+                  modifiers: ["mod"],
+                  key: "F",
+                }}
+              />
             </Group>
           }
         />
       </Stack>
+
       <Group gap="sm" mt="xs">
         <Button
           radius="lg"
@@ -374,7 +523,13 @@ export default function CommitterTab({ active }: CommitterTabProps) {
               ? "Force Push"
               : "Push"}
         </Button>
-        <ShortcutKeys shortcut={{ modifiers: ["mod"], key: "Enter" }} />
+
+        <ShortcutKeys
+          shortcut={{
+            modifiers: ["mod"],
+            key: "Enter",
+          }}
+        />
       </Group>
     </Stack>
   );
