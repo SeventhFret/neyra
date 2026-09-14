@@ -28,6 +28,7 @@ import { showAppNotification } from "./components/NotificationCenter/helper";
 import NeyraUpdatesModal from "./components/NeyraUpdatesModal/NeyraUpdatesModal";
 import { useUpdatesStore } from "./stores/updates/store";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import { Center, Loader, Stack, Text } from "@mantine/core";
 
 export type TabId =
   | "status"
@@ -79,12 +80,16 @@ function App() {
   };
 
   useEffect(() => {
-    refresh();
+    if (repoStatus !== "ready") {
+      return;
+    }
+
+    void refresh();
 
     let unlisten: (() => void) | undefined;
     let disposed = false;
 
-    listenForRepoChanges().then((stop) => {
+    void listenForRepoChanges().then((stop) => {
       if (disposed) {
         stop();
       } else {
@@ -96,7 +101,7 @@ function App() {
       disposed = true;
       unlisten?.();
     };
-  }, [refresh]);
+  }, [repoStatus, refresh]);
 
   useEffect(() => {
     initializeRepo();
@@ -154,6 +159,17 @@ function App() {
 
   if (repoStatus === "none") {
     return <NeyraRepoSelector />;
+  }
+
+  if (repoStatus === "checking") {
+    return (
+      <Center w="100dvw" h="100dvh">
+        <Stack align="center">
+          <Loader color="var(--neyra-primary)" />
+          <Text c="dimmed">Loading the repository...</Text>
+        </Stack>
+      </Center>
+    );
   }
 
   return (
