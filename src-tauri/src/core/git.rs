@@ -7,6 +7,12 @@ use chrono::{DateTime, FixedOffset, SecondsFormat, Utc};
 use git2::{BranchType, Repository, Sort};
 use serde::Serialize;
 
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
+#[cfg(target_os = "windows")]
+const CREATE_NO_WINDOW: u32 = 0x08000000;
+
 const LOG_LIMIT: usize = 50;
 
 #[derive(Debug, Serialize)]
@@ -727,31 +733,38 @@ fn ref_exists(repo: &Repository, refname: &str) -> bool {
 }
 
 fn run_git(cwd: &Path, args: &[&str]) -> Result<Output, String> {
-    let output = Command::new("git")
-        .args(args)
-        .current_dir(cwd)
-        .output()
-        .map_err(|error| format!("failed to run `git {}`: {error}", args.join(" ")))?;
+    let mut command = Command::new("git");
 
-    if output.status.success() {
-        return Ok(output);
+    command.args(args).current_dir(cwd);
+
+    #[cfg(target_os = "windows")]
+    command.creation_flags(CREATE_NO_WINDOW);
+
+    let output = command
+        .output()
+        .map_err(|err| format!("failed to run `git {}`: {err}", args.join(" ")))?;
+
+    if !output.status.success() {
+        let mut report = String::from_utf8_lossy(&output.stdout).trim().to_string();
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+
+        if !stderr.trim().is_empty() {
+            if !report.is_empty() {
+                report.push('\n');
+            }
+
+            report.push_str(stderr.trim());
+        }
+
+        return Err(if report.is_empty() {
+            format!("`git {}` failed", args.join(" "))
+        } else {
+            report
+        });
     }
 
-    let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
-
-    let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
-
-    let report = [stdout, stderr]
-        .into_iter()
-        .filter(|part| !part.is_empty())
-        .collect::<Vec<_>>()
-        .join("\n");
-
-    Err(if report.is_empty() {
-        format!("`git {}` failed", args.join(" "))
-    } else {
-        report
-    })
+    Ok(output)
 }
 
 fn git(cwd: &Path, args: &[&str]) -> Result<String, String> {

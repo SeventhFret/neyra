@@ -27,6 +27,7 @@ import NeyraStatusBar from "./components/NeyraStatusBar/NeyraStatusBar";
 import { showAppNotification } from "./components/NotificationCenter/helper";
 import NeyraUpdatesModal from "./components/NeyraUpdatesModal/NeyraUpdatesModal";
 import { useUpdatesStore } from "./stores/updates/store";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 
 export type TabId =
   | "status"
@@ -48,6 +49,8 @@ const TAB_ORDER: TabId[] = [
 ];
 
 function App() {
+  // prevent default windows shortcuts from firing
+  useKeyboardShortcuts();
   const [currentTab, setCurrentTab] = useState<TabId>("committer");
   const unreadCount = useNotificationStore(
     (state) => state.items.filter((item) => !item.read).length,
