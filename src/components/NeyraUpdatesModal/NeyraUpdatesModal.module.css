@@ -91,3 +91,75 @@
 
   border: 1px solid var(--neyra-border-soft);
 }
+
+/* Markdown with Neyra styles */
+
+.markdown {
+  color: var(--neyra-text-secondary);
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  color: var(--neyra-text-primary);
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.markdown h1 {
+  font-size: 1.2rem;
+}
+
+.markdown h2 {
+  font-size: 1.05rem;
+}
+
+.markdown h3 {
+  font-size: 0.95rem;
+}
+
+.markdown p {
+  margin: 6px 0;
+}
+
+.markdown ul,
+.markdown ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.markdown li {
+  margin: 3px 0;
+}
+
+.markdown code {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.9em;
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: var(--neyra-surface-2);
+}
+
+.markdown pre {
+  overflow-x: auto;
+  padding: 12px;
+  border-radius: var(--mantine-radius-md);
+  background: var(--neyra-surface-2);
+}
+
+.markdown pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.markdown a {
+  color: var(--neyra-primary);
+  text-decoration: none;
+}
+
+.markdown a:hover {
+  text-decoration: underline;
+}
