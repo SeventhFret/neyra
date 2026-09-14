@@ -62,6 +62,7 @@ export default function NeyraUpdatesModal({
       radius="xl"
       size="lg"
       withCloseButton={false}
+      zIndex={600}
       classNames={{
         content: classes.modal,
         body: classes.body,
