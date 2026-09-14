@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useHotkeys } from "@mantine/hooks";
 import { showAppNotification } from "../../../../components/NotificationCenter/helper";
 import ShortcutKeys from "../../../../components/ShortcutKeys/ShortcutKeys";
+import { TEXT_INPUT_ADDITIONAL_PROPS } from "../../../../lib/constants/input";
 
 export default function GitConfig() {
   const [name, setName] = useState<string>("");
@@ -126,6 +127,7 @@ export default function GitConfig() {
       </Stack>
       <Stack w="100%" maw="450px">
         <TextInput
+          {...TEXT_INPUT_ADDITIONAL_PROPS}
           label="Name"
           value={name}
           onChange={(event) => setName(event.target.value)}
@@ -137,6 +139,7 @@ export default function GitConfig() {
         />
 
         <TextInput
+          {...TEXT_INPUT_ADDITIONAL_PROPS}
           label="E-Mail"
           value={email}
           onChange={(event) => setEmail(event.target.value)}

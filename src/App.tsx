@@ -129,7 +129,7 @@ function App() {
       showAppNotification({
         type: "update",
         title: "Update available",
-        message: "New version of Neyra is released.",
+        message: `Neyra v${update.version} is released!`,
         actions: [
           {
             icon: IconCloudDownload,
@@ -152,7 +152,11 @@ function App() {
       ["mod+D", () => selectTab("files"), { usePhysicalKeys: true }],
       ["mod+K", () => selectTab("settings"), { usePhysicalKeys: true }],
       ["mod+P", () => selectTab("pull-requests"), { usePhysicalKeys: true }],
-      ["mod+shift+N", () => toggleNotificationCenter(), { usePhysicalKeys: true }],
+      [
+        "mod+shift+N",
+        () => toggleNotificationCenter(),
+        { usePhysicalKeys: true },
+      ],
 
       ["mod+R", () => void refresh(), { usePhysicalKeys: true }],
       ["mod+alt+C", () => copyBranch(), { usePhysicalKeys: true }],

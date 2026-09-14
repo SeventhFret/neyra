@@ -1,5 +1,10 @@
 .codeMessage {
-  font-family: monospace;
+  font-family: var(--mantine-font-family-monospace);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+
+  max-height: 220px;
+  overflow-y: auto;
+
+  padding-right: 4px;
 }
