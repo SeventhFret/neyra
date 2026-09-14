@@ -21,11 +21,8 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { useRepoData, type Branch } from "../../stores";
-import {
-  formatRelativeDate,
-  showErrorNotification,
-  showSuccessNotification,
-} from "../../utils";
+import { showAppNotification } from "../../components/NotificationCenter/helper";
+import { formatRelativeTime } from "../../lib/time";
 import classes from "./BranchesTab.module.css";
 
 const BranchRow = memo(function BranchRow({
@@ -125,7 +122,7 @@ const BranchRow = memo(function BranchRow({
           </Text>
 
           <Text size="xs" c="dimmed" style={{ flex: "none" }}>
-            · {formatRelativeDate(branch.date)}
+            · {formatRelativeTime(branch.date)}
           </Text>
         </Group>
       </Stack>
@@ -297,7 +294,8 @@ export default function BranchesTab({ active }: BranchesTabProps) {
 
         await refresh();
 
-        showSuccessNotification({
+        showAppNotification({
+          type: "info",
           title:
             command === "switch"
               ? `Switched to ${name}`
@@ -305,9 +303,11 @@ export default function BranchesTab({ active }: BranchesTabProps) {
           message: result,
         });
       } catch (error) {
-        showErrorNotification({
+        showAppNotification({
+          type: "error",
           title: `Failed to ${command} ${name}`,
           message: error,
+          messageFormat: "code",
         });
       } finally {
         finishWork();
@@ -334,14 +334,17 @@ export default function BranchesTab({ active }: BranchesTabProps) {
 
       setNewBranch("");
 
-      showSuccessNotification({
+      showAppNotification({
+        type: "success",
         title: `Created ${name}`,
         message: result,
       });
     } catch (error) {
-      showErrorNotification({
+      showAppNotification({
+        type: "error",
         title: `Failed to create ${name}`,
         message: error,
+        messageFormat: "code",
       });
     } finally {
       finishWork();

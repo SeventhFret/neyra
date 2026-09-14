@@ -1,6 +1,13 @@
 import type { Icon } from "@tabler/icons-react";
 
-export type NeyraNotificationType = "success" | "error" | "info" | "warning" | "update";
+export type NeyraNotificationType =
+  | "success"
+  | "error"
+  | "info"
+  | "warning"
+  | "update";
+
+export type NotificationMessageFormat = "text" | "code";
 
 export interface NeyraNotificationAction {
   label: string;
@@ -14,6 +21,7 @@ export type NeyraNotification = {
   id: string;
   type: NeyraNotificationType;
   title: string;
+  messageFormat?: NotificationMessageFormat;
   message?: string;
   createdAt: number;
   read: boolean;

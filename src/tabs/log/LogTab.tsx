@@ -18,8 +18,8 @@ import {
   IconGitCommit,
 } from "@tabler/icons-react";
 import { useRepoData, type Commit } from "../../stores";
-import { formatRelativeDate } from "../../utils";
 import classes from "./LogTab.module.css";
+import { formatRelativeTime } from "../../lib/time";
 
 /** Conventional commit types, coloured so the log scans by kind of change. */
 const TYPE_COLORS: Record<string, string> = {
@@ -128,7 +128,7 @@ function CommitRow({ commit }: { commit: Commit }) {
           </Text>
           <Tooltip label={new Date(commit.date).toLocaleString()} withArrow>
             <Text size="xs" c="dimmed">
-              {formatRelativeDate(commit.date)}
+              {formatRelativeTime(commit.date)}
             </Text>
           </Tooltip>
           <Text size="xs" c="dimmed">
@@ -214,7 +214,11 @@ export default function LogTab() {
         ) : commits.length === 0 ? (
           <Center style={{ flex: 1 }} p="xl">
             <Stack align="center" gap="xs">
-              <IconGitCommit size={34} stroke={1.7} color="var(--neyra-text-muted)" />
+              <IconGitCommit
+                size={34}
+                stroke={1.7}
+                color="var(--neyra-text-muted)"
+              />
               <Text c="dimmed">No commits yet</Text>
               <Text size="xs" c="dimmed">
                 The first one you make in the Committer tab shows up here.

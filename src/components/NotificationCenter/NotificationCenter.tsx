@@ -16,7 +16,7 @@ import {
 } from "@tabler/icons-react";
 
 import { useNotificationStore } from "../../stores/notifications/store";
-import { formatNotificationTime } from "../../utils";
+import { formatNotificationTime } from "../../lib/time";
 
 import classes from "./NotificationCenter.module.css";
 
@@ -142,6 +142,19 @@ export function NotificationCenter({
                           notification.read
                             ? "dimmed"
                             : "var(--neyra-text-secondary)"
+                        }
+                        ff={
+                          notification.messageFormat === "code"
+                            ? "monospace"
+                            : undefined
+                        }
+                        style={
+                          notification.messageFormat === "code"
+                            ? {
+                                whiteSpace: "pre-wrap",
+                                overflowWrap: "anywhere",
+                              }
+                            : undefined
                         }
                       >
                         {notification.message}
