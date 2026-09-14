@@ -1,6 +1,6 @@
 import { Text } from "@mantine/core";
 import type { NotificationMessageProps } from "./NotificationMessage.types";
-import classes from "./NotificationMessage.module.css"
+import classes from "./NotificationMessage.module.css";
 
 export default function NotificationMessage({
   message,
@@ -12,6 +12,7 @@ export default function NotificationMessage({
       size="sm"
       c={dimmed ? "dimmed" : "var(--neyra-text-secondary)"}
       className={format === "code" ? classes.codeMessage : undefined}
+      style={{ minWidth: 0 }}
     >
       {message}
     </Text>
