@@ -24,7 +24,7 @@ export function showAppNotification({
   message,
   messageFormat = "text",
   actions,
-  autoClose = 3000,
+  autoClose,
 }: AppNotificationInput) {
   const text = String(message);
 
@@ -42,7 +42,7 @@ export function showAppNotification({
   notifications.show({
     ...MANTINE_NOTIFICATION_PROPS,
     title,
-    autoClose,
+    autoClose: autoClose ?? (messageFormat === "code" ? 5000 : 3000),
     color: meta.mantineColor,
 
     icon: <Icon size={20} color={meta.color} />,

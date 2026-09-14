@@ -28,6 +28,7 @@ import { useRepoData, type StatusEntry } from "../../stores";
 import { showAppNotification } from "../../components/NotificationCenter/helper";
 import classes from "./FilesTab.module.css";
 import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
+import { TEXT_INPUT_ADDITIONAL_PROPS } from "../../lib/constants/input";
 
 const STATUS_COLORS = {
   conflicted: "#da77f2",
@@ -257,6 +258,7 @@ export default function FilesTab({ active }: FilesTabProps) {
 
       <Group gap="sm" align="center">
         <TextInput
+          {...TEXT_INPUT_ADDITIONAL_PROPS}
           radius="lg"
           ref={filterInputRef}
           placeholder="Filter by file name"

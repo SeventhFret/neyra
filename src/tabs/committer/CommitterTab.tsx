@@ -17,6 +17,7 @@ import { IconCloudUpload, IconGitCommit, IconLink } from "@tabler/icons-react";
 import { invoke } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { useMemo, useState } from "react";
+import { TEXT_INPUT_ADDITIONAL_PROPS } from "../../lib/constants/input";
 
 import { useRepoData } from "../../stores";
 import { showAppNotification } from "../../components/NotificationCenter/helper";
@@ -65,13 +66,6 @@ const COMMON_SCOPES = [
 ];
 
 const SCOPE_PATTERN = /^\w+\(([^)]+)\)!?:/;
-
-const TEXT_INPUT_PROPS = {
-  autoComplete: "off",
-  autoCorrect: "off",
-  autoCapitalize: "off",
-  spellCheck: false,
-} as const;
 
 interface CommitterTabProps {
   active: boolean;
@@ -376,7 +370,7 @@ export default function CommitterTab({ active }: CommitterTabProps) {
       <Grid gap="md" align="end">
         <Grid.Col span={2}>
           <Autocomplete
-            {...TEXT_INPUT_PROPS}
+            {...TEXT_INPUT_ADDITIONAL_PROPS}
             size="lg"
             radius="lg"
             description="type"
@@ -396,7 +390,7 @@ export default function CommitterTab({ active }: CommitterTabProps) {
 
         <Grid.Col span={2}>
           <Autocomplete
-            {...TEXT_INPUT_PROPS}
+            {...TEXT_INPUT_ADDITIONAL_PROPS}
             size="lg"
             radius="lg"
             description="scope"
@@ -412,7 +406,7 @@ export default function CommitterTab({ active }: CommitterTabProps) {
 
         <Grid.Col span={6}>
           <TextInput
-            {...TEXT_INPUT_PROPS}
+            {...TEXT_INPUT_ADDITIONAL_PROPS}
             size="lg"
             radius="lg"
             description="message"
@@ -425,7 +419,7 @@ export default function CommitterTab({ active }: CommitterTabProps) {
 
         <Grid.Col span={2}>
           <TextInput
-            {...TEXT_INPUT_PROPS}
+            {...TEXT_INPUT_ADDITIONAL_PROPS}
             size="lg"
             radius="lg"
             description="suffix"
@@ -438,7 +432,7 @@ export default function CommitterTab({ active }: CommitterTabProps) {
       </Grid>
 
       <Textarea
-        {...TEXT_INPUT_PROPS}
+        {...TEXT_INPUT_ADDITIONAL_PROPS}
         description="description"
         value={commitDescription}
         onChange={(event) => setCommitDescription(event.target.value)}

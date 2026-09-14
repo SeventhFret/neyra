@@ -25,6 +25,7 @@ import {
 } from "../../stores/repoSelector/store";
 
 import classes from "./NeyraRepoSelector.module.css";
+import { TEXT_INPUT_ADDITIONAL_PROPS } from "../../lib/constants/input";
 
 export default function NeyraRepoSelector() {
   const selectRepo = useRepositorySelectionStore(
@@ -92,6 +93,7 @@ export default function NeyraRepoSelector() {
       <Paper className={classes.panel} radius="xl" p="md">
         <Stack gap="md">
           <TextInput
+            {...TEXT_INPUT_ADDITIONAL_PROPS}
             value={query}
             onChange={(event) => setQuery(event.currentTarget.value)}
             placeholder="Filter repositories"
