@@ -173,7 +173,6 @@ export default function FilesTab({ active }: FilesTabProps) {
   const [filter, setFilter] = useState<string>("");
   const [isWorking, setIsWorking] = useState<boolean>(false);
   const filterInputRef = useRef<HTMLInputElement | null>(null);
-  // Kept in a ref as well so the callbacks stay stable across renders.
   const isWorkingRef = useRef<boolean>(false);
 
   const { data, meta } = useMemo(() => {
@@ -189,8 +188,6 @@ export default function FilesTab({ active }: FilesTabProps) {
     initialExpandedState: getTreeExpandedState(data, "*"),
   });
 
-  // Tree resets its expanded state when the data changes, and a status view is
-  // only useful fully open — so re-expand whenever the list is rebuilt.
   useEffect(() => {
     tree.expandAllNodes();
   }, [data]);
@@ -199,8 +196,6 @@ export default function FilesTab({ active }: FilesTabProps) {
 
   const run = useCallback(
     async (command: "stage" | "unstage", paths: string[] | null) => {
-      // git takes index.lock for the duration, so two of these at once would
-      // fail — one at a time.
       if (isWorkingRef.current) {
         return;
       }
@@ -233,8 +228,12 @@ export default function FilesTab({ active }: FilesTabProps) {
   useHotkeys(
     active
       ? [
-          ["ctrl+Enter", stageAll],
-          ["ctrl+F", () => filterInputRef.current?.focus()],
+          ["mod+Enter", stageAll, { usePhysicalKeys: true }],
+          [
+            "mod+F",
+            () => filterInputRef.current?.focus(),
+            { usePhysicalKeys: true },
+          ],
         ]
       : [],
     [],
@@ -246,9 +245,6 @@ export default function FilesTab({ active }: FilesTabProps) {
         <div className="header-container">
           <h1>Files</h1>
         </div>
-        {/* flex: none — .header-container is width: 90% in App.css, so without
-            this the badges are the ones that shrink and Badge clips its label
-            with an ellipsis. fullWidth makes it worse: it sets width: 100%. */}
         <Group gap="xs" pb="xs" wrap="nowrap" style={{ flex: "none" }}>
           <Badge size="lg" variant="light" radius="sm" color="teal">
             {stagedCount} staged
