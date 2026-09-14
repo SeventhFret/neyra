@@ -228,16 +228,18 @@ export default function BranchesTab({ active }: BranchesTabProps) {
     active
       ? [
           [
-            "ctrl+F",
+            "mod+F",
             () => {
               filterInputRef.current?.focus();
             },
+            { usePhysicalKeys: true },
           ],
           [
-            "ctrl+N",
+            "mod+N",
             () => {
               newBranchRef.current?.focus();
             },
+            { usePhysicalKeys: true },
           ],
         ]
       : [],
@@ -301,6 +303,7 @@ export default function BranchesTab({ active }: BranchesTabProps) {
               ? `Switched to ${name}`
               : `Rebased onto ${name}`,
           message: result,
+          messageFormat: "code",
         });
       } catch (error) {
         showAppNotification({
