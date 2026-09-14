@@ -37,8 +37,6 @@ export function NotificationCenter({
 
   const unreadCount = items.filter((item) => !item.read).length;
 
-  console.log(items);
-
   return (
     <Drawer
       radius="lg"
