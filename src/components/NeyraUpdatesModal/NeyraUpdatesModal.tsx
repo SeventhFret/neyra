@@ -91,7 +91,7 @@ export default function NeyraUpdatesModal({
           <Group gap={7}>
             <IconSparkles size={17} stroke={1.7} color="var(--neyra-primary)" />
 
-            <Title order={2}>Neyra {update.version}</Title>
+            <Title order={2}>Neyra v{update.version}</Title>
           </Group>
 
           <Text c="dimmed">A new version of Neyra is available.</Text>
