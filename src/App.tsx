@@ -259,6 +259,7 @@ function Page({ tab, currentTab, children }: PageProps) {
         pointerEvents: active ? "auto" : "none",
       }}
       aria-hidden={!active}
+      inert={!active}
     >
       {children}
     </motion.section>
