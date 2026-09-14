@@ -3,10 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "@mantine/hooks";
-import {
-  showErrorNotification,
-  showSuccessNotification,
-} from "../../../../utils";
+import { showAppNotification } from "../../../../components/NotificationCenter/helper";
 import ShortcutKeys from "../../../../components/ShortcutKeys/ShortcutKeys";
 
 export default function GitConfig() {
@@ -40,9 +37,11 @@ export default function GitConfig() {
         setName(userName ?? "");
         setEmail(userEmail ?? "");
       } catch (error) {
-        showErrorNotification({
+        showAppNotification({
+          type: "error",
           title: "Failed to read the git config",
           message: error,
+          messageFormat: "code",
         });
       } finally {
         if (isCurrent) {
@@ -84,16 +83,18 @@ export default function GitConfig() {
         global: isGlobal,
       });
 
-      // `git config` prints nothing on success, so the notification reports
-      // what was written instead.
-      showSuccessNotification({
+      showAppNotification({
+        type: "success",
         title: `Saved to the ${isGlobal ? "global" : "repository"} config`,
         message: `user.name=${name.trim()}\nuser.email=${email.trim()}`,
+        messageFormat: "code",
       });
     } catch (error) {
-      showErrorNotification({
+      showAppNotification({
+        type: "error",
         title: "Failed to save the git config",
         message: error,
+        messageFormat: "code",
       });
     } finally {
       setIsSaving(false);
@@ -153,7 +154,9 @@ export default function GitConfig() {
               Use
               <code style={{ fontWeight: 600 }}>--global</code>
               flag
-              <ShortcutKeys shortcut={{ modifiers: ["mod", "alt"], key: "G" }} />
+              <ShortcutKeys
+                shortcut={{ modifiers: ["mod", "alt"], key: "G" }}
+              />
             </Group>
           }
         />

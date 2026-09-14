@@ -12,16 +12,14 @@ import {
   Grid,
 } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
-import { IconCloudUpload, IconGitCommit } from "@tabler/icons-react";
+import { IconCloudUpload, IconGitCommit, IconLink } from "@tabler/icons-react";
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useMemo, useState } from "react";
 import { useRepoData } from "../../stores";
-import {
-  showErrorNotification,
-  showSuccessNotification,
-  parseUrlFromCommitStatus,
-} from "../../utils";
+import { showAppNotification } from "../../components/NotificationCenter/helper";
+import { parsePullRequestAction } from "../../lib/git";
 import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 /** The Conventional Commits types, with what each one is for. */
 const COMMIT_TYPES: Record<string, string> = {
@@ -157,15 +155,33 @@ export default function CommitterTab({ active }: CommitterTabProps) {
         : await invoke<string>("push", { forceWithLease: forceWithLease });
       await refresh();
       await resetFields();
-      showSuccessNotification({
+
+      const prAction = parsePullRequestAction(result);
+
+      showAppNotification({
+        type: "success",
         title: performCommit ? "Commit is successful" : "Push is successful",
         message: result,
-        prUrl: parseUrlFromCommitStatus(result),
+        messageFormat: "code",
+        actions: prAction
+          ? [
+              {
+                label:
+                  prAction.kind === "create" ? "Create MR/PR" : "Open MR/PR",
+                icon: IconLink,
+                onClick: async () => {
+                  await openUrl(prAction.url);
+                },
+              },
+            ]
+          : undefined,
       });
     } catch (error) {
-      showErrorNotification({
+      showAppNotification({
+        type: "error",
         title: performCommit ? "Failed to commit" : "Failed to push",
         message: error,
+        messageFormat: "code",
       });
     } finally {
       setIsCommitting(false);

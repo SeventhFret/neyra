@@ -15,6 +15,7 @@ import {
 } from "@tabler/icons-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { useMemo, useState } from "react";
+import { repoName } from "../../lib/strings";
 
 import neyraLogo from "../../assets/logo/neyra-logo-1024.png";
 
@@ -24,12 +25,6 @@ import {
 } from "../../stores/repoSelector/store";
 
 import classes from "./NeyraRepoSelector.module.css";
-
-export function repoName(path: string) {
-  const parts = path.split(/[\\/]/).filter(Boolean);
-
-  return parts.length > 0 ? parts[parts.length - 1] : path;
-}
 
 export default function NeyraRepoSelector() {
   const selectRepo = useRepositorySelectionStore(

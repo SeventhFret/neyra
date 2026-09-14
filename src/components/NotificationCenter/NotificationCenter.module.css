@@ -9,51 +9,199 @@
     box-shadow 120ms ease;
 }
 
-.unread {
-  background: color-mix(
-    in srgb,
-    var(--neyra-primary) 6%,
-    var(--neyra-surface-2)
-  );
-
-  border-color: var(--neyra-border-accent);
-
-  box-shadow: inset 3px 0 0 var(--neyra-primary);
-}
-
-.unread:hover {
-  background: color-mix(
-    in srgb,
-    var(--neyra-primary) 9%,
-    var(--neyra-surface-2)
-  );
-}
-
-.read {
-  background: var(--neyra-surface-1);
-  border-color: var(--neyra-border-soft);
-
-  opacity: 0.78;
-}
-
-.read:hover {
-  opacity: 1;
-
-  background: var(--neyra-surface-2);
-  border-color: var(--neyra-border);
-}
-
 .unreadDot {
   display: inline-block;
 
   width: 6px;
   height: 6px;
-
   flex: 0 0 6px;
 
   border-radius: 50%;
 
   background: var(--neyra-primary);
 
-  box-shadow: 0 0 8px color-mix(in srgb, var(--neyra-primary) 45%, transparent);
+  box-shadow:
+    0 0 8px
+    color-mix(in srgb, var(--neyra-primary) 45%, transparent);
+}
+
+/* ============================================
+   DRAWER LAYOUT
+   ============================================ */
+
+.drawerContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.drawerBody {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.drawerStack {
+  min-height: 0;
+}
+
+/* ============================================
+   NOTIFICATION LIST
+   ============================================ */
+
+.notificationList {
+  flex: 1;
+  min-height: 0;
+}
+
+.notificationContent {
+  min-width: 0;
+
+  /* Permanent gutter so cards do not resize when scrollbar appears. */
+  padding-right: 6px;
+  padding-block: 2px;
+}
+
+/* ============================================
+   NOTIFICATION CARD
+   ============================================ */
+
+.notification {
+  align-items: flex-start;
+}
+
+.notification.read {
+  background: var(--neyra-surface-1);
+  border-color: var(--neyra-border-soft);
+
+  opacity: 0.78;
+
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.13) !important;
+}
+
+.notification.read:hover {
+  opacity: 1;
+
+  background: var(--neyra-surface-2);
+  border-color: var(--neyra-border);
+
+  box-shadow:
+    0 3px 7px rgba(0, 0, 0, 0.16) !important;
+}
+
+.notification.unread {
+  background:
+    color-mix(
+      in srgb,
+      var(--neyra-primary) 6%,
+      var(--neyra-surface-2)
+    );
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--neyra-primary) 18%,
+      var(--neyra-border)
+    );
+
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.15) !important;
+}
+
+.notification.unread:hover {
+  background:
+    color-mix(
+      in srgb,
+      var(--neyra-primary) 9%,
+      var(--neyra-surface-2)
+    );
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--neyra-primary) 25%,
+      var(--neyra-border)
+    );
+
+  box-shadow:
+    0 3px 7px rgba(0, 0, 0, 0.18) !important;
+}
+
+.notification :global(.mantine-Notification-icon) {
+  align-self: flex-start;
+  margin-top: 2px;
+}
+
+.notification :global(.mantine-Notification-closeButton) {
+  align-self: flex-start;
+  margin-top: 2px;
+}
+
+/* ============================================
+   ACTIONS
+   ============================================ */
+
+.destructiveAction {
+  color: var(--neyra-danger);
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--neyra-danger) 35%,
+      transparent
+    );
+
+  background:
+    color-mix(
+      in srgb,
+      var(--neyra-danger) 12%,
+      transparent
+    );
+}
+
+.destructiveAction:hover {
+  color: var(--neyra-danger);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--neyra-danger) 18%,
+      transparent
+    );
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--neyra-danger) 50%,
+      transparent
+    );
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+
+.scrollbar {
+  background: transparent;
+}
+
+.scrollbarThumb {
+  background:
+    color-mix(
+      in srgb,
+      var(--neyra-primary) 45%,
+      var(--neyra-surface-2)
+    );
+
+  border-radius: 999px;
+}
+
+.scrollbarThumb:hover {
+  background:
+    color-mix(
+      in srgb,
+      var(--neyra-primary) 65%,
+      var(--neyra-surface-2)
+    );
 }

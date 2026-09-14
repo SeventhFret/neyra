@@ -1,0 +1,5 @@
+.codeMessage {
+  font-family: monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

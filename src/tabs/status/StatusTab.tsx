@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { invoke } from "@tauri-apps/api/core";
 import SelectWithDescription from "../../components/SelectWithDescription";
-import { showSuccessNotification, showErrorNotification } from "../../utils";
+import { showAppNotification } from "../../components/NotificationCenter/helper";
 import { useHotkeys } from "@mantine/hooks";
 import {
   IconCloudDownload,
@@ -63,12 +63,18 @@ export default function StatusTab({ active }: StatusTabProps) {
       });
       await refresh();
       setPullOutput(result);
-      showSuccessNotification({
+      showAppNotification({
+        type: "success",
         title: "Pull is successful",
         message: "Finished pulling",
       });
     } catch (error) {
-      showErrorNotification({ title: "Failed to pull", message: error });
+      showAppNotification({
+        type: "error",
+        title: "Failed to pull",
+        message: error,
+        messageFormat: "code",
+      });
     } finally {
       setIsPulling(false);
     }
@@ -83,12 +89,18 @@ export default function StatusTab({ active }: StatusTabProps) {
       });
       await refresh();
       setPullOutput(result);
-      showSuccessNotification({
+      showAppNotification({
+        type: "success",
         title: "Fetch is successful",
         message: "Finished fetching",
       });
     } catch (error) {
-      showErrorNotification({ title: "Failed to fetch", message: error });
+      showAppNotification({
+        type: "error",
+        title: "Failed to fetch",
+        message: error,
+        messageFormat: "code",
+      });
     } finally {
       setIsFetching(false);
     }

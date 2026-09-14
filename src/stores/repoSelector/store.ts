@@ -56,7 +56,6 @@ export const useRepositorySelectionStore = create<
     });
 
     try {
-      console.log("SELECTING REPO");
       const root = await invoke<string>("select_repository", { path });
 
       await useRepoData.getState().refresh();

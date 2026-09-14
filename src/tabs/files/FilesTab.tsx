@@ -25,7 +25,7 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRepoData, type StatusEntry } from "../../stores";
-import { showErrorNotification } from "../../utils";
+import { showAppNotification } from "../../components/NotificationCenter/helper";
 import classes from "./FilesTab.module.css";
 import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
 
@@ -211,7 +211,8 @@ export default function FilesTab({ active }: FilesTabProps) {
         await invoke<string>(command, { paths });
         await refresh();
       } catch (error) {
-        showErrorNotification({
+        showAppNotification({
+          type: "error",
           title: command === "stage" ? "Failed to stage" : "Failed to unstage",
           message: error,
         });
