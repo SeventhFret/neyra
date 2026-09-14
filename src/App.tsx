@@ -2,9 +2,11 @@ import { useClipboard, useHotkeys } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useDisclosure } from "@mantine/hooks";
 import { exit } from "@tauri-apps/plugin-process";
+import { check } from "@tauri-apps/plugin-updater";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { IconCloudDownload } from "@tabler/icons-react";
 
 import CommitterTab from "./tabs/committer/CommitterTab";
 import StatusTab from "./tabs/status/StatusTab";
@@ -22,6 +24,9 @@ import "./App.css";
 import { NotificationCenter } from "./components/NotificationCenter/NotificationCenter";
 import NeyraRepoSelector from "./components/NeyraRepoSelector/NeyraRepoSelector";
 import NeyraStatusBar from "./components/NeyraStatusBar/NeyraStatusBar";
+import { showAppNotification } from "./components/NotificationCenter/helper";
+import NeyraUpdatesModal from "./components/NeyraUpdatesModal/NeyraUpdatesModal";
+import { useUpdatesStore } from "./stores/updates/store";
 
 export type TabId =
   | "status"
@@ -47,7 +52,15 @@ function App() {
   const unreadCount = useNotificationStore(
     (state) => state.items.filter((item) => !item.read).length,
   );
-  const [notificationsOpened, { open, close }] = useDisclosure(false);
+  const [
+    notificationsOpened,
+    { open: openNotificationCenter, close: closeNotificationCenter },
+  ] = useDisclosure(false);
+  const [
+    updateModalOpened,
+    { open: openUpdateModal, close: closeUpdateModal },
+  ] = useDisclosure(false);
+  const setUpdate = useUpdatesStore((state) => state.setUpdate);
   const refreshing = useRepoData((state) => state.isLoading);
   const refresh = useRepoData((state) => state.refresh);
   const currentBranch = useRepoData((state) => state.currentBranch);
@@ -93,6 +106,30 @@ function App() {
 
     setCurrentTab(nextTab);
   };
+
+  useEffect(() => {
+    check().then((update) => {
+      if (update === null) {
+        return;
+      }
+
+      setUpdate(update);
+      showAppNotification({
+        type: "update",
+        title: "Update available",
+        message: "New version of Neyra is released.",
+        actions: [
+          {
+            icon: IconCloudDownload,
+            label: "Update now",
+            onClick: () => {
+              openUpdateModal();
+            },
+          },
+        ],
+      });
+    });
+  }, []);
 
   useHotkeys(
     [
@@ -149,7 +186,10 @@ function App() {
         </Page>
       </div>
 
-      <NotificationCenter opened={notificationsOpened} onClose={close} />
+      <NotificationCenter
+        opened={notificationsOpened}
+        onClose={closeNotificationCenter}
+      />
       <NeyraDock
         value={currentTab}
         onChange={selectTab}
@@ -157,9 +197,13 @@ function App() {
         copied={clipboard.copied}
         onRefresh={() => void refresh()}
         onCopyBranch={copyBranch}
-        onOpenNotifications={() => open()}
+        onOpenNotifications={() => openNotificationCenter()}
         onExit={() => void exit(0)}
         unreadNotifications={unreadCount}
+      />
+      <NeyraUpdatesModal
+        opened={updateModalOpened}
+        onClose={closeUpdateModal}
       />
     </main>
   );
