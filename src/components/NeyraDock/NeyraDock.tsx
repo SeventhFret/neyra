@@ -260,7 +260,15 @@ export function NeyraDock({
       </nav>
 
       <div className={classes.shellRight}>
-        <Tooltip label="Notifications" position="left">
+        <Tooltip
+          label={
+            <DockTooltip
+              label="Notifications"
+              shortcut={{ modifiers: ["mod", "shift"], key: "N" }}
+            />
+          }
+          position="left"
+        >
           <Indicator
             disabled={unreadNotifications === 0}
             label={unreadNotifications}

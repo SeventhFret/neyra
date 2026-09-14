@@ -58,7 +58,11 @@ function App() {
   );
   const [
     notificationsOpened,
-    { open: openNotificationCenter, close: closeNotificationCenter },
+    {
+      open: openNotificationCenter,
+      close: closeNotificationCenter,
+      toggle: toggleNotificationCenter,
+    },
   ] = useDisclosure(false);
   const [
     updateModalOpened,
@@ -148,6 +152,7 @@ function App() {
       ["mod+D", () => selectTab("files"), { usePhysicalKeys: true }],
       ["mod+K", () => selectTab("settings"), { usePhysicalKeys: true }],
       ["mod+P", () => selectTab("pull-requests"), { usePhysicalKeys: true }],
+      ["mod+shift+N", () => toggleNotificationCenter(), { usePhysicalKeys: true }],
 
       ["mod+R", () => void refresh(), { usePhysicalKeys: true }],
       ["mod+alt+C", () => copyBranch(), { usePhysicalKeys: true }],
