@@ -7,6 +7,7 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
+import ReactMarkdown from "react-markdown";
 import { IconRocket, IconSparkles } from "@tabler/icons-react";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { useState } from "react";
@@ -105,16 +106,9 @@ export default function NeyraUpdatesModal({
               What's new
             </Text>
 
-            <Text
-              size="sm"
-              c="var(--neyra-text-secondary)"
-              style={{
-                whiteSpace: "pre-wrap",
-                overflowWrap: "anywhere",
-              }}
-            >
-              {update.body}
-            </Text>
+            <div className={classes.markdown}>
+              <ReactMarkdown>{update.body}</ReactMarkdown>
+            </div>
           </div>
         )}
 
