@@ -19,6 +19,7 @@ jobs:
 
     outputs:
       release_id: ${{ steps.release.outputs.release_id }}
+      release_body: ${{ steps.release.outputs.release_body }}
 
     steps:
       - name: Checkout repository
@@ -29,37 +30,50 @@ jobs:
       - name: Create or find GitHub Release
         id: release
         env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
-            TAG="${GITHUB_REF_NAME}"
+          TAG="${GITHUB_REF_NAME}"
 
-            RELEASE_ID="$(
+          RELEASE_ID="$(
             gh release view "$TAG" \
-                --json databaseId \
-                --jq '.databaseId' \
-                2>/dev/null || true
-            )"
+              --json databaseId \
+              --jq '.databaseId' \
+              2>/dev/null || true
+          )"
 
-            if [ -z "$RELEASE_ID" ]; then
+          if [ -z "$RELEASE_ID" ]; then
             echo "Creating release for ${TAG}"
 
             gh release create "$TAG" \
-                --verify-tag \
-                --title "Neyra ${TAG}" \
-                --generate-notes
+              --verify-tag \
+              --title "Neyra ${TAG}" \
+              --generate-notes
 
             RELEASE_ID="$(
-                gh release view "$TAG" \
+              gh release view "$TAG" \
                 --json databaseId \
                 --jq '.databaseId'
             )"
-            else
+          else
             echo "Release for ${TAG} already exists"
-            fi
+          fi
 
-            echo "release_id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
-            echo "Release ID: $RELEASE_ID"
+          RELEASE_BODY="$(
+            gh release view "$TAG" \
+              --json body \
+              --jq '.body'
+          )"
+
+          echo "release_id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "release_body<<EOF"
+            echo "$RELEASE_BODY"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Release ID: $RELEASE_ID"
 
   build:
     needs: create-release
@@ -181,8 +195,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-
-          # Ad-hoc signing for unsigned macOS builds.
           APPLE_SIGNING_IDENTITY: "-"
 
         with:
@@ -190,8 +202,9 @@ jobs:
 
           releaseId: ${{ needs.create-release.outputs.release_id }}
           tagName: ${{ github.ref_name }}
+          releaseBody: ${{ needs.create-release.outputs.release_body }}
 
           uploadWorkflowArtifacts: true
           updaterJsonPreferNsis: true
 
-          releaseAssetNamePattern: "Neyra_[version]_[platform]_[arch].[ext]"
+          releaseAssetNamePattern: "Neyra_[version]_[platform]_[arch][setup][ext]"
