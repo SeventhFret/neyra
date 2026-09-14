@@ -8,5 +8,12 @@ export function parseUrlFromGitOutput(output: string): string | null {
   }
   const urlLine = urlLines[0];
 
-  return urlLine.slice(urlLine.indexOf("https://")).trim();
+  const sanitizedUrl = urlLine.slice(urlLine.indexOf("https://")).trim();
+  const searchQueries = ["/pull/new", "/merge_requests/"];
+
+  if (searchQueries.some((query) => sanitizedUrl.includes(query))) {
+    return sanitizedUrl;
+  }
+
+  return null;
 }
