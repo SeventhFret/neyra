@@ -14,7 +14,7 @@ import LogTab from "./tabs/log/LogTab";
 import BranchesTab from "./tabs/branches/BranchesTab";
 import FilesTab from "./tabs/files/FilesTab";
 import SettingsTab from "./tabs/settings/SettingsTab";
-import PullRequestsTab from "./tabs/pull-requests/PullRequestsTab";
+import MergeRequestsTab from "./tabs/merge-requests/MergeRequestsTab";
 
 import { NeyraDock } from "./components/NeyraDock/NeyraDock";
 import { useRepoData, listenForRepoChanges } from "./stores";
@@ -29,13 +29,14 @@ import NeyraUpdatesModal from "./components/NeyraUpdatesModal/NeyraUpdatesModal"
 import { useUpdatesStore } from "./stores/updates/store";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { Center, Loader, Stack, Text } from "@mantine/core";
+import { useGitProvidersStore } from "./stores/providers/store";
 
 export type TabId =
   | "status"
   | "committer"
   | "branches"
   | "files"
-  | "pull-requests"
+  | "merge-requests"
   | "log"
   | "settings";
 
@@ -44,7 +45,7 @@ const TAB_ORDER: TabId[] = [
   "committer",
   "branches",
   "files",
-  "pull-requests",
+  "merge-requests",
   "log",
   "settings",
 ];
@@ -74,6 +75,9 @@ function App() {
   const currentBranch = useRepoData((state) => state.currentBranch);
   const repoStatus = useRepositorySelectionStore((state) => state.status);
   const initializeRepo = useRepositorySelectionStore(
+    (state) => state.initialize,
+  );
+  const initializeGitProviders = useGitProvidersStore(
     (state) => state.initialize,
   );
 
@@ -109,7 +113,8 @@ function App() {
 
   useEffect(() => {
     initializeRepo();
-  }, [initializeRepo]);
+    initializeGitProviders();
+  }, []);
 
   const selectTab = (nextTab: TabId) => {
     if (nextTab === currentTab) {
@@ -151,7 +156,7 @@ function App() {
       ["mod+E", () => selectTab("log"), { usePhysicalKeys: true }],
       ["mod+D", () => selectTab("files"), { usePhysicalKeys: true }],
       ["mod+K", () => selectTab("settings"), { usePhysicalKeys: true }],
-      ["mod+P", () => selectTab("pull-requests"), { usePhysicalKeys: true }],
+      ["mod+P", () => selectTab("merge-requests"), { usePhysicalKeys: true }],
       [
         "mod+shift+N",
         () => toggleNotificationCenter(),
@@ -201,8 +206,8 @@ function App() {
           <FilesTab active={currentTab === "files"} />
         </Page>
 
-        <Page tab="pull-requests" currentTab={currentTab}>
-          <PullRequestsTab />
+        <Page tab="merge-requests" currentTab={currentTab}>
+          <MergeRequestsTab />
         </Page>
 
         <Page tab="log" currentTab={currentTab}>

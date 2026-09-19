@@ -4,6 +4,14 @@
   color: var(--neyra-text-primary);
 }
 
+.innerInput {
+  color: var(--neyra-text-primary);
+}
+
+.innerInput::placeholder {
+  color: var(--neyra-text-muted);
+}
+
 .input::placeholder {
   color: var(--neyra-text-muted);
   opacity: 1;
@@ -412,4 +420,37 @@
 
 .notifications > * {
   pointer-events: auto;
+}
+
+/* Segmented control */
+
+.segmentedControl {
+  background: var(--neyra-surface-1);
+  border: 1px solid var(--neyra-border-soft);
+}
+
+.segmentedControlIndicator {
+  background: color-mix(
+    in srgb,
+    var(--neyra-primary) 12%,
+    var(--neyra-surface-2)
+  );
+
+  border: 1px solid
+    color-mix(in srgb, var(--neyra-primary) 22%, var(--neyra-border-soft));
+
+  box-shadow: none;
+}
+
+.segmentedControlLabel {
+  color: var(--neyra-text-muted);
+  transition: color 120ms ease;
+}
+
+.segmentedControlLabel:hover {
+  color: var(--neyra-text-primary);
+}
+
+.segmentedControlLabel[data-active] {
+  color: var(--neyra-text-primary);
 }
