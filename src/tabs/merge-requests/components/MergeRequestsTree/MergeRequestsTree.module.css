@@ -8,7 +8,7 @@
 
   --tree-line-color: color-mix(
     in srgb,
-    var(--neyra-primary) 30%,
+    var(--neyra-border-strong) 50%,
     var(--neyra-border)
   );
 }

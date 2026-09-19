@@ -17,7 +17,8 @@ import {
   IconGitBranch,
   IconGitCommit,
 } from "@tabler/icons-react";
-import { useRepoData, type Commit } from "../../stores";
+import { useRepoDataStore } from "../../stores/repoData/store";
+import { Commit } from "../../stores/repoData/store.types";
 import classes from "./LogTab.module.css";
 import { formatRelativeTime } from "../../lib/time";
 
@@ -159,10 +160,10 @@ function CommitRow({ commit }: { commit: Commit }) {
 }
 
 export default function LogTab() {
-  const commits = useRepoData((state) => state.commits);
-  const currentBranch = useRepoData((state) => state.currentBranch);
-  const isLoading = useRepoData((state) => state.isLoading);
-  const error = useRepoData((state) => state.error);
+  const commits = useRepoDataStore((state) => state.commits);
+  const currentBranch = useRepoDataStore((state) => state.currentBranch);
+  const isLoading = useRepoDataStore((state) => state.isLoading);
+  const error = useRepoDataStore((state) => state.error);
 
   return (
     <Stack px="xl" gap="md">

@@ -17,7 +17,10 @@ import SettingsTab from "./tabs/settings/SettingsTab";
 import MergeRequestsTab from "./tabs/merge-requests/MergeRequestsTab";
 
 import { NeyraDock } from "./components/NeyraDock/NeyraDock";
-import { useRepoData, listenForRepoChanges } from "./stores";
+import {
+  useRepoDataStore,
+  listenForRepoChanges,
+} from "./stores/repoData/store";
 import { useNotificationStore } from "./stores/notifications/store";
 import { useRepositorySelectionStore } from "./stores/repoSelector/store";
 import "./App.css";
@@ -70,9 +73,9 @@ function App() {
     { open: openUpdateModal, close: closeUpdateModal },
   ] = useDisclosure(false);
   const setUpdate = useUpdatesStore((state) => state.setUpdate);
-  const refreshing = useRepoData((state) => state.isLoading);
-  const refresh = useRepoData((state) => state.refresh);
-  const currentBranch = useRepoData((state) => state.currentBranch);
+  const refreshing = useRepoDataStore((state) => state.isLoading);
+  const refresh = useRepoDataStore((state) => state.refresh);
+  const currentBranch = useRepoDataStore((state) => state.currentBranch);
   const repoStatus = useRepositorySelectionStore((state) => state.status);
   const initializeRepo = useRepositorySelectionStore(
     (state) => state.initialize,
