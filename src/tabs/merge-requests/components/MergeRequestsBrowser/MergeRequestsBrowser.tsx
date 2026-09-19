@@ -12,12 +12,14 @@ import {
   IconSearch,
   IconSitemap,
 } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { DockTooltip } from "../../../../components/NeyraDock/NeyraDock";
 
 import type { ProviderMergeRequest } from "../../../../stores/mergeRequests/store.types";
 import MergeRequestsList from "../MergeRequestsList/MergeRequestsList";
 import MergeRequestsTree from "../MergeRequestsTree/MergeRequestsTree";
 import { TEXT_INPUT_ADDITIONAL_PROPS } from "../../../../lib/constants/input";
+import { useHotkeys } from "@mantine/hooks";
 
 type MergeRequestsBrowserProps = {
   requests: ProviderMergeRequest[];
@@ -39,6 +41,24 @@ export default function MergeRequestsBrowser({
 }: MergeRequestsBrowserProps) {
   const [view, setView] = useState<ViewMode>("tree");
   const [search, setSearch] = useState("");
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  useHotkeys(
+    [
+      ["mod+F", () => searchInputRef.current?.focus()],
+      ["mod+shift+R", onRefresh],
+      ["mod+shift+T", () => toggleViewMode()],
+    ],
+    [],
+  );
+
+  const toggleViewMode = () => {
+    if (view === "tree") {
+      setView("list");
+      return;
+    }
+    setView("tree");
+  };
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -62,16 +82,33 @@ export default function MergeRequestsBrowser({
   return (
     <Stack gap="sm" h="100%" style={{ minHeight: 0 }}>
       <Group gap="xs" wrap="nowrap">
-        <TextInput
-          flex={1}
-          placeholder="Search requests..."
-          leftSection={<IconSearch size={15} />}
-          value={search}
-          onChange={(event) => setSearch(event.currentTarget.value)}
-          {...TEXT_INPUT_ADDITIONAL_PROPS}
-        />
+        <Tooltip
+          label={
+            <DockTooltip
+              label="Search"
+              shortcut={{ modifiers: ["mod"], key: "F" }}
+            />
+          }
+        >
+          <TextInput
+            flex={1}
+            ref={searchInputRef}
+            placeholder="Search requests..."
+            leftSection={<IconSearch size={15} />}
+            value={search}
+            onChange={(event) => setSearch(event.currentTarget.value)}
+            {...TEXT_INPUT_ADDITIONAL_PROPS}
+          />
+        </Tooltip>
 
-        <Tooltip label="Refresh">
+        <Tooltip
+          label={
+            <DockTooltip
+              label="Refresh"
+              shortcut={{ modifiers: ["mod"], key: "R" }}
+            />
+          }
+        >
           <ActionIcon
             variant="default"
             size="lg"
@@ -84,32 +121,41 @@ export default function MergeRequestsBrowser({
         </Tooltip>
       </Group>
 
-      <SegmentedControl
-        fullWidth
-        size="xs"
-        value={view}
-        onChange={(value) => setView(value as ViewMode)}
-        data={[
-          {
-            value: "tree",
-            label: (
-              <Group gap={6} justify="center">
-                <IconSitemap size={14} />
-                Tree
-              </Group>
-            ),
-          },
-          {
-            value: "list",
-            label: (
-              <Group gap={6} justify="center">
-                <IconList size={14} />
-                List
-              </Group>
-            ),
-          },
-        ]}
-      />
+      <Tooltip
+        label={
+          <DockTooltip
+            label="Toggle view"
+            shortcut={{ modifiers: ["mod", "shift"], key: "T" }}
+          />
+        }
+      >
+        <SegmentedControl
+          fullWidth
+          size="xs"
+          value={view}
+          onChange={(value) => setView(value as ViewMode)}
+          data={[
+            {
+              value: "tree",
+              label: (
+                <Group gap={6} justify="center">
+                  <IconSitemap size={14} />
+                  Tree
+                </Group>
+              ),
+            },
+            {
+              value: "list",
+              label: (
+                <Group gap={6} justify="center">
+                  <IconList size={14} />
+                  List
+                </Group>
+              ),
+            },
+          ]}
+        />
+      </Tooltip>
 
       {view === "tree" ? (
         <MergeRequestsTree

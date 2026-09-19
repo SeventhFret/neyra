@@ -93,7 +93,7 @@ const tabs: {
   },
 ];
 
-function DockTooltip({
+export function DockTooltip({
   label,
   shortcut,
 }: {
