@@ -49,15 +49,6 @@ impl RepositoryManager {
         Some(ActiveRepository { repo, root })
     }
 
-    pub fn root(&self) -> Result<PathBuf, String> {
-        let active = self.active.lock().map_err(lock_error)?;
-
-        active
-            .as_ref()
-            .map(|active| active.root.clone())
-            .ok_or_else(|| "No repository selected".to_string())
-    }
-
     pub fn root_optional(&self) -> Option<PathBuf> {
         self.active
             .lock()
