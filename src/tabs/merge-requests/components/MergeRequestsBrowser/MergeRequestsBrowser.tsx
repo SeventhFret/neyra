@@ -122,6 +122,7 @@ export default function MergeRequestsBrowser({
       </Group>
 
       <Tooltip
+        position="bottom"
         label={
           <DockTooltip
             label="Toggle view"
