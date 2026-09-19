@@ -2,7 +2,7 @@ use tauri::AppHandle;
 
 use crate::core::{
     config::get_provider,
-    providers::{self, models::MergeRequest},
+    providers::{self},
 };
 use crate::core::{
     config::{
@@ -10,13 +10,14 @@ use crate::core::{
         remove_provider as remove_provider_config,
     },
     credentials,
+    providers::models::ProviderMergeRequest,
 };
 
 #[tauri::command]
 pub async fn get_provider_merge_requests(
     app: AppHandle,
     provider_id: String,
-) -> Result<Vec<MergeRequest>, String> {
+) -> Result<Vec<ProviderMergeRequest>, String> {
     let provider = get_provider(&app, &provider_id)?
         .ok_or_else(|| format!("Provider '{}' doesn't exist", provider_id))?;
 
@@ -27,7 +28,19 @@ pub async fn get_provider_merge_requests(
         )
     })?;
 
-    providers::get_merge_requests(&provider, &token).await
+    let merge_requests = providers::get_merge_requests(&provider, &token).await?;
+
+    let provider_id = provider.id.clone();
+    let provider_type = provider.provider_type;
+
+    Ok(merge_requests
+        .into_iter()
+        .map(|merge_request| ProviderMergeRequest {
+            merge_request,
+            provider_id: provider_id.clone(),
+            provider_type,
+        })
+        .collect())
 }
 
 #[tauri::command]

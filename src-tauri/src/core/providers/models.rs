@@ -1,3 +1,4 @@
+use crate::core::config::models::ProviderType;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -5,6 +6,8 @@ use serde::{Deserialize, Serialize};
 pub struct MergeRequest {
     pub id: u64,
     pub number: u64,
+
+    pub repository: String,
 
     pub title: String,
     pub description: Option<String>,
@@ -23,6 +26,16 @@ pub struct MergeRequest {
 
     pub created_at: String,
     pub updated_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProviderMergeRequest {
+    #[serde(flatten)]
+    pub merge_request: MergeRequest,
+
+    pub provider_id: String,
+    pub provider_type: ProviderType,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

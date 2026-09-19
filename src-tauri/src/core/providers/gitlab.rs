@@ -23,9 +23,15 @@ struct GitLabUser {
 }
 
 #[derive(Debug, Deserialize)]
+struct GitLabMergeRequestReferences {
+    full: String,
+}
+
+#[derive(Debug, Deserialize)]
 struct GitLabMergeRequest {
     id: u64,
     iid: u64,
+    references: GitLabMergeRequestReferences,
 
     title: String,
     description: Option<String>,
@@ -105,6 +111,14 @@ fn normalize_host(host: &str) -> String {
         .to_owned()
 }
 
+fn repository_from_reference(reference: &str) -> String {
+    reference
+        .rsplit_once('!')
+        .map(|(repository, _)| repository)
+        .unwrap_or(reference)
+        .to_owned()
+}
+
 fn map_merge_request(request: GitLabMergeRequest) -> MergeRequest {
     let state = match request.state.as_str() {
         "merged" => MergeRequestState::Merged,
@@ -114,9 +128,13 @@ fn map_merge_request(request: GitLabMergeRequest) -> MergeRequest {
 
     let merge_status = map_merge_status(request.detailed_merge_status.as_deref());
 
+    let repository = repository_from_reference(&request.references.full);
+
     MergeRequest {
         id: request.id,
         number: request.iid,
+
+        repository,
 
         title: request.title,
         description: request.description,
@@ -138,7 +156,6 @@ fn map_merge_request(request: GitLabMergeRequest) -> MergeRequest {
         updated_at: request.updated_at,
     }
 }
-
 fn map_user(user: GitLabUser) -> ProviderUser {
     ProviderUser {
         username: user.username,

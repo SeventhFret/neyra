@@ -57,7 +57,9 @@ pub async fn get_merge_requests(host: &str, token: &str) -> Result<Vec<MergeRequ
                 .await
                 .map_err(|error| error.to_string())?;
 
-            result.push(map_pull_request(pull));
+            let repository = format!("{owner}/{repo}");
+
+            result.push(map_pull_request(pull, repository));
         }
     }
 
@@ -128,7 +130,7 @@ fn map_author(user: octocrab::models::Author) -> ProviderUser {
     }
 }
 
-fn map_pull_request(pull: PullRequest) -> MergeRequest {
+fn map_pull_request(pull: PullRequest, repository: String) -> MergeRequest {
     let author = pull
         .user
         .map(|user| map_author(*user))
@@ -165,6 +167,7 @@ fn map_pull_request(pull: PullRequest) -> MergeRequest {
     MergeRequest {
         id: pull.id.0,
         number: pull.number,
+        repository,
 
         title: pull.title.unwrap_or_default(),
         description: pull.body,
