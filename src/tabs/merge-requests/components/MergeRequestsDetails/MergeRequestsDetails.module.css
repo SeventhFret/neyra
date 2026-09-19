@@ -8,6 +8,10 @@
   color: var(--neyra-text-muted);
 }
 
+.divider {
+  border-color: var(--neyra-border);
+}
+
 .title {
   max-width: 900px;
 

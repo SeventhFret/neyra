@@ -90,7 +90,7 @@ export default function MergeRequestDetails({
           </Group>
         </Stack>
 
-        <Divider />
+        <Divider className={classes.divider} />
 
         <Group gap="xl" align="flex-start">
           <Stack gap={6}>
@@ -167,7 +167,7 @@ export default function MergeRequestDetails({
           </Group>
         </Stack>
 
-        <Divider />
+        <Divider className={classes.divider} />
 
         <Stack gap="xs">
           <Text className={classes.sectionLabel}>Description</Text>
