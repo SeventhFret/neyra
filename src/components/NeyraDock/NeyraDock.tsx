@@ -20,6 +20,7 @@ import {
   IconListDetails,
   IconRefresh,
   IconSettings,
+  IconRoute,
   IconTerminal2,
 } from "@tabler/icons-react";
 
@@ -84,6 +85,12 @@ const tabs: {
     label: "Log",
     shortcut: { modifiers: ["mod"], key: "E" },
     icon: IconListDetails,
+  },
+  {
+    id: "git-flows",
+    label: "Git Flows",
+    shortcut: { modifiers: ["mod"], key: "I" },
+    icon: IconRoute,
   },
   {
     id: "settings",

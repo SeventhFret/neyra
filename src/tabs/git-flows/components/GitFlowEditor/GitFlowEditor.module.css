@@ -1,0 +1,146 @@
+.drawerContent {
+  height: 100%;
+  overflow: hidden;
+}
+
+.drawerBody {
+  height: calc(100% - 60px);
+  padding: 0;
+  overflow: hidden;
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+  min-height: 0;
+}
+
+.editorHeader {
+  flex-shrink: 0;
+
+  padding: var(--mantine-spacing-lg) var(--mantine-spacing-lg)
+    var(--mantine-spacing-md);
+}
+
+.stepsScroll {
+  flex: 1;
+  min-height: 0;
+}
+
+.stepsContent {
+  padding: 0 var(--mantine-spacing-lg) var(--mantine-spacing-lg);
+}
+
+.step {
+  padding: var(--mantine-spacing-md);
+
+  background: var(--neyra-surface-2);
+  border: 1px solid var(--neyra-border-soft);
+}
+
+.stepContent {
+  min-width: 0;
+}
+
+.git {
+  padding: 2px 6px;
+
+  border-radius: var(--mantine-radius-xs);
+
+  background: var(--neyra-surface-3);
+  color: var(--neyra-primary);
+
+  font-family: "Fira Code", monospace;
+}
+
+.variableButton {
+  color: var(--neyra-primary);
+
+  font-family: "Fira Code", monospace;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.variableButton:disabled {
+  cursor: default;
+}
+
+.variable {
+  padding: 2px 6px;
+
+  border: 1px solid
+    color-mix(in srgb, var(--neyra-primary) 25%, var(--neyra-border-soft));
+
+  border-radius: var(--mantine-radius-xs);
+
+  background: color-mix(
+    in srgb,
+    var(--neyra-primary) 10%,
+    var(--neyra-surface-1)
+  );
+
+  color: var(--neyra-primary);
+
+  font-family: "Fira Code", monospace;
+}
+
+.addArgument {
+  align-self: flex-start;
+}
+
+.emptySteps {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 150px;
+
+  gap: 5px;
+
+  border: 1px dashed var(--neyra-border);
+  border-radius: var(--mantine-radius-md);
+
+  background: transparent;
+  color: var(--neyra-text-muted);
+
+  cursor: pointer;
+
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.emptySteps:hover {
+  background: var(--neyra-surface-2);
+
+  border-color: color-mix(
+    in srgb,
+    var(--neyra-primary) 35%,
+    var(--neyra-border)
+  );
+
+  color: var(--neyra-primary);
+}
+
+.emptySteps:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.footer {
+  flex-shrink: 0;
+  padding: var(--mantine-spacing-md) var(--mantine-spacing-lg);
+  border-top: 1px solid var(--neyra-border-soft);
+  border-radius: var(--mantine-radius-xl);
+  background: var(--neyra-surface-1);
+}
+
+.divider {
+  border-color: var(--neyra-border);
+}

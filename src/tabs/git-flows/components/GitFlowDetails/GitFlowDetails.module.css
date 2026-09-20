@@ -1,0 +1,49 @@
+.root {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+
+.header {
+  flex-shrink: 0;
+  padding: var(--mantine-spacing-lg);
+
+  border-bottom: 1px solid var(--neyra-border-soft);
+}
+
+.headerIcon {
+  flex-shrink: 0;
+  color: var(--neyra-primary);
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+}
+
+.steps {
+  width: min(100%, 900px);
+  padding: var(--mantine-spacing-lg);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+
+  gap: 6px;
+  padding: var(--mantine-spacing-xl);
+}
+
+.emptyIcon {
+  margin-bottom: 4px;
+  color: var(--neyra-text-muted);
+}
