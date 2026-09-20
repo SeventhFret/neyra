@@ -1,0 +1,234 @@
+.step {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  column-gap: 10px;
+}
+
+.timeline {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+}
+
+.status {
+  z-index: 1;
+
+  display: grid;
+  place-items: center;
+
+  width: 22px;
+  height: 22px;
+
+  border: 1px solid var(--neyra-border);
+  border-radius: 50%;
+
+  background: var(--neyra-surface-1);
+  color: var(--neyra-text-muted);
+}
+
+.status svg {
+  display: block;
+}
+
+.status[data-status="running"] {
+  border-color: color-mix(
+    in srgb,
+    var(--neyra-primary) 55%,
+    var(--neyra-border)
+  );
+
+  background: color-mix(
+    in srgb,
+    var(--neyra-primary) 12%,
+    var(--neyra-surface-1)
+  );
+
+  color: var(--neyra-primary);
+}
+
+.status[data-status="success"] {
+  border-color: var(--mantine-color-teal-7);
+  color: var(--mantine-color-teal-6);
+
+  animation: statusAppear 180ms ease-out;
+}
+
+.status[data-status="failed"] {
+  border-color: var(--mantine-color-red-7);
+  color: var(--mantine-color-red-6);
+
+  animation: statusAppear 180ms ease-out;
+}
+
+.status[data-status="timedOut"] {
+  border-color: var(--mantine-color-orange-7);
+  color: var(--mantine-color-orange-6);
+
+  animation: statusAppear 180ms ease-out;
+}
+
+.status[data-status="skipped"] {
+  opacity: 0.55;
+}
+
+/*
+ * Draw terminal-state icons in rather than making them
+ * appear instantly.
+ *
+ * Tabler icons are stroke-based SVGs, so animating the
+ * stroke gives us the "drawn" effect.
+ */
+.status[data-status="success"] svg path,
+.status[data-status="success"] svg polyline,
+.status[data-status="success"] svg line,
+.status[data-status="failed"] svg path,
+.status[data-status="failed"] svg polyline,
+.status[data-status="failed"] svg line,
+.status[data-status="timedOut"] svg path,
+.status[data-status="timedOut"] svg polyline,
+.status[data-status="timedOut"] svg line {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+
+  animation: drawStatusIcon 220ms ease-out forwards;
+}
+
+@keyframes statusAppear {
+  from {
+    transform: scale(0.82);
+    opacity: 0.5;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes drawStatusIcon {
+  from {
+    stroke-dashoffset: 40;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.line {
+  position: absolute;
+  top: 22px;
+  bottom: 0;
+
+  width: 1px;
+
+  background: var(--neyra-border-soft);
+}
+
+.line[data-complete] {
+  background: color-mix(
+    in srgb,
+    var(--neyra-primary) 30%,
+    var(--neyra-border-soft)
+  );
+}
+
+.content {
+  min-width: 0;
+  padding: 1px 0 24px;
+}
+
+.number {
+  min-width: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.command {
+  display: block;
+
+  width: fit-content;
+  max-width: 100%;
+
+  margin-top: 8px;
+  padding: 6px 9px;
+
+  overflow: hidden;
+
+  border: 1px solid var(--neyra-border-soft);
+  border-radius: var(--mantine-radius-sm);
+
+  background: var(--neyra-surface-2);
+  color: var(--neyra-text-secondary);
+
+  font-family: "Fira Code", monospace;
+  font-size: var(--mantine-font-size-xs);
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.git {
+  color: var(--neyra-primary);
+}
+
+.outputToggle {
+  margin-top: 8px;
+  color: var(--neyra-text-muted);
+}
+
+.outputToggle:hover {
+  color: var(--neyra-text-primary);
+}
+
+.console {
+  max-height: 260px;
+  margin-top: 7px;
+  padding: 10px 12px;
+
+  overflow: auto;
+
+  border: 1px solid var(--neyra-border-soft);
+  border-radius: var(--mantine-radius-md);
+
+  background: var(--neyra-bg);
+}
+
+.console pre {
+  margin: 0;
+
+  color: var(--neyra-text-secondary);
+
+  font-family: "Fira Code", monospace;
+  font-size: 11px;
+  line-height: 1.6;
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.console .stderr {
+  color: var(--mantine-color-red-5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status[data-status="success"],
+  .status[data-status="failed"],
+  .status[data-status="timedOut"] {
+    animation: none;
+  }
+
+  .status[data-status="success"] svg path,
+  .status[data-status="success"] svg polyline,
+  .status[data-status="success"] svg line,
+  .status[data-status="failed"] svg path,
+  .status[data-status="failed"] svg polyline,
+  .status[data-status="failed"] svg line,
+  .status[data-status="timedOut"] svg path,
+  .status[data-status="timedOut"] svg polyline,
+  .status[data-status="timedOut"] svg line {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+}

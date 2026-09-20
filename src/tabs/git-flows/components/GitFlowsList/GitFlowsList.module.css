@@ -1,0 +1,45 @@
+.scroll {
+  flex: 1;
+  min-height: 0;
+}
+
+.item {
+  width: 100%;
+  padding: 10px;
+
+  border: 1px solid transparent;
+  border-radius: var(--mantine-radius-md);
+
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.item:hover {
+  background: var(--neyra-surface-2);
+}
+
+.item[data-active] {
+  background: color-mix(
+    in srgb,
+    var(--neyra-primary) 9%,
+    var(--neyra-surface-2)
+  );
+
+  border-color: color-mix(
+    in srgb,
+    var(--neyra-primary) 22%,
+    var(--neyra-border-soft)
+  );
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.flowIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--neyra-text-muted);
+}
