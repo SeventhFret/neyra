@@ -22,7 +22,11 @@ pub enum GitFlowStepOutcome {
 }
 
 #[derive(Debug, Clone, Serialize)]
-#[serde(tag = "type", rename_all = "camelCase")]
+#[serde(
+    tag = "type",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
 pub enum GitFlowEvent {
     FlowStarted {
         run_id: String,
