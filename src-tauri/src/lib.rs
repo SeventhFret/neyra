@@ -62,6 +62,7 @@ pub fn run() {
             commands::git_flows::get_git_flow_by_id,
             commands::git_flows::get_git_flows_from_config,
             commands::git_flows::remove_git_flow,
+            commands::git_flows::update_git_flow,
             commands::git_flows::run_git_flow,
         ])
         .run(tauri::generate_context!())

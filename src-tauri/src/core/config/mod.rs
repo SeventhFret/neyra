@@ -129,3 +129,17 @@ pub fn remove_git_flow(app: &AppHandle, id: &str) -> Result<(), String> {
 
     save(app, &config)
 }
+
+pub fn update_git_flow(app: &AppHandle, git_flow: GitFlow) -> Result<(), String> {
+    let mut config = load(app)?;
+
+    let existing = config
+        .git_flows
+        .iter_mut()
+        .find(|flow| flow.id == git_flow.id)
+        .ok_or_else(|| format!("Git Flow with id '{}' doesn't exist", git_flow.id))?;
+
+    *existing = git_flow;
+
+    save(app, &config)
+}

@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct AppConfig {
     #[serde(default)]
     pub providers: Vec<ProviderConfig>,
+    #[serde(default)]
     pub git_flows: Vec<GitFlow>,
 }
 
@@ -37,7 +38,7 @@ pub struct GitFlowStep {
     pub stop_on_failure: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Default, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GitFlow {
     pub id: String,

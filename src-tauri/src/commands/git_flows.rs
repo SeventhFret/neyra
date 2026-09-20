@@ -1,7 +1,7 @@
 use crate::core::config::models::GitFlow;
 use crate::core::config::{
     add_git_flow as add_git_flow_config, get_git_flow, get_git_flows,
-    remove_git_flow as remove_git_flow_config,
+    remove_git_flow as remove_git_flow_config, update_git_flow as update_git_flow_config,
 };
 use crate::core::git_flows::models::GitFlowContext;
 use crate::core::git_flows::runner::run;
@@ -29,6 +29,11 @@ pub fn get_git_flows_from_config(app: AppHandle) -> Result<Vec<GitFlow>, String>
 #[tauri::command]
 pub fn remove_git_flow(app: AppHandle, id: String) -> Result<(), String> {
     remove_git_flow_config(&app, &id)
+}
+
+#[tauri::command]
+pub fn update_git_flow(app: AppHandle, git_flow: GitFlow) -> Result<(), String> {
+    update_git_flow_config(&app, git_flow)
 }
 
 #[tauri::command]
