@@ -91,7 +91,7 @@
   stroke-dasharray: 40;
   stroke-dashoffset: 40;
 
-  animation: drawStatusIcon 220ms ease-out forwards;
+  animation: drawStatusIcon 1500ms ease-out forwards;
 }
 
 @keyframes statusAppear {

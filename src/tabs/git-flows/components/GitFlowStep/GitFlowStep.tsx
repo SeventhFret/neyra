@@ -143,19 +143,19 @@ export default function GitFlowStep({
 function StatusIcon({ status }: { status: GitFlowStepStatus }) {
   switch (status) {
     case "running":
-      return <IconPlayerPlay size={13} stroke={2} />;
+      return <IconPlayerPlay size={14} stroke={2} />;
 
     case "success":
-      return <IconCheck size={13} stroke={2.5} />;
+      return <IconCheck size={14} stroke={2.5} />;
 
     case "failed":
-      return <IconX size={13} stroke={2.5} />;
+      return <IconX size={14} stroke={2.5} />;
 
     case "timedOut":
-      return <IconClock size={13} stroke={2} />;
+      return <IconClock size={14} stroke={2} />;
 
     case "skipped":
-      return <IconChevronRight size={12} />;
+      return <IconChevronRight size={14} />;
 
     case "pending":
       return null;
