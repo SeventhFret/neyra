@@ -1,0 +1,112 @@
+.scroll {
+  min-height: 0;
+}
+
+.tree {
+  min-width: max-content;
+  padding-right: 8px;
+
+  --tree-line-color: color-mix(
+    in srgb,
+    var(--neyra-border-strong) 50%,
+    var(--neyra-border)
+  );
+}
+
+.group,
+.request {
+  min-height: 30px;
+  border-radius: var(--mantine-radius-sm);
+  color: var(--neyra-text-secondary);
+}
+
+.group {
+  display: block;
+  width: 100%;
+
+  padding-block: 4px;
+  padding-right: 7px;
+}
+.group:hover {
+  background: var(--neyra-surface-2);
+  color: var(--neyra-text-primary);
+}
+
+.chevron {
+  display: flex;
+  width: 14px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--neyra-text-muted);
+}
+
+.providerIcon {
+  flex-shrink: 0;
+  color: var(--neyra-text-secondary);
+}
+
+.request {
+  display: flex;
+  width: 100%;
+  min-width: 220px;
+  max-width: 310px;
+
+  align-items: center;
+  gap: 7px;
+
+  padding-block: 5px;
+  padding-right: 8px;
+
+  border: 1px solid transparent;
+
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.leafSpacer {
+  width: 14px;
+  flex-shrink: 0;
+}
+
+.request:hover {
+  background: var(--neyra-surface-2);
+  color: var(--neyra-text-primary);
+}
+
+.request[data-active] {
+  background: color-mix(
+    in srgb,
+    var(--neyra-primary) 9%,
+    var(--neyra-surface-2)
+  );
+
+  border-color: color-mix(in srgb, var(--neyra-primary) 20%, transparent);
+
+  color: var(--neyra-text-primary);
+}
+
+.requestIcon {
+  flex-shrink: 0;
+  color: var(--neyra-text-muted);
+}
+
+.request[data-active] .requestIcon {
+  color: var(--neyra-primary);
+}
+
+.requestTitle {
+  min-width: 0;
+  flex: 1;
+}
+
+.number {
+  flex-shrink: 0;
+}
+
+.empty {
+  color: var(--neyra-text-muted);
+}

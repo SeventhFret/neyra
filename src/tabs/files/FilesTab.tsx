@@ -24,7 +24,8 @@ import {
 } from "@tabler/icons-react";
 import { invoke } from "@tauri-apps/api/core";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRepoData, type StatusEntry } from "../../stores";
+import { useRepoDataStore } from "../../stores/repoData/store";
+import { StatusEntry } from "../../stores/repoData/store.types";
 import { showAppNotification } from "../../components/NotificationCenter/helper";
 import classes from "./FilesTab.module.css";
 import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
@@ -167,9 +168,9 @@ interface FilesTabProps {
 }
 
 export default function FilesTab({ active }: FilesTabProps) {
-  const status = useRepoData((state) => state.status);
-  const isLoading = useRepoData((state) => state.isLoading);
-  const refresh = useRepoData((state) => state.refresh);
+  const status = useRepoDataStore((state) => state.status);
+  const isLoading = useRepoDataStore((state) => state.isLoading);
+  const refresh = useRepoDataStore((state) => state.refresh);
 
   const [filter, setFilter] = useState<string>("");
   const [isWorking, setIsWorking] = useState<boolean>(false);

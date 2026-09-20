@@ -20,7 +20,8 @@ import {
 } from "@tabler/icons-react";
 import { invoke } from "@tauri-apps/api/core";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
-import { useRepoData, type Branch } from "../../stores";
+import { useRepoDataStore } from "../../stores/repoData/store";
+import { Branch } from "../../stores/repoData/store.types";
 import { showAppNotification } from "../../components/NotificationCenter/helper";
 import { formatRelativeTime } from "../../lib/time";
 import classes from "./BranchesTab.module.css";
@@ -217,10 +218,10 @@ interface BranchesTabProps {
 }
 
 export default function BranchesTab({ active }: BranchesTabProps) {
-  const branches = useRepoData((state) => state.branches);
-  const currentBranch = useRepoData((state) => state.currentBranch);
-  const isLoading = useRepoData((state) => state.isLoading);
-  const refresh = useRepoData((state) => state.refresh);
+  const branches = useRepoDataStore((state) => state.branches);
+  const currentBranch = useRepoDataStore((state) => state.currentBranch);
+  const isLoading = useRepoDataStore((state) => state.isLoading);
+  const refresh = useRepoDataStore((state) => state.refresh);
 
   const filterInputRef = useRef<HTMLInputElement | null>(null);
   const newBranchRef = useRef<HTMLInputElement | null>(null);

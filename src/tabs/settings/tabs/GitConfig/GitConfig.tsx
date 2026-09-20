@@ -132,7 +132,12 @@ export default function GitConfig() {
           value={name}
           onChange={(event) => setName(event.target.value)}
           description={
-            <Text c="dimmed" ff="Fira code, monospace" size="xs">
+            <Text
+              component="span"
+              c="dimmed"
+              ff="Fira code, monospace"
+              size="xs"
+            >
               git config{isGlobal ? " --global" : ""} user.name
             </Text>
           }
@@ -144,7 +149,12 @@ export default function GitConfig() {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           description={
-            <Text c="dimmed" ff="Fira code, monospace" size="xs">
+            <Text
+              component="span"
+              c="dimmed"
+              ff="Fira code, monospace"
+              size="xs"
+            >
               git config{isGlobal ? " --global" : ""} user.email
             </Text>
           }

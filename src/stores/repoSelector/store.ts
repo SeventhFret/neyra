@@ -7,7 +7,7 @@ import {
   RepositoryHistoryState,
   RepositoryHistoryAction,
 } from "./store.types";
-import { useRepoData } from "../../stores";
+import { useRepoDataStore } from "../repoData/store";
 
 export const useRepositorySelectionStore = create<
   RepositorySelectionState & RepositorySelectionAction
@@ -39,7 +39,7 @@ export const useRepositorySelectionStore = create<
         root,
       });
 
-      await useRepoData.getState().refresh();
+      await useRepoDataStore.getState().refresh();
     } catch (error) {
       set({
         status: "none",
@@ -58,7 +58,7 @@ export const useRepositorySelectionStore = create<
     try {
       const root = await invoke<string>("select_repository", { path });
 
-      await useRepoData.getState().refresh();
+      await useRepoDataStore.getState().refresh();
 
       set({
         status: "ready",

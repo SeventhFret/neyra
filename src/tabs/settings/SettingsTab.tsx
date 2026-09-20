@@ -9,6 +9,8 @@ import {
 
 import GitConfig from "./tabs/GitConfig/GitConfig";
 import classes from "./SettingsTab.module.css";
+import GitHub from "./tabs/GitHub/GitHub";
+import GitLab from "./tabs/GitLab/GitLab";
 
 export default function SettingsTab() {
   return (
@@ -39,7 +41,6 @@ export default function SettingsTab() {
           <Tabs.Tab
             value="gitlab"
             leftSection={<IconBrandGitlab size={19} stroke={1.7} />}
-            disabled
           >
             GitLab
           </Tabs.Tab>
@@ -47,7 +48,6 @@ export default function SettingsTab() {
           <Tabs.Tab
             value="github"
             leftSection={<IconBrandGithub size={19} stroke={1.7} />}
-            disabled
           >
             GitHub
           </Tabs.Tab>
@@ -71,6 +71,12 @@ export default function SettingsTab() {
 
         <Tabs.Panel value="git-config">
           <GitConfig />
+        </Tabs.Panel>
+        <Tabs.Panel value="github">
+          <GitHub />
+        </Tabs.Panel>
+        <Tabs.Panel value="gitlab">
+          <GitLab />
         </Tabs.Panel>
       </Tabs>
     </Stack>

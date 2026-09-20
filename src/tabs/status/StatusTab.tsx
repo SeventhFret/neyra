@@ -18,7 +18,7 @@ import {
   IconGitBranch,
   IconPlaylistX,
 } from "@tabler/icons-react";
-import { useRepoData } from "../../stores";
+import { useRepoDataStore } from "../../stores/repoData/store";
 import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
 
 interface StatusTabProps {
@@ -26,10 +26,10 @@ interface StatusTabProps {
 }
 
 export default function StatusTab({ active }: StatusTabProps) {
-  const status = useRepoData((state) => state.statusMessage);
-  const remotes = useRepoData((state) => state.remotes);
-  const refresh = useRepoData((state) => state.refresh);
-  const currentBranch = useRepoData((state) => state.currentBranch);
+  const status = useRepoDataStore((state) => state.statusMessage);
+  const remotes = useRepoDataStore((state) => state.remotes);
+  const refresh = useRepoDataStore((state) => state.refresh);
+  const currentBranch = useRepoDataStore((state) => state.currentBranch);
 
   const [rebase, setRebase] = useState(false);
   const [remote, setRemote] = useState<string | null>(null);

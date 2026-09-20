@@ -52,6 +52,12 @@ pub fn run() {
             commands::git::unstage,
             commands::git::get_config,
             commands::git::set_config,
+            commands::providers::get_provider_merge_requests,
+            commands::providers::get_provider_by_id,
+            commands::providers::get_providers_from_config,
+            commands::providers::add_provider,
+            commands::providers::remove_provider,
+            commands::providers::update_provider_token,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

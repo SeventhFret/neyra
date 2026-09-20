@@ -8,6 +8,8 @@ import {
   Notification,
   Drawer,
   Kbd,
+  PasswordInput,
+  SegmentedControl,
   ScrollArea,
   Select,
   CSSVariablesResolver,
@@ -196,7 +198,6 @@ export const theme = createTheme({
         root: classes.kbd,
       },
     }),
-
     InputWrapper: InputWrapper.extend({
       styles: {
         label: {
@@ -206,6 +207,12 @@ export const theme = createTheme({
         description: {
           color: "var(--neyra-text-muted)",
         },
+      },
+    }),
+    PasswordInput: PasswordInput.extend({
+      classNames: {
+        input: classes.input,
+        innerInput: classes.innerInput,
       },
     }),
     Tooltip: {
@@ -230,6 +237,13 @@ export const theme = createTheme({
         option: classes.autocompleteOption,
       },
     },
+    SegmentedControl: SegmentedControl.extend({
+      classNames: {
+        root: classes.segmentedControl,
+        indicator: classes.segmentedControlIndicator,
+        label: classes.segmentedControlLabel,
+      },
+    }),
     Select: Select.extend({
       classNames: {
         dropdown: classes.selectDropdown,
