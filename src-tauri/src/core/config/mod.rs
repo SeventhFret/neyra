@@ -4,6 +4,8 @@ use std::{fs, path::PathBuf};
 
 use tauri::{AppHandle, Manager};
 
+use crate::core::config::models::GitFlow;
+
 use self::models::{AppConfig, ProviderConfig};
 
 const CONFIG_FILE: &str = "config.json";
@@ -81,6 +83,48 @@ pub fn remove_provider(app: &AppHandle, id: &str) -> Result<(), String> {
 
     if config.providers.len() == original_len {
         return Err(format!("Provider '{}' doesn't exist", id));
+    }
+
+    save(app, &config)
+}
+
+pub fn add_git_flow(app: &AppHandle, git_flow: GitFlow) -> Result<(), String> {
+    let mut config = load(app)?;
+
+    if config
+        .git_flows
+        .iter()
+        .any(|existing| existing.id == git_flow.id)
+    {
+        return Err(format!("Git Flow with id '{}' already exists", git_flow.id));
+    }
+
+    config.git_flows.push(git_flow);
+
+    save(app, &config)
+}
+
+pub fn get_git_flow(app: &AppHandle, id: &str) -> Result<Option<GitFlow>, String> {
+    let config = load(app)?;
+
+    Ok(config.git_flows.into_iter().find(|flow| flow.id == id))
+}
+
+pub fn get_git_flows(app: &AppHandle) -> Result<Vec<GitFlow>, String> {
+    let config = load(app)?;
+
+    Ok(config.git_flows)
+}
+
+pub fn remove_git_flow(app: &AppHandle, id: &str) -> Result<(), String> {
+    let mut config = load(app)?;
+
+    let original_len = config.git_flows.len();
+
+    config.git_flows.retain(|flow| flow.id != id);
+
+    if config.git_flows.len() == original_len {
+        return Err(format!("Git Flow with id '{}' doesn't exist", id));
     }
 
     save(app, &config)
