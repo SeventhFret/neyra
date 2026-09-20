@@ -33,6 +33,7 @@ import { useUpdatesStore } from "./stores/updates/store";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { Center, Loader, Stack, Text } from "@mantine/core";
 import { useGitProvidersStore } from "./stores/providers/store";
+import GitFlowsTab from "./tabs/git-flows/GitFlowsTab";
 
 export type TabId =
   | "status"
@@ -41,6 +42,7 @@ export type TabId =
   | "files"
   | "merge-requests"
   | "log"
+  | "git-flows"
   | "settings";
 
 const TAB_ORDER: TabId[] = [
@@ -50,6 +52,7 @@ const TAB_ORDER: TabId[] = [
   "files",
   "merge-requests",
   "log",
+  "git-flows",
   "settings",
 ];
 
@@ -160,6 +163,7 @@ function App() {
       ["mod+D", () => selectTab("files"), { usePhysicalKeys: true }],
       ["mod+K", () => selectTab("settings"), { usePhysicalKeys: true }],
       ["mod+P", () => selectTab("merge-requests"), { usePhysicalKeys: true }],
+      ["mod+I", () => selectTab("git-flows"), { usePhysicalKeys: true }],
       [
         "mod+shift+N",
         () => toggleNotificationCenter(),
@@ -215,6 +219,10 @@ function App() {
 
         <Page tab="log" currentTab={currentTab}>
           <LogTab />
+        </Page>
+
+        <Page tab="git-flows" currentTab={currentTab}>
+          <GitFlowsTab />
         </Page>
 
         <Page tab="settings" currentTab={currentTab}>
