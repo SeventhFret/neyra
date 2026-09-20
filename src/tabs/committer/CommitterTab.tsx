@@ -19,7 +19,7 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import { useMemo, useState } from "react";
 import { TEXT_INPUT_ADDITIONAL_PROPS } from "../../lib/constants/input";
 
-import { useRepoData } from "../../stores";
+import { useRepoDataStore } from "../../stores/repoData/store";
 import { showAppNotification } from "../../components/NotificationCenter/helper";
 import { parsePullRequestAction } from "../../lib/git";
 import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
@@ -72,9 +72,9 @@ interface CommitterTabProps {
 }
 
 export default function CommitterTab({ active }: CommitterTabProps) {
-  const refresh = useRepoData((state) => state.refresh);
-  const commits = useRepoData((state) => state.commits);
-  const currentBranch = useRepoData((state) => state.currentBranch);
+  const refresh = useRepoDataStore((state) => state.refresh);
+  const commits = useRepoDataStore((state) => state.commits);
+  const currentBranch = useRepoDataStore((state) => state.currentBranch);
 
   const [commitType, setCommitType] = useState("");
   const [commitScope, setCommitScope] = useState("");

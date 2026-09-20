@@ -1,0 +1,74 @@
+.accordion {
+  --accordion-radius: var(--mantine-radius-lg);
+}
+
+.item {
+  overflow: hidden;
+
+  background: color-mix(in srgb, var(--neyra-surface-2) 55%, transparent);
+
+  border: 1px solid var(--neyra-border-soft);
+  border-radius: var(--mantine-radius-lg);
+
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.item + .item {
+  margin-top: 8px;
+}
+
+.item:hover {
+  background: color-mix(in srgb, var(--neyra-surface-2) 75%, transparent);
+
+  border-color: color-mix(
+    in srgb,
+    var(--neyra-primary) 20%,
+    var(--neyra-border-soft)
+  );
+}
+
+.item[data-active] {
+  background: color-mix(in srgb, var(--neyra-surface-2) 85%, transparent);
+
+  border-color: color-mix(
+    in srgb,
+    var(--neyra-primary) 25%,
+    var(--neyra-border-soft)
+  );
+}
+
+.control {
+  padding: 12px 16px;
+  border-radius: inherit;
+}
+
+.control:hover {
+  background: transparent;
+}
+
+.label {
+  padding: 0;
+}
+
+.chevron {
+  color: var(--neyra-text-muted);
+}
+
+.panel {
+  border-top: 1px solid var(--neyra-border-soft);
+}
+
+.content {
+  padding: 16px;
+}
+
+.dangerButton {
+  color: var(--neyra-danger);
+}
+
+.dangerButton:hover {
+  color: var(--neyra-danger);
+  background: color-mix(in srgb, var(--neyra-danger) 18%, transparent);
+}

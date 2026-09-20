@@ -1,14 +1,14 @@
 import { Group, Text } from "@mantine/core";
 
-import { useRepoData } from "../../stores";
+import { useRepoDataStore } from "../../stores/repoData/store";
 import { repoName } from "../../lib/strings";
 import { IconGitBranch } from "@tabler/icons-react";
 import neyraLogo from "../../assets/logo/neyra-logo-1024.png";
 import classes from "./NeyraStatusBar.module.css";
 
 export default function NeyraStatusBar() {
-  const currentBranch = useRepoData((state) => state.currentBranch);
-  const repoRoot = useRepoData((state) => state.root);
+  const currentBranch = useRepoDataStore((state) => state.currentBranch);
+  const repoRoot = useRepoDataStore((state) => state.root);
 
   return (
     <div className={classes.statusBar}>

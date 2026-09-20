@@ -1,0 +1,38 @@
+.details {
+  min-width: 0;
+  min-height: 0;
+}
+
+.empty {
+  height: 100%;
+  color: var(--neyra-text-muted);
+}
+
+.divider {
+  border-color: var(--neyra-border);
+}
+
+.title {
+  max-width: 900px;
+
+  color: var(--neyra-text-primary);
+
+  font-size: 20px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.sectionLabel {
+  color: var(--neyra-text-muted);
+
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.branch {
+  max-width: 320px;
+  font-family: var(--mantine-font-family-monospace);
+  font-weight: 400;
+}
