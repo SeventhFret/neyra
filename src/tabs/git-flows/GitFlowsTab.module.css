@@ -1,0 +1,29 @@
+.root {
+  height: 100%;
+  min-height: 0;
+  padding: var(--mantine-spacing-lg);
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+
+  background: var(--neyra-surface-1);
+  border: 1px solid var(--neyra-border-soft);
+}
+
+.browser {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding: var(--mantine-spacing-md);
+
+  border-right: 1px solid var(--neyra-border-soft);
+}
