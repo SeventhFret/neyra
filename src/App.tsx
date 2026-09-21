@@ -4,7 +4,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { exit } from "@tauri-apps/plugin-process";
 import { check } from "@tauri-apps/plugin-updater";
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { ReactNode } from "react";
 import { IconCloudDownload } from "@tabler/icons-react";
 
@@ -261,14 +261,26 @@ interface PageProps {
 
 function Page({ tab, currentTab, children }: PageProps) {
   const active = tab === currentTab;
+  const pageRef = useRef<HTMLElement>(null);
 
   const pageIndex = TAB_ORDER.indexOf(tab);
   const activeIndex = TAB_ORDER.indexOf(currentTab);
 
   const offset = pageIndex < activeIndex ? -8 : 8;
 
+  useEffect(() => {
+    if (!active) {
+      return;
+    }
+
+    pageRef.current?.focus({
+      preventScroll: true,
+    });
+  }, [active]);
+
   return (
     <motion.section
+      ref={pageRef}
       className="page"
       data-active={active || undefined}
       initial={false}
@@ -283,6 +295,7 @@ function Page({ tab, currentTab, children }: PageProps) {
       style={{
         pointerEvents: active ? "auto" : "none",
       }}
+      tabIndex={-1}
       aria-hidden={!active}
       inert={!active}
     >
@@ -290,5 +303,4 @@ function Page({ tab, currentTab, children }: PageProps) {
     </motion.section>
   );
 }
-
 export default App;
