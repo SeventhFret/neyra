@@ -6,7 +6,7 @@ use std::{
 };
 
 use git2::{ErrorCode, Repository, Status};
-use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
+use notify::{Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter};
 
@@ -112,9 +112,15 @@ impl RepositoryManager {
         let (tx, rx) = mpsc::channel::<Vec<PathBuf>>();
 
         let mut watcher = notify::recommended_watcher(move |result: notify::Result<Event>| {
-            if let Ok(event) = result {
-                let _ = tx.send(event.paths);
+            let Ok(event) = result else {
+                return;
+            };
+
+            if !should_process_event(&event) {
+                return;
             }
+
+            let _ = tx.send(event.paths);
         })
         .map_err(|error| format!("Failed to create repository watcher: {error}"))?;
 
@@ -188,11 +194,17 @@ fn relevant_change(
         }
 
         match active.repo.status_file(relative) {
-            Ok(status) if !status.contains(Status::IGNORED) => {
+            Ok(status) => {
+                if status == Status::CURRENT {
+                    continue;
+                }
+
+                if status.contains(Status::IGNORED) {
+                    continue;
+                }
+
                 return Some(active.root.clone());
             }
-
-            Ok(_) => {}
 
             Err(error) if error.code() == ErrorCode::NotFound => {
                 if !active.repo.status_should_ignore(relative).unwrap_or(false) {
@@ -219,6 +231,13 @@ fn watch_paths(active: &ActiveRepository) -> Vec<PathBuf> {
     }
 
     paths
+}
+
+fn should_process_event(event: &Event) -> bool {
+    matches!(
+        event.kind,
+        EventKind::Create(_) | EventKind::Modify(_) | EventKind::Remove(_)
+    )
 }
 
 fn lock_error<T>(error: std::sync::PoisonError<T>) -> String {
