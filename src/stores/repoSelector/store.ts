@@ -75,6 +75,10 @@ export const useRepositorySelectionStore = create<
     }
   },
 
+  setRepoSelectionStatus: (status) => {
+    set({ status: status });
+  },
+
   clearRepository: () => {
     set({
       status: "none",

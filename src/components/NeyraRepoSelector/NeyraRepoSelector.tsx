@@ -12,6 +12,7 @@ import {
   IconSearch,
   IconArrowRight,
   IconFolderSearch,
+  IconArrowLeft,
 } from "@tabler/icons-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { useMemo, useState } from "react";
@@ -26,13 +27,23 @@ import {
 
 import classes from "./NeyraRepoSelector.module.css";
 import { TEXT_INPUT_ADDITIONAL_PROPS } from "../../lib/constants/input";
+import { useHotkeys } from "@mantine/hooks";
 
-export default function NeyraRepoSelector() {
+interface NeyraRepoSelectorProps {
+  withExit?: boolean;
+}
+
+export default function NeyraRepoSelector({
+  withExit,
+}: NeyraRepoSelectorProps) {
   const selectRepo = useRepositorySelectionStore(
     (state) => state.selectRepository,
   );
   const repoHistory = useRepoHistoryStore((state) => state.repositories);
   const addRepoToHistory = useRepoHistoryStore((state) => state.addEntry);
+  const setRepoSelectionStatus = useRepositorySelectionStore(
+    (state) => state.setRepoSelectionStatus,
+  );
 
   const [query, setQuery] = useState("");
 
@@ -51,8 +62,14 @@ export default function NeyraRepoSelector() {
     });
   }, [query, repoHistory]);
 
+  useHotkeys(withExit ? [["esc", () => handleExit()]] : [], []);
+
   const handleOpen = async (path: string) => {
     await selectRepo(path);
+  };
+
+  const handleExit = () => {
+    setRepoSelectionStatus("ready");
   };
 
   const handleBrowse = async () => {
@@ -156,7 +173,20 @@ export default function NeyraRepoSelector() {
         </Stack>
       </Paper>
 
-      <Group className={classes.buttonsBox} justify="flex-end">
+      <Group className={classes.buttonsBox} justify="space-between">
+        {withExit ? (
+          <Button
+            variant="subtle"
+            size="md"
+            radius="md"
+            leftSection={<IconArrowLeft size={20} stroke={1.7} />}
+            onClick={handleExit}
+          >
+            Back
+          </Button>
+        ) : (
+          <div></div>
+        )}
         <Button
           variant="light"
           size="md"

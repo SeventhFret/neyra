@@ -9,6 +9,7 @@ export interface RepositorySelectionState {
 export interface RepositorySelectionAction {
   initialize: () => Promise<void>;
   selectRepository: (path: string) => Promise<void>;
+  setRepoSelectionStatus: (status: RepositorySelectionStatus) => void;
   clearRepository: () => void;
 }
 
