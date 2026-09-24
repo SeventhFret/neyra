@@ -22,6 +22,7 @@ import {
   IconSettings,
   IconRoute,
   IconTerminal2,
+  IconFolderSymlink,
 } from "@tabler/icons-react";
 
 import type { Shortcut } from "../ShortcutKeys/ShortcutKeys.types";
@@ -39,6 +40,7 @@ interface NeyraDockProps {
   onRefresh: () => void;
   onCopyBranch: () => void;
   onOpenNotifications: () => void;
+  onSwitchRepo: () => void;
   onExit: () => void;
 
   unreadNotifications?: number;
@@ -124,6 +126,7 @@ export function NeyraDock({
   onRefresh,
   onCopyBranch,
   onOpenNotifications,
+  onSwitchRepo,
   onExit,
   unreadNotifications = 0,
 }: NeyraDockProps) {
@@ -239,6 +242,31 @@ export function NeyraDock({
               ) : (
                 <IconClipboard size={21} stroke={1.7} />
               )}
+            </ActionIcon>
+          </Tooltip>
+
+          <Tooltip
+            label={
+              <DockTooltip
+                label="Switch repository"
+                shortcut={{
+                  modifiers: ["mod"],
+                  key: "O",
+                }}
+              />
+            }
+            position="top"
+          >
+            <ActionIcon
+              tabIndex={-1}
+              variant="subtle"
+              size={40}
+              radius="md"
+              onClick={onSwitchRepo}
+              aria-label="Switch repository"
+              className={classes.quickAction}
+            >
+              <IconFolderSymlink size={21} stroke={1.7} />
             </ActionIcon>
           </Tooltip>
 

@@ -80,8 +80,12 @@ function App() {
   const refresh = useRepoDataStore((state) => state.refresh);
   const currentBranch = useRepoDataStore((state) => state.currentBranch);
   const repoStatus = useRepositorySelectionStore((state) => state.status);
+  const repoRoot = useRepositorySelectionStore((state) => state.root);
   const initializeRepo = useRepositorySelectionStore(
     (state) => state.initialize,
+  );
+  const setRepoSelectionStatus = useRepositorySelectionStore(
+    (state) => state.setRepoSelectionStatus,
   );
   const initializeGitProviders = useGitProvidersStore(
     (state) => state.initialize,
@@ -91,6 +95,10 @@ function App() {
 
   const copyBranch = () => {
     clipboard.copy(currentBranch ?? "no branch");
+  };
+
+  const onSwitchRepo = () => {
+    setRepoSelectionStatus("none");
   };
 
   useEffect(() => {
@@ -173,13 +181,14 @@ function App() {
       ["mod+R", () => void refresh(), { usePhysicalKeys: true }],
       ["mod+alt+C", () => copyBranch(), { usePhysicalKeys: true }],
       ["mod+alt+L", () => notifications.clean(), { usePhysicalKeys: true }],
+      ["mod+O", () => onSwitchRepo(), { usePhysicalKeys: true }],
       ["mod+Q", () => void exit(0)],
     ],
     [],
   );
 
   if (repoStatus === "none") {
-    return <NeyraRepoSelector />;
+    return <NeyraRepoSelector withExit={repoRoot !== null} />;
   }
 
   if (repoStatus === "checking") {
@@ -239,10 +248,11 @@ function App() {
         onChange={selectTab}
         refreshing={refreshing}
         copied={clipboard.copied}
-        onRefresh={() => void refresh()}
+        onRefresh={() => refresh()}
         onCopyBranch={copyBranch}
         onOpenNotifications={() => openNotificationCenter()}
-        onExit={() => void exit(0)}
+        onSwitchRepo={() => onSwitchRepo()}
+        onExit={() => exit(0)}
         unreadNotifications={unreadCount}
       />
       <NeyraUpdatesModal
