@@ -165,11 +165,12 @@ export function NotificationCenter({
                         </Text>
                         {notification.actions &&
                         notification?.actions?.length > 0
-                          ? notification.actions?.map((action) => {
+                          ? notification.actions?.map((action, actionIdx) => {
                               const ActionIcon = action?.icon;
 
                               return (
                                 <Button
+                                  key={`${action.label}-${actionIdx}`}
                                   size="xs"
                                   variant="light"
                                   loading={action?.loading ?? false}
