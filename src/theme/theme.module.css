@@ -293,6 +293,30 @@
   color: var(--neyra-text-primary);
 }
 
+.selectSection {
+  color: var(--neyra-text-muted);
+}
+
+.selectSection button {
+  color: var(--neyra-text-muted);
+
+  border-radius: var(--mantine-radius-sm);
+
+  transition:
+    color 120ms ease,
+    background-color 120ms ease;
+}
+
+.selectSection button:hover {
+  color: var(--neyra-text-primary);
+
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-color-neyraCyan-5) 9%,
+    transparent
+  );
+}
+
 /* ============================================
    NOTIFICATIONS
    ============================================ */
