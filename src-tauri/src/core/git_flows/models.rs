@@ -1,9 +1,24 @@
-use serde::Serialize;
+use std::collections::HashMap;
+
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone)]
 pub struct GitFlowContext {
     pub repository_root: String,
     pub current_branch: Option<String>,
+    pub remote: Option<String>,
+    pub default_branch: Option<String>,
+    pub variables: HashMap<String, String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GitFlowInput {
+    pub remote: Option<String>,
+    pub default_branch: Option<String>,
+
+    #[serde(default)]
+    pub variables: HashMap<String, String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -54,6 +69,11 @@ pub enum GitFlowEvent {
     StepSkipped {
         run_id: String,
         step_id: String,
+    },
+
+    FlowFailed {
+        run_id: String,
+        error: String,
     },
 
     FlowFinished {

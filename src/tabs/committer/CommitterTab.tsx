@@ -16,13 +16,14 @@ import { useHotkeys } from "@mantine/hooks";
 import { IconCloudUpload, IconGitCommit, IconLink } from "@tabler/icons-react";
 import { invoke } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TEXT_INPUT_ADDITIONAL_PROPS } from "../../lib/constants/input";
 
 import { useRepoDataStore } from "../../stores/repoData/store";
 import { showAppNotification } from "../../components/NotificationCenter/helper";
 import { parsePullRequestAction } from "../../lib/git";
 import ShortcutKeys from "../../components/ShortcutKeys/ShortcutKeys";
+import SelectWithDescription from "../../components/SelectWithDescription";
 
 const COMMIT_TYPES: Record<string, string> = {
   feat: "Adds a feature",
@@ -75,7 +76,9 @@ export default function CommitterTab({ active }: CommitterTabProps) {
   const refresh = useRepoDataStore((state) => state.refresh);
   const commits = useRepoDataStore((state) => state.commits);
   const currentBranch = useRepoDataStore((state) => state.currentBranch);
+  const remotes = useRepoDataStore((state) => state.remotes);
 
+  const [remote, setRemote] = useState<string | null>(null);
   const [commitType, setCommitType] = useState("");
   const [commitScope, setCommitScope] = useState("");
   const [commitMsg, setCommitMsg] = useState("");
@@ -135,6 +138,21 @@ export default function CommitterTab({ active }: CommitterTabProps) {
     return [...seen];
   }, [commits]);
 
+  useEffect(() => {
+    if (remotes.length === 0) {
+      setRemote(null);
+      return;
+    }
+
+    setRemote((current) => {
+      if (current && remotes.some((item) => item.name === current)) {
+        return current;
+      }
+
+      return remotes[0].name;
+    });
+  }, [remotes]);
+
   const renderType: AutocompleteProps["renderOption"] = ({ option }) => {
     const color = TYPE_COLORS[option.value] ?? "gray";
 
@@ -191,6 +209,7 @@ export default function CommitterTab({ active }: CommitterTabProps) {
     setIsCommitting(true);
 
     try {
+      console.log(remote)
       const result = performCommit
         ? await invoke<string>("commit", {
             message: fullCommitMsg,
@@ -199,6 +218,7 @@ export default function CommitterTab({ active }: CommitterTabProps) {
           })
         : await invoke<string>("push", {
             forceWithLease,
+            remote: remote,
           });
 
       await refresh();
@@ -496,6 +516,25 @@ export default function CommitterTab({ active }: CommitterTabProps) {
             </Group>
           }
         />
+        <Stack gap="xs">
+          <Text size="sm" fw="bold">
+            Remote
+          </Text>
+          <Group>
+            <SelectWithDescription
+              value={remote}
+              onChange={setRemote}
+              data={remotes.map((val) => ({
+                value: val.name,
+                label: val.name,
+                description: val.fetchUrl,
+              }))}
+              placeholder={
+                remotes.length > 0 ? remotes[0].name : "No remote found"
+              }
+            />
+          </Group>
+        </Stack>
       </Stack>
 
       <Group gap="sm" mt="xs">

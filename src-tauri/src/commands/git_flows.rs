@@ -3,8 +3,8 @@ use crate::core::config::{
     add_git_flow as add_git_flow_config, get_git_flow, get_git_flows,
     remove_git_flow as remove_git_flow_config, update_git_flow as update_git_flow_config,
 };
-use crate::core::git_flows::models::GitFlowContext;
-use crate::core::git_flows::runner::run;
+use crate::core::git_flows::models::{GitFlowEvent, GitFlowInput};
+use crate::core::git_flows::runner::{emit, prepare_git_flow_context, run};
 use uuid::Uuid;
 
 use tauri::{AppHandle, State};
@@ -41,21 +41,28 @@ pub async fn run_git_flow(
     app: AppHandle,
     state: State<'_, RepositoryManager>,
     id: String,
+    input: GitFlowInput,
 ) -> Result<String, String> {
     let git_flow_config = get_git_flow(&app, &id)?
         .ok_or_else(|| format!("Git Flow with id '{}' doesn't exist", id))?;
     let repo_data = state.with_repo(git::get_repo_data)?;
-    let context = GitFlowContext {
-        repository_root: repo_data.root,
-        current_branch: repo_data.current_branch,
-    };
+    let context = prepare_git_flow_context(&repo_data, input);
+
     let run_id = Uuid::new_v4().to_string();
 
     let runner_id = run_id.clone();
 
     tauri::async_runtime::spawn(async move {
-        if let Err(error) = run(app, runner_id, git_flow_config, context).await {
-            eprintln!("Git flow runner failed: {error}");
+        if let Err(error) = run(&app, runner_id.clone(), git_flow_config, context).await {
+            if let Err(emit_error) = emit(
+                &app,
+                GitFlowEvent::FlowFailed {
+                    run_id: runner_id,
+                    error,
+                },
+            ) {
+                eprintln!("Failed to emit Git flow failure: {emit_error}");
+            }
         }
     });
 

@@ -168,6 +168,23 @@
   overflow-wrap: anywhere;
 }
 
+.variable {
+  padding: 2px 4px;
+
+  border: 1px solid
+    color-mix(in srgb, var(--neyra-primary) 25%, var(--neyra-border-soft));
+
+  border-radius: var(--mantine-radius-xs);
+
+  background: color-mix(
+    in srgb,
+    var(--neyra-primary) 10%,
+    var(--neyra-surface-1)
+  );
+
+  color: var(--neyra-primary);
+}
+
 .git {
   color: var(--neyra-primary);
 }

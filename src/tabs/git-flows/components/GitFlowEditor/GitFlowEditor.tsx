@@ -47,6 +47,14 @@ const GIT_FLOW_VARIABLES = [
     name: "repositoryRoot",
     value: "{{repositoryRoot}}",
   },
+  {
+    name: "remote",
+    value: "{{remote}}",
+  },
+  {
+    name: "defaultBranch",
+    value: "{{defaultBranch}}",
+  },
 ] as const;
 
 export default function GitFlowEditor({
@@ -373,7 +381,8 @@ function StepEditor({
             <Tooltip label="Remove step">
               <ActionIcon
                 variant="subtle"
-                color="red"
+                radius="sm"
+                color="var(--neyra-danger)"
                 size="sm"
                 disabled={disabled}
                 onClick={onRemove}
@@ -502,7 +511,7 @@ function ArgumentInput({
         <Tooltip label="Remove argument">
           <ActionIcon
             variant="subtle"
-            color="gray"
+            color="var(--neyra-danger)"
             disabled={disabled}
             onClick={onRemove}
           >

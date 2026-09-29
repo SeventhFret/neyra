@@ -1,0 +1,148 @@
+.modal {
+  position: relative;
+
+  max-height: min(760px, calc(100dvh - 48px));
+
+  overflow: hidden;
+
+  background: var(--neyra-surface-2);
+
+  border: 1px solid var(--neyra-border-accent);
+  border-radius: var(--mantine-radius-xl);
+
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--neyra-text-primary) 4%, transparent),
+    0 24px 70px rgba(0, 0, 0, 0.48);
+}
+
+.header {
+  min-height: 60px;
+  padding: 14px 18px;
+
+  background: var(--neyra-surface-2);
+
+  border-bottom: 1px solid var(--neyra-border-soft);
+}
+
+.modalTitle {
+  color: var(--neyra-text-primary);
+
+  font-size: var(--mantine-font-size-md);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.close {
+  color: var(--neyra-text-muted);
+
+  border-radius: var(--mantine-radius-md);
+
+  transition:
+    color 120ms ease,
+    background-color 120ms ease;
+}
+
+.close:hover {
+  color: var(--neyra-text-primary);
+
+  background: var(--neyra-surface-3);
+}
+
+.body {
+  padding: 0;
+
+  min-height: 0;
+
+  background: var(--neyra-surface-2);
+  color: var(--neyra-text-primary);
+}
+
+.content {
+  padding: 20px;
+
+  max-height: min(700px, calc(100dvh - 110px));
+  min-height: 0;
+
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionTitle {
+  color: var(--neyra-text-secondary);
+
+  letter-spacing: 0.055em;
+}
+
+.description {
+  color: var(--neyra-text-muted);
+
+  line-height: 1.45;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+
+  flex-shrink: 0;
+
+  background: var(--neyra-border-soft);
+}
+
+.inlineCode {
+  padding: 1px 5px;
+
+  color: var(--mantine-color-neyraBlue-3);
+
+  background: color-mix(in srgb, var(--neyra-primary) 10%, transparent);
+
+  border: 1px solid color-mix(in srgb, var(--neyra-primary) 18%, transparent);
+
+  border-radius: var(--mantine-radius-sm);
+
+  font-family: var(--mantine-font-family-monospace);
+  font-size: var(--mantine-font-size-xs);
+}
+
+.variableName {
+  flex: 0 0 38%;
+}
+
+.variableValue {
+  flex: 1;
+  min-width: 0;
+}
+
+.removeButton {
+  flex-shrink: 0;
+
+  color: var(--neyra-text-muted);
+}
+
+.removeButton:hover {
+  color: var(--mantine-color-red-5);
+
+  background: color-mix(in srgb, var(--mantine-color-red-6) 10%, transparent);
+}
+
+.actions {
+  padding-top: 4px;
+}
+
+.overlay {
+  background: rgba(2, 5, 9, 0.5);
+
+  backdrop-filter: blur(3px);
+}
+
+.variableError {
+  width: 38%;
+  padding-left: 2px;
+
+  color: var(--neyra-danger);
+}
+
+.emptyVariables {
+  color: var(--neyra-text-muted);
+}

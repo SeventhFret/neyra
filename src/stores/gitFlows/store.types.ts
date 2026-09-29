@@ -12,6 +12,12 @@ export interface GitFlow {
   steps: GitFlowStep[];
 }
 
+export interface GitFlowInput {
+  remote: string | null;
+  defaultBranch: string | null;
+  variables: Record<string, string>;
+}
+
 export type GitFlowStepStatus =
   | "pending"
   | "running"
@@ -79,6 +85,11 @@ export type GitFlowEvent =
       type: "stepSkipped";
       runId: string;
       stepId: string;
+    }
+  | {
+      type: "flowFailed";
+      runId: string;
+      error: string;
     }
   | {
       type: "flowFinished";

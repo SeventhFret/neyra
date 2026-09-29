@@ -23,6 +23,7 @@ pub struct RepoData {
     pub status: Vec<StatusEntry>,
     pub status_message: String,
     pub remotes: Vec<Remote>,
+    pub upstream: Option<UpstreamBranch>,
     pub branches: Vec<Branch>,
     pub commits: Vec<Commit>,
 }
@@ -58,6 +59,14 @@ pub struct Remote {
     pub name: String,
     pub fetch_url: Option<String>,
     pub push_url: Option<String>,
+    pub default_branch: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpstreamBranch {
+    pub remote: String,
+    pub branch: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -82,6 +91,7 @@ pub fn get_repo_data(repo: &Repository) -> Result<RepoData, String> {
         status: status(&root)?,
         status_message: status_message(&root)?,
         remotes: remotes(repo)?,
+        upstream: upstream(repo),
         branches: branches(repo)?,
         commits: commits(repo, LOG_LIMIT)?,
     })
@@ -107,6 +117,26 @@ pub fn current_branch(repo: &Repository) -> Option<String> {
 
         Err(_) => None,
     }
+}
+
+fn upstream(repo: &Repository) -> Option<UpstreamBranch> {
+    let head = repo.head().ok()?;
+    let branch_name = head.shorthand().ok()?;
+
+    let branch = repo
+        .find_branch(branch_name, git2::BranchType::Local)
+        .ok()?;
+
+    let upstream = branch.upstream().ok()?;
+
+    let upstream_name = upstream.name().ok()??;
+
+    let (remote, branch) = upstream_name.split_once('/')?;
+
+    Some(UpstreamBranch {
+        remote: remote.to_owned(),
+        branch: branch.to_owned(),
+    })
 }
 
 fn status(root: &Path) -> Result<Vec<StatusEntry>, String> {
@@ -160,6 +190,17 @@ fn status_message(root: &Path) -> Result<String, String> {
     Ok(raw.trim_end().to_string())
 }
 
+fn remote_default_branch(repo: &Repository, remote_name: &str) -> Option<String> {
+    let reference_name = format!("refs/remotes/{remote_name}/HEAD");
+
+    let reference = repo.find_reference(&reference_name).ok()?;
+    let target = reference.symbolic_target().ok()??;
+
+    let prefix = format!("refs/remotes/{remote_name}/");
+
+    target.strip_prefix(&prefix).map(str::to_owned)
+}
+
 fn remotes(repo: &Repository) -> Result<Vec<Remote>, String> {
     let names = repo.remotes().map_err(git_error)?;
     let mut result = Vec::new();
@@ -178,9 +219,11 @@ fn remotes(repo: &Repository) -> Result<Vec<Remote>, String> {
             .map_err(git_error)?
             .map(str::to_string)
             .or_else(|| fetch_url.clone());
+        let remotes_default_branch = remote_default_branch(repo, name);
 
         result.push(Remote {
             name: name.to_string(),
+            default_branch: remotes_default_branch,
             fetch_url,
             push_url,
         });

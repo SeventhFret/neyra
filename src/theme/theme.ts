@@ -248,6 +248,7 @@ export const theme = createTheme({
       classNames: {
         dropdown: classes.selectDropdown,
         option: classes.selectOption,
+        section: classes.selectSection,
       },
     }),
     Button: Button.extend({

@@ -7,7 +7,11 @@ use tokio::{
     time::timeout,
 };
 
-use crate::core::config::models::{GitFlow, GitFlowStep};
+use crate::core::{
+    config::models::{GitFlow, GitFlowStep},
+    git::{Remote, RepoData},
+    git_flows::models::GitFlowInput,
+};
 
 use super::{
     arguments::resolve_arguments,
@@ -18,13 +22,13 @@ const GIT_FLOW_EVENT: &str = "git-flow-event";
 const DEFAULT_STEP_TIMEOUT: Duration = Duration::from_secs(5 * 60);
 
 pub async fn run(
-    app: AppHandle,
+    app: &AppHandle,
     run_id: String,
     flow: GitFlow,
     context: GitFlowContext,
 ) -> Result<(), String> {
     emit(
-        &app,
+        app,
         GitFlowEvent::FlowStarted {
             run_id: run_id.clone(),
         },
@@ -33,7 +37,7 @@ pub async fn run(
     let mut flow_success = true;
 
     for (index, step) in flow.steps.iter().enumerate() {
-        let succeeded = run_step(&app, &run_id, step, &context).await?;
+        let succeeded = run_step(app, &run_id, step, &context).await?;
 
         if succeeded {
             continue;
@@ -44,7 +48,7 @@ pub async fn run(
         if step.stop_on_failure {
             for skipped_step in flow.steps.iter().skip(index + 1) {
                 emit(
-                    &app,
+                    app,
                     GitFlowEvent::StepSkipped {
                         run_id: run_id.clone(),
                         step_id: skipped_step.id.clone(),
@@ -57,7 +61,7 @@ pub async fn run(
     }
 
     emit(
-        &app,
+        app,
         GitFlowEvent::FlowFinished {
             run_id,
             success: flow_success,
@@ -73,6 +77,8 @@ async fn run_step(
     step: &GitFlowStep,
     context: &GitFlowContext,
 ) -> Result<bool, String> {
+    let args = resolve_arguments(&step.args, context)?;
+
     emit(
         app,
         GitFlowEvent::StepStarted {
@@ -80,26 +86,6 @@ async fn run_step(
             step_id: step.id.clone(),
         },
     )?;
-
-    let args = match resolve_arguments(&step.args, context) {
-        Ok(args) => args,
-
-        Err(error) => {
-            emit_error(app, run_id, &step.id, &error)?;
-
-            emit(
-                app,
-                GitFlowEvent::StepFinished {
-                    run_id: run_id.to_owned(),
-                    step_id: step.id.clone(),
-                    exit_code: None,
-                    outcome: GitFlowStepOutcome::Failed,
-                },
-            )?;
-
-            return Ok(false);
-        }
-    };
 
     let mut child = match Command::new("git")
         .args(&args)
@@ -256,7 +242,7 @@ async fn wait_for_stream(task: tokio::task::JoinHandle<Result<(), String>>) -> R
         .map_err(|error| format!("Git output task failed: {error}"))?
 }
 
-fn emit(app: &AppHandle, event: GitFlowEvent) -> Result<(), String> {
+pub fn emit(app: &AppHandle, event: GitFlowEvent) -> Result<(), String> {
     app.emit(GIT_FLOW_EVENT, event)
         .map_err(|error| format!("Failed to emit Git flow event: {error}"))
 }
@@ -271,4 +257,51 @@ fn emit_error(app: &AppHandle, run_id: &str, step_id: &str, message: &str) -> Re
             chunk: format!("{message}\n"),
         },
     )
+}
+
+fn preferred_remote(repo_data: &RepoData) -> Option<&Remote> {
+    if let Some(upstream) = &repo_data.upstream {
+        if let Some(remote) = repo_data
+            .remotes
+            .iter()
+            .find(|remote| remote.name == upstream.remote)
+        {
+            return Some(remote);
+        }
+    }
+
+    if let Some(remote) = repo_data
+        .remotes
+        .iter()
+        .find(|remote| remote.name == "origin")
+    {
+        return Some(remote);
+    }
+
+    if repo_data.remotes.len() == 1 {
+        return repo_data.remotes.first();
+    }
+
+    None
+}
+
+pub fn prepare_git_flow_context(repo_data: &RepoData, input: GitFlowInput) -> GitFlowContext {
+    let remote = input
+        .remote
+        .as_deref()
+        .and_then(|name| repo_data.remotes.iter().find(|r| r.name == name))
+        .or_else(|| preferred_remote(repo_data));
+
+    let default_branch = input
+        .default_branch
+        .clone()
+        .or_else(|| remote.and_then(|r| r.default_branch.clone()));
+
+    GitFlowContext {
+        repository_root: repo_data.root.clone(),
+        current_branch: repo_data.current_branch.clone(),
+        remote: remote.map(|r| r.name.clone()),
+        variables: input.variables,
+        default_branch,
+    }
 }
