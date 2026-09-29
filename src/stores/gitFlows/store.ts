@@ -12,6 +12,7 @@ import type {
   GitFlowStepOutcome,
   GitFlowStepStatus,
 } from "./store.types";
+import { useGitFlowInputsStore } from "../gitFlowsInputs/store";
 
 const GIT_FLOW_EVENT = "git-flow-event";
 
@@ -175,12 +176,17 @@ export const useGitFlowsStore = create<GitFlowsStore>((set, get) => ({
     });
 
     pendingFlow = flow;
+    const repoRoot = useRepoDataStore.getState().root;
+    const inputs = useGitFlowInputsStore
+      .getState()
+      .getInputs(repoRoot, flow.id);
 
     try {
       await ensureEventListener();
 
       const runId = await invoke<string>("run_git_flow", {
         id: flow.id,
+        input: inputs,
       });
 
       set((state) => {
@@ -315,6 +321,22 @@ function handleGitFlowEvent(event: GitFlowEvent) {
       break;
     }
 
+    case "flowFailed": {
+      updateRun(event.runId, (run) => ({
+        ...run,
+        isRunning: false,
+        success: false,
+        finishedAt: Date.now(),
+      }));
+
+      store.setState({
+        isRunning: false,
+        error: event.error,
+      });
+
+      break;
+    }
+
     case "flowFinished": {
       updateRun(event.runId, (run) => ({
         ...run,
@@ -327,7 +349,7 @@ function handleGitFlowEvent(event: GitFlowEvent) {
         isRunning: false,
       });
 
-      void useRepoDataStore.getState().refresh();
+      useRepoDataStore.getState().refresh();
 
       break;
     }

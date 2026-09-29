@@ -10,33 +10,56 @@ import {
   Tooltip,
 } from "@mantine/core";
 import {
+  IconAdjustmentsHorizontal,
   IconPencil,
   IconPlayerPlayFilled,
   IconRoute,
   IconTrash,
 } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useGitFlowsStore } from "../../../../stores/gitFlows/store";
 import type { GitFlow } from "../../../../stores/gitFlows/store.types";
 import GitFlowStep from "../GitFlowStep/GitFlowStep";
 
 import classes from "./GitFlowDetails.module.css";
+import { useDisclosure } from "@mantine/hooks";
+import GitFlowInputsEditor from "../GitFlowInputsEditor/GitFlowInputsEditor";
+import { showAppNotification } from "../../../../components/NotificationCenter/helper";
 
 type GitFlowsDetailsProps = {
   onEdit: (flow: GitFlow) => void;
 };
 
 export default function GitFlowsDetails({ onEdit }: GitFlowsDetailsProps) {
+  const [
+    inputsEditorOpened,
+    { open: openInputsEditor, close: closeInputsEditor },
+  ] = useDisclosure(false);
   const selected = useGitFlowsStore((state) => state.selected);
   const activeRun = useGitFlowsStore((state) => state.activeRun);
   const isRunning = useGitFlowsStore((state) => state.isRunning);
+  const error = useGitFlowsStore((state) => state.error);
 
   const run = useGitFlowsStore((state) => state.run);
   const remove = useGitFlowsStore((state) => state.remove);
 
   const [deleteOpened, setDeleteOpened] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    if (!error || error.length == 0) {
+      return;
+    }
+
+    showAppNotification({
+      type: "error",
+      title: "Error running the git flow",
+      message: error,
+      messageFormat: "code",
+      autoClose: 4000,
+    });
+  }, [error]);
 
   if (!selected) {
     return (
@@ -102,6 +125,17 @@ export default function GitFlowsDetails({ onEdit }: GitFlowsDetailsProps) {
                 </ActionIcon>
               </Tooltip>
 
+              <Tooltip label="Configure inputs">
+                <ActionIcon
+                  variant="subtle"
+                  aria-label="Configure inputs"
+                  disabled={isRunning}
+                  onClick={() => openInputsEditor()}
+                >
+                  <IconAdjustmentsHorizontal size={16} />
+                </ActionIcon>
+              </Tooltip>
+
               <Tooltip label="Delete flow">
                 <ActionIcon
                   variant="subtle"
@@ -118,7 +152,7 @@ export default function GitFlowsDetails({ onEdit }: GitFlowsDetailsProps) {
                 leftSection={<IconPlayerPlayFilled size={14} />}
                 loading={selectedRun?.isRunning ?? false}
                 disabled={isRunning && !selectedRun?.isRunning}
-                onClick={() => void run(selected)}
+                onClick={() => run(selected)}
               >
                 {selectedRun?.isRunning ? "Running" : "Run"}
               </Button>
@@ -191,6 +225,11 @@ export default function GitFlowsDetails({ onEdit }: GitFlowsDetailsProps) {
           </Group>
         </Stack>
       </Modal>
+
+      <GitFlowInputsEditor
+        opened={inputsEditorOpened}
+        onClose={closeInputsEditor}
+      />
     </>
   );
 }

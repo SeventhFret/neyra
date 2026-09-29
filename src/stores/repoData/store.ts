@@ -20,6 +20,7 @@ export const useRepoDataStore = create<RepoDataStoreData & RepoDataStoreAction>(
     status: [],
     statusMessage: "",
 
+    upstream: null,
     remotes: [],
     branches: [],
     commits: [],

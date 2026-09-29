@@ -22,6 +22,12 @@ export interface Remote {
   name: string;
   fetchUrl: string | null;
   pushUrl: string | null;
+  defaultBranch: string | null;
+}
+
+export interface UpstreamBranch {
+  remote: string;
+  branch: string;
 }
 
 export interface Commit {
@@ -94,6 +100,7 @@ export interface RepoData {
 
   status: StatusEntry[];
   statusMessage: string;
+  upstream: UpstreamBranch | null;
 
   remotes: Remote[];
   branches: Branch[];

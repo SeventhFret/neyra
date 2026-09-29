@@ -15,7 +15,7 @@ import {
   IconPlayerPlay,
   IconX,
 } from "@tabler/icons-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 import type {
   GitFlowStep as GitFlowStepType,
@@ -24,6 +24,8 @@ import type {
 } from "../../../../stores/gitFlows/store.types";
 
 import classes from "./GitFlowStep.module.css";
+
+const VARIABLE_REGEX = /(\{\{[^{}]+\}\})/g;
 
 type GitFlowStepProps = {
   step: GitFlowStepType;
@@ -96,7 +98,13 @@ export default function GitFlowStep({
         </Group>
 
         <Box className={classes.command} component="code">
-          <span className={classes.git}>git</span> {step.args.join(" ")}
+          <span className={classes.git}>git</span>
+          {step.args.map((arg, argInd) => (
+            <Fragment key={`${arg}-${argInd}`}>
+              {" "}
+              <CommandArgument arg={arg} />
+            </Fragment>
+          ))}
         </Box>
 
         {run && hasOutput && (
@@ -137,6 +145,33 @@ export default function GitFlowStep({
         )}
       </div>
     </div>
+  );
+}
+
+function CommandArgument({ arg }: { arg: string }) {
+  const parts = arg.split(VARIABLE_REGEX);
+
+  return (
+    <>
+      {parts.map((part, index) => {
+        const isVariable = part.startsWith("{{") && part.endsWith("}}");
+
+        if (isVariable) {
+          return (
+            <Text
+              key={index}
+              component="code"
+              size="xs"
+              className={classes.variable}
+            >
+              {part}
+            </Text>
+          );
+        }
+
+        return <Fragment key={index}>{part}</Fragment>;
+      })}
+    </>
   );
 }
 
