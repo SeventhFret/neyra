@@ -5,7 +5,7 @@ use tauri::{AppHandle, State};
 use crate::{core::git, state::RepositoryManager};
 
 #[tauri::command(async)]
-pub fn get_repo_data(state: State<'_, RepositoryManager>) -> Result<git::models::RepoData, String> {
+pub fn get_repo_data(state: State<'_, RepositoryManager>) -> Result<git::RepoData, String> {
     state.with_repo(git::get_repo_data)
 }
 
@@ -46,6 +46,15 @@ pub fn stage(
 #[tauri::command(async)]
 pub fn unstage(paths: Vec<String>, state: State<'_, RepositoryManager>) -> Result<String, String> {
     state.with_repo(|repo| git::unstage(repo, paths))
+}
+
+#[tauri::command]
+pub fn get_file_diff(
+    state: tauri::State<'_, RepositoryManager>,
+    path: String,
+    source: git::DiffSource,
+) -> Result<Option<git::FileDiff>, String> {
+    state.with_repo(|repo| git::diff::file_diff(repo, &path, source))
 }
 
 #[tauri::command(async)]

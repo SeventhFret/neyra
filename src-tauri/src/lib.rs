@@ -50,6 +50,7 @@ pub fn run() {
             commands::git::create_branch,
             commands::git::stage,
             commands::git::unstage,
+            commands::git::get_file_diff,
             commands::git::get_config,
             commands::git::set_config,
             commands::providers::get_provider_merge_requests,

@@ -1,4 +1,10 @@
+pub mod diff;
 pub mod models;
+
+pub use models::{
+    Branch, Commit, DiffFileStatus, DiffHunk, DiffLine, DiffLineKind, DiffSource, FileDiff, Remote,
+    RepoData, StatusEntry, UpstreamBranch,
+};
 
 use std::{
     path::{Path, PathBuf},
@@ -7,8 +13,6 @@ use std::{
 
 use chrono::{DateTime, FixedOffset, SecondsFormat, Utc};
 use git2::{BranchType, Repository, Sort};
-
-use models::{Branch, Commit, Remote, RepoData, StatusEntry, UpstreamBranch};
 
 #[cfg(target_os = "windows")]
 use std::os::windows::process::CommandExt;

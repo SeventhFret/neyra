@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -65,4 +65,63 @@ pub struct Commit {
     pub ref_name: Option<String>,
     pub subject: String,
     pub body: String,
+}
+
+#[derive(Debug, Clone, Copy, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum DiffSource {
+    Staged,
+    Unstaged,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FileDiff {
+    pub old_path: Option<String>,
+    pub new_path: Option<String>,
+    pub status: DiffFileStatus,
+    pub binary: bool,
+    pub hunks: Vec<DiffHunk>,
+}
+
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum DiffFileStatus {
+    Added,
+    Deleted,
+    Modified,
+    Renamed,
+    Copied,
+    Untracked,
+    TypeChanged,
+    Conflicted,
+    Unknown,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DiffHunk {
+    pub old_start: u32,
+    pub old_lines: u32,
+    pub new_start: u32,
+    pub new_lines: u32,
+    pub header: String,
+    pub lines: Vec<DiffLine>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DiffLine {
+    pub kind: DiffLineKind,
+    pub old_line_number: Option<u32>,
+    pub new_line_number: Option<u32>,
+    pub content: String,
+}
+
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum DiffLineKind {
+    Context,
+    Addition,
+    Deletion,
 }
