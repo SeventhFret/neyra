@@ -5,7 +5,7 @@ use tauri::{AppHandle, State};
 use crate::{core::git, state::RepositoryManager};
 
 #[tauri::command(async)]
-pub fn get_repo_data(state: State<'_, RepositoryManager>) -> Result<git::RepoData, String> {
+pub fn get_repo_data(state: State<'_, RepositoryManager>) -> Result<git::models::RepoData, String> {
     state.with_repo(git::get_repo_data)
 }
 

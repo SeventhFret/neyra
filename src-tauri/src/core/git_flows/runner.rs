@@ -9,7 +9,7 @@ use tokio::{
 
 use crate::core::{
     config::models::{GitFlow, GitFlowStep},
-    git::{Remote, RepoData},
+    git::models::{Remote, RepoData},
     git_flows::models::GitFlowInput,
 };
 
