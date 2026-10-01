@@ -1,5 +1,10 @@
 :root[data-mantine-color-scheme="dark"] {
   --neyra-bg: #06090e;
+  --neyra-dock-height: 66px;
+  --neyra-dock-gap: 16px;
+  --neyra-dock-safe-area: calc(
+    var(--neyra-dock-height) + var(--neyra-dock-gap)
+  );
 
   --neyra-surface-1: #0b1018;
   --neyra-surface-2: #101722;
