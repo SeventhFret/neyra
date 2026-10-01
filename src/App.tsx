@@ -13,7 +13,6 @@ import CommitterTab from "./tabs/committer/CommitterTab";
 import StatusTab from "./tabs/status/StatusTab";
 import LogTab from "./tabs/log/LogTab";
 import BranchesTab from "./tabs/branches/BranchesTab";
-import FilesTab from "./tabs/files/FilesTab";
 import SettingsTab from "./tabs/settings/SettingsTab";
 import MergeRequestsTab from "./tabs/merge-requests/MergeRequestsTab";
 import GitFlowsTab from "./tabs/git-flows/GitFlowsTab";
@@ -40,7 +39,6 @@ export type TabId =
   | "status"
   | "committer"
   | "branches"
-  | "files"
   | "merge-requests"
   | "log"
   | "git-flows"
@@ -51,7 +49,6 @@ const TAB_ORDER: TabId[] = [
   "status",
   "committer",
   "branches",
-  "files",
   "merge-requests",
   "log",
   "git-flows",
@@ -171,7 +168,6 @@ function App() {
       ["mod+G", () => selectTab("committer"), { usePhysicalKeys: true }],
       ["mod+B", () => selectTab("branches"), { usePhysicalKeys: true }],
       ["mod+E", () => selectTab("log"), { usePhysicalKeys: true }],
-      ["mod+D", () => selectTab("files"), { usePhysicalKeys: true }],
       ["mod+K", () => selectTab("settings"), { usePhysicalKeys: true }],
       ["mod+P", () => selectTab("merge-requests"), { usePhysicalKeys: true }],
       ["mod+J", () => selectTab("changes"), { usePhysicalKeys: true }],
@@ -220,10 +216,6 @@ function App() {
 
         <Page tab="branches" currentTab={currentTab}>
           <BranchesTab active={currentTab === "branches"} />
-        </Page>
-
-        <Page tab="files" currentTab={currentTab}>
-          <FilesTab active={currentTab === "files"} />
         </Page>
 
         <Page tab="merge-requests" currentTab={currentTab}>

@@ -72,12 +72,6 @@ const tabs: {
     icon: IconGitMerge,
   },
   {
-    id: "files",
-    label: "Files",
-    shortcut: { modifiers: ["mod"], key: "D" },
-    icon: IconFolder,
-  },
-  {
     id: "merge-requests",
     label: "Pull / Merge requests",
     shortcut: { modifiers: ["mod"], key: "P" },
