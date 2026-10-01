@@ -12,9 +12,7 @@ import {
 import {
   IconChevronDown,
   IconChevronRight,
-  IconFile,
   IconFolder,
-  IconFolderOpen,
   IconSearch,
 } from "@tabler/icons-react";
 import { invoke } from "@tauri-apps/api/core";
