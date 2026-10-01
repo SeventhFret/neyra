@@ -1,10 +1,11 @@
+import { useEffect, useState, useRef } from "react";
+import { Center, Loader, Stack, Text } from "@mantine/core";
 import { useClipboard, useHotkeys } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useDisclosure } from "@mantine/hooks";
 import { exit } from "@tauri-apps/plugin-process";
 import { check } from "@tauri-apps/plugin-updater";
 import { motion } from "motion/react";
-import { useEffect, useState, useRef } from "react";
 import type { ReactNode } from "react";
 import { IconCloudDownload } from "@tabler/icons-react";
 
@@ -12,47 +13,46 @@ import CommitterTab from "./tabs/committer/CommitterTab";
 import StatusTab from "./tabs/status/StatusTab";
 import LogTab from "./tabs/log/LogTab";
 import BranchesTab from "./tabs/branches/BranchesTab";
-import FilesTab from "./tabs/files/FilesTab";
 import SettingsTab from "./tabs/settings/SettingsTab";
 import MergeRequestsTab from "./tabs/merge-requests/MergeRequestsTab";
+import GitFlowsTab from "./tabs/git-flows/GitFlowsTab";
+import ChangesTab from "./tabs/changes/ChangesTab";
 
 import { NeyraDock } from "./components/NeyraDock/NeyraDock";
+import { NotificationCenter } from "./components/NotificationCenter/NotificationCenter";
+import NeyraRepoSelector from "./components/NeyraRepoSelector/NeyraRepoSelector";
+import NeyraStatusBar from "./components/NeyraStatusBar/NeyraStatusBar";
+import NeyraUpdatesModal from "./components/NeyraUpdatesModal/NeyraUpdatesModal";
 import {
   useRepoDataStore,
   listenForRepoChanges,
 } from "./stores/repoData/store";
 import { useNotificationStore } from "./stores/notifications/store";
 import { useRepositorySelectionStore } from "./stores/repoSelector/store";
-import "./App.css";
-import { NotificationCenter } from "./components/NotificationCenter/NotificationCenter";
-import NeyraRepoSelector from "./components/NeyraRepoSelector/NeyraRepoSelector";
-import NeyraStatusBar from "./components/NeyraStatusBar/NeyraStatusBar";
-import { showAppNotification } from "./components/NotificationCenter/helper";
-import NeyraUpdatesModal from "./components/NeyraUpdatesModal/NeyraUpdatesModal";
-import { useUpdatesStore } from "./stores/updates/store";
-import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
-import { Center, Loader, Stack, Text } from "@mantine/core";
 import { useGitProvidersStore } from "./stores/providers/store";
-import GitFlowsTab from "./tabs/git-flows/GitFlowsTab";
+import { useUpdatesStore } from "./stores/updates/store";
+import { showAppNotification } from "./components/NotificationCenter/helper";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import "./App.css";
 
 export type TabId =
   | "status"
   | "committer"
   | "branches"
-  | "files"
   | "merge-requests"
   | "log"
   | "git-flows"
+  | "changes"
   | "settings";
 
 const TAB_ORDER: TabId[] = [
   "status",
   "committer",
   "branches",
-  "files",
   "merge-requests",
   "log",
   "git-flows",
+  "changes",
   "settings",
 ];
 
@@ -168,9 +168,9 @@ function App() {
       ["mod+G", () => selectTab("committer"), { usePhysicalKeys: true }],
       ["mod+B", () => selectTab("branches"), { usePhysicalKeys: true }],
       ["mod+E", () => selectTab("log"), { usePhysicalKeys: true }],
-      ["mod+D", () => selectTab("files"), { usePhysicalKeys: true }],
       ["mod+K", () => selectTab("settings"), { usePhysicalKeys: true }],
       ["mod+P", () => selectTab("merge-requests"), { usePhysicalKeys: true }],
+      ["mod+J", () => selectTab("changes"), { usePhysicalKeys: true }],
       ["mod+I", () => selectTab("git-flows"), { usePhysicalKeys: true }],
       [
         "mod+shift+N",
@@ -218,10 +218,6 @@ function App() {
           <BranchesTab active={currentTab === "branches"} />
         </Page>
 
-        <Page tab="files" currentTab={currentTab}>
-          <FilesTab active={currentTab === "files"} />
-        </Page>
-
         <Page tab="merge-requests" currentTab={currentTab}>
           <MergeRequestsTab />
         </Page>
@@ -232,6 +228,10 @@ function App() {
 
         <Page tab="git-flows" currentTab={currentTab}>
           <GitFlowsTab />
+        </Page>
+
+        <Page tab="changes" currentTab={currentTab}>
+          <ChangesTab />
         </Page>
 
         <Page tab="settings" currentTab={currentTab}>

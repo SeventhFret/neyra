@@ -1,0 +1,10 @@
+.icon {
+  display: block;
+  flex: none;
+
+  width: auto;
+  object-fit: contain;
+
+  user-select: none;
+  pointer-events: none;
+}

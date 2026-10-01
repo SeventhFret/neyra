@@ -48,6 +48,15 @@ pub fn unstage(paths: Vec<String>, state: State<'_, RepositoryManager>) -> Resul
     state.with_repo(|repo| git::unstage(repo, paths))
 }
 
+#[tauri::command]
+pub fn get_file_diff(
+    state: tauri::State<'_, RepositoryManager>,
+    path: String,
+    source: git::DiffSource,
+) -> Result<Option<git::FileDiff>, String> {
+    state.with_repo(|repo| git::diff::file_diff(repo, &path, source))
+}
+
 #[tauri::command(async)]
 pub fn rebase(branch: String, state: State<'_, RepositoryManager>) -> Result<String, String> {
     state.with_repo(|repo| git::rebase(repo, branch))

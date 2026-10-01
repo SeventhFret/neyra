@@ -1,0 +1,163 @@
+.root {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+
+  background: var(--neyra-surface-1);
+  border: 1px solid var(--neyra-border);
+  border-radius: var(--mantine-radius-lg);
+}
+
+.fileHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  min-height: 44px;
+  padding: 0 14px;
+
+  background: var(--neyra-surface-2);
+  border-bottom: 1px solid var(--neyra-border-soft);
+}
+
+.filePath {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--neyra-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileStatus {
+  flex-shrink: 0;
+  color: var(--neyra-text-muted);
+}
+
+.diff {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.hunk + .hunk {
+  border-top: 1px solid var(--neyra-border-soft);
+}
+
+.hunkHeader,
+.diffRow {
+  display: grid;
+  grid-template-columns: 52px 52px minmax(max-content, 1fr);
+  min-width: max-content;
+}
+
+.hunkHeader {
+  min-height: 32px;
+
+  color: var(--mantine-color-neyraBlue-3);
+  background: color-mix(
+    in srgb,
+    var(--neyra-primary) 8%,
+    var(--neyra-surface-1)
+  );
+}
+
+.emptyGutter {
+  border-right: 1px solid var(--neyra-border-soft);
+}
+
+.hunkHeaderText {
+  display: flex;
+  align-items: center;
+
+  padding: 0 10px;
+
+  font-family: var(--mantine-font-family-monospace);
+  font-size: var(--mantine-font-size-xs);
+  white-space: pre;
+}
+
+.diffRow {
+  min-height: 28px;
+}
+
+.lineNumber {
+  padding: 0 8px;
+
+  color: var(--neyra-text-muted);
+  border-right: 1px solid var(--neyra-border-soft);
+
+  font-family: var(--mantine-font-family-monospace);
+  font-size: var(--mantine-font-size-xs);
+  line-height: 28px;
+  text-align: right;
+
+  user-select: none;
+}
+
+.code {
+  display: grid;
+  grid-template-columns: 24px minmax(max-content, 1fr);
+
+  min-width: 0;
+}
+
+.marker {
+  display: block;
+
+  font-family: var(--mantine-font-family-monospace);
+  font-size: var(--mantine-font-size-sm);
+  line-height: 28px;
+  text-align: center;
+
+  user-select: none;
+}
+
+.codeContent {
+  display: block;
+
+  padding-right: 16px;
+  padding-left: 8px;
+
+  color: var(--neyra-text-secondary);
+
+  font-family: var(--mantine-font-family-monospace);
+  font-size: var(--mantine-font-size-sm);
+  line-height: 28px;
+
+  white-space: pre;
+}
+
+.context {
+  background: var(--neyra-surface-1);
+}
+
+.addition {
+  background: color-mix(in srgb, var(--mantine-color-green-8) 18%, transparent);
+}
+
+.deletion {
+  background: color-mix(in srgb, var(--mantine-color-red-8) 18%, transparent);
+}
+
+.addition .marker {
+  color: var(--mantine-color-green-4);
+  background: color-mix(in srgb, var(--mantine-color-green-7) 24%, transparent);
+}
+
+.deletion .marker {
+  color: var(--mantine-color-red-4);
+  background: color-mix(in srgb, var(--mantine-color-red-7) 24%, transparent);
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 120px;
+  padding: 24px;
+
+  background: var(--neyra-surface-1);
+  border: 1px solid var(--neyra-border);
+  border-radius: var(--mantine-radius-lg);
+}

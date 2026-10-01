@@ -1,3 +1,11 @@
+pub mod diff;
+pub mod models;
+
+pub use models::{
+    Branch, Commit, DiffFileStatus, DiffHunk, DiffLine, DiffLineKind, DiffSource, FileDiff, Remote,
+    RepoData, StatusEntry, UpstreamBranch,
+};
+
 use std::{
     path::{Path, PathBuf},
     process::{Command, Output},
@@ -5,7 +13,6 @@ use std::{
 
 use chrono::{DateTime, FixedOffset, SecondsFormat, Utc};
 use git2::{BranchType, Repository, Sort};
-use serde::Serialize;
 
 #[cfg(target_os = "windows")]
 use std::os::windows::process::CommandExt;
@@ -14,73 +21,6 @@ use std::os::windows::process::CommandExt;
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 const LOG_LIMIT: usize = 50;
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct RepoData {
-    pub root: String,
-    pub current_branch: Option<String>,
-    pub status: Vec<StatusEntry>,
-    pub status_message: String,
-    pub remotes: Vec<Remote>,
-    pub upstream: Option<UpstreamBranch>,
-    pub branches: Vec<Branch>,
-    pub commits: Vec<Commit>,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Branch {
-    pub name: String,
-    pub is_current: bool,
-    pub is_remote: bool,
-    pub remote: Option<String>,
-    pub upstream: Option<String>,
-    pub ahead: u32,
-    pub behind: u32,
-    pub upstream_gone: bool,
-    pub short_hash: String,
-    pub subject: String,
-    pub date: String,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct StatusEntry {
-    pub index_status: String,
-    pub worktree_status: String,
-    pub path: String,
-    pub original_path: Option<String>,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Remote {
-    pub name: String,
-    pub fetch_url: Option<String>,
-    pub push_url: Option<String>,
-    pub default_branch: Option<String>,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct UpstreamBranch {
-    pub remote: String,
-    pub branch: String,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Commit {
-    pub hash: String,
-    pub short_hash: String,
-    pub author_name: String,
-    pub author_email: String,
-    pub date: String,
-    pub ref_name: Option<String>,
-    pub subject: String,
-    pub body: String,
-}
 
 pub fn get_repo_data(repo: &Repository) -> Result<RepoData, String> {
     let root = repo_root(repo)?;
@@ -219,6 +159,7 @@ fn remotes(repo: &Repository) -> Result<Vec<Remote>, String> {
             .map_err(git_error)?
             .map(str::to_string)
             .or_else(|| fetch_url.clone());
+
         let remotes_default_branch = remote_default_branch(repo, name);
 
         result.push(Remote {
