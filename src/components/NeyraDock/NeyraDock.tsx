@@ -23,6 +23,7 @@ import {
   IconRoute,
   IconTerminal2,
   IconFolderSymlink,
+  IconFileDiff,
 } from "@tabler/icons-react";
 
 import type { Shortcut } from "../ShortcutKeys/ShortcutKeys.types";
@@ -93,6 +94,12 @@ const tabs: {
     label: "Git Flows",
     shortcut: { modifiers: ["mod"], key: "I" },
     icon: IconRoute,
+  },
+  {
+    id: "changes",
+    label: "Changes",
+    shortcut: { modifiers: ["mod"], key: "J" },
+    icon: IconFileDiff,
   },
   {
     id: "settings",
