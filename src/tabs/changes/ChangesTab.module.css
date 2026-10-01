@@ -1,7 +1,7 @@
 .root {
   height: 100%;
   /* height: calc(100dvh - var(--neyra-dock-safe-area)); */
-  padding-bottom: var(--neyra-dock-safe-area);
+  /* padding-bottom: var(--neyra-dock-safe-area); */
   min-height: 0;
 }
 

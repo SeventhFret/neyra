@@ -13,7 +13,6 @@ import {
   IconClipboard,
   IconClipboardCheck,
   IconDoorExit,
-  IconFolder,
   IconGitMerge,
   IconGitCommit,
   IconGitPullRequest,
